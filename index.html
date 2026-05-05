@@ -153,8 +153,57 @@ select:hover{border-color:var(--border2);}
 .btn-save{background:var(--gold);border:none;color:#0b0b0e;border-radius:6px;padding:8px 19px;font-size:13px;font-weight:500;transition:.15s;}
 .btn-save:hover{background:var(--gold2);}
 /* STATS */
-.stats-wrap{padding:18px 20px;}
-.stats-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px;}
+.stats-wrap{padding:0;}
+/* Letterboxd-style stats */
+.stats-hero{background:linear-gradient(135deg,#0d0d12 0%,#131318 100%);padding:48px 40px 36px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.stats-hero::before{content:'A Life in Film';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fraunces',serif;font-size:120px;font-weight:400;color:rgba(255,255,255,.025);white-space:nowrap;pointer-events:none;letter-spacing:-4px;}
+.stats-hero-name{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--text3);margin-bottom:12px;}
+.stats-hero-kpis{display:flex;gap:0;flex-wrap:wrap;}
+.stats-hero-kpi{padding:0 32px 0 0;margin-right:32px;border-right:1px solid var(--border2);}
+.stats-hero-kpi:last-child{border-right:none;}
+.stats-hero-val{font-family:'Fraunces',serif;font-size:44px;font-weight:400;color:var(--text);line-height:1;}
+.stats-hero-val.gold{color:var(--gold2);}
+.stats-hero-val.purple{color:var(--purple);}
+.stats-hero-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-top:4px;}
+/* Content area */
+.stats-content{padding:32px 40px;}
+.stats-section{margin-bottom:36px;}
+.stats-section-hd{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--text3);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+/* By year bar chart */
+.stats-year-chart{display:flex;align-items:flex-end;gap:2px;height:80px;overflow-x:auto;padding-bottom:4px;}
+.stats-year-bar{flex-shrink:0;width:10px;border-radius:2px 2px 0 0;min-height:2px;transition:.2s;cursor:pointer;position:relative;}
+.stats-year-bar:hover{opacity:.7;}
+/* Rating distribution */
+.stats-dist{display:flex;align-items:flex-end;gap:4px;height:80px;}
+.stats-dist-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;}
+.stats-dist-bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;}
+.stats-dist-lbl{font-size:9px;color:var(--text3);}
+/* Two-col grid */
+.stats-grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+/* Directors grid - circular photos like Letterboxd */
+.stats-dirs-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.stats-dir-card{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:.15s;}
+.stats-dir-card:hover .stats-dir-photo{border-color:var(--gold2);}
+.stats-dir-photo{width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--bg3);border:2px solid transparent;transition:.15s;flex-shrink:0;}
+.stats-dir-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.stats-dir-photo-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;font-family:'Fraunces',serif;color:var(--text3);}
+.stats-dir-name{font-size:11px;text-align:center;line-height:1.3;color:var(--text2);}
+.stats-dir-count{font-size:10px;color:var(--text3);}
+/* Countries bar */
+.stats-country-list{display:flex;flex-direction:column;gap:7px;}
+.stats-country-row{display:flex;align-items:center;gap:8px;}
+.stats-country-name{font-size:12px;color:var(--text2);width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stats-country-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.stats-country-fill{height:100%;border-radius:3px;background:var(--purple);transition:width .5s;}
+.stats-country-val{font-size:10.5px;color:var(--text3);white-space:nowrap;min-width:80px;text-align:right;}
+/* Decades */
+.stats-decades{display:flex;flex-direction:column;gap:20px;}
+.stats-decade-row{display:flex;align-items:flex-start;gap:16px;}
+.stats-decade-label{font-family:'Fraunces',serif;font-size:28px;font-weight:400;color:var(--text3);min-width:70px;line-height:1;}
+.stats-decade-films{display:flex;flex-wrap:wrap;gap:4px;}
+.stats-decade-poster{width:36px;height:54px;border-radius:3px;object-fit:cover;display:block;background:var(--bg3);transition:.15s;}
+.stats-decade-poster:hover{transform:scale(1.08);z-index:2;}
+/* Keep old KPI for compat */
 .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;}
 .kpi-val{font-size:24px;font-weight:500;font-family:'Fraunces',serif;color:var(--gold2);margin-bottom:2px;}
 .kpi-val.pers{color:var(--purple);}
@@ -602,8 +651,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
       <div class="home-hero-mosaic" id="home-mosaic"></div>
       <div class="home-hero-overlay"></div>
       <div class="home-hero-content">
-        <div class="home-hero-eyebrow">Mi Cinemateca</div>
-        <div class="home-hero-title">Biblioteca<br><em>Personal</em></div>
+        <div class="home-hero-eyebrow">Cine · Academia Otto Salamanca</div>
+        <div class="home-hero-title">Espacio<br><em>Cinéfilo</em></div>
         <div class="home-hero-date" id="home-sub-date"></div>
         <div class="home-hero-stats" id="home-kpis"></div>
         <div class="home-ephemeris" id="home-ephemeris"></div>
@@ -1633,11 +1682,39 @@ async function searchFilmog() {
     const pData=await fetch(`https://api.themoviedb.org/3/search/person?api_key=${TMDB_KEY}&query=${encodeURIComponent(name)}`).then(r=>r.json());
     if(!pData.results?.length){res.innerHTML='<div style="font-size:13px;color:var(--text3);padding:10px 0">Director no encontrado.</div>';return;}
     const person=pData.results[0];
-    const credData=await fetch(`https://api.themoviedb.org/3/person/${person.id}/movie_credits?api_key=${TMDB_KEY}`).then(r=>r.json());
+    // Fetch credits with Spanish language for title matching
+    const [credData, credDataEs] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/person/${person.id}/movie_credits?api_key=${TMDB_KEY}`).then(r=>r.json()),
+      fetch(`https://api.themoviedb.org/3/person/${person.id}/movie_credits?api_key=${TMDB_KEY}&language=es`).then(r=>r.json()),
+    ]);
     const directed=(credData.crew||[]).filter(m=>m.job==='Director'&&m.release_date).sort((a,b)=>b.release_date.localeCompare(a.release_date));
+    // Build a map of tmdb id → Spanish title
+    const esTitleMap={};
+    (credDataEs.crew||[]).forEach(m=>{ if(m.id) esTitleMap[m.id]=m.title; });
+
+    // Build seen set: all title variants from user's library
     const seenTitles=new Set(FILMS.map(f=>f.title.toLowerCase().trim()));
-    const seen=directed.filter(m=>seenTitles.has(m.title.toLowerCase().trim()));
-    const unseen=directed.filter(m=>!seenTitles.has(m.title.toLowerCase().trim()));
+
+    // Match: check original title, Spanish title, and also partial match
+    const isFilmSeen = (m) => {
+      const origLow = (m.title||'').toLowerCase().trim();
+      const esLow = (esTitleMap[m.id]||'').toLowerCase().trim();
+      const origTitleLow = (m.original_title||'').toLowerCase().trim();
+      return seenTitles.has(origLow) || seenTitles.has(esLow) || seenTitles.has(origTitleLow);
+    };
+
+    const getMyFilm = (m) => {
+      const origLow = (m.title||'').toLowerCase().trim();
+      const esLow = (esTitleMap[m.id]||'').toLowerCase().trim();
+      const origTitleLow = (m.original_title||'').toLowerCase().trim();
+      return FILMS.find(f => {
+        const fl = f.title.toLowerCase().trim();
+        return fl===origLow || fl===esLow || fl===origTitleLow;
+      });
+    };
+
+    const seen=directed.filter(m=>isFilmSeen(m));
+    const unseen=directed.filter(m=>!isFilmSeen(m));
     res.innerHTML=`
       <div class="filmog-dir-header">
         <div>
@@ -1647,15 +1724,17 @@ async function searchFilmog() {
       </div>
       ${seen.length?`<div class="filmog-section-title">✅ Vistas (${seen.length})</div>
       <div class="filmog-grid">${seen.map(m=>{
-        const myFilm=FILMS.find(f=>f.title.toLowerCase().trim()===m.title.toLowerCase().trim());
+        const myFilm=getMyFilm(m);
+        const displayTitle=esTitleMap[m.id]||m.title;
         const poster=m.poster_path?`https://image.tmdb.org/t/p/w185${m.poster_path}`:'';
-        return`<div class="filmog-card seen">${poster?`<img src="${poster}" loading="lazy">`:`<div class="filmog-card-noimg">${esc(m.title.substring(0,20))}</div>`}${myFilm?.rating!=null?`<div class="filmog-rating-badge">${fmtR(myFilm.rating)}</div>`:''}<div class="filmog-seen-badge">Vista</div><div class="filmog-card-info"><div class="filmog-card-title">${esc(m.title)}</div><div class="filmog-card-year">${m.release_date?.split('-')[0]||'?'}</div></div></div>`;
+        return`<div class="filmog-card seen">${poster?`<img src="${poster}" loading="lazy">`:`<div class="filmog-card-noimg">${esc(m.title.substring(0,20))}</div>`}${myFilm?.rating!=null?`<div class="filmog-rating-badge">${fmtR(myFilm.rating)}</div>`:''}<div class="filmog-seen-badge">Vista</div><div class="filmog-card-info"><div class="filmog-card-title">${esc(displayTitle)}</div><div class="filmog-card-year">${m.release_date?.split('-')[0]||'?'}</div></div></div>`;
       }).join('')}</div>`:''}
       ${unseen.length?`<div class="filmog-section-title">🎬 Pendientes (${unseen.length})</div>
       <div class="filmog-grid">${unseen.map(m=>{
+        const displayTitle=esTitleMap[m.id]||m.title;
         const poster=m.poster_path?`https://image.tmdb.org/t/p/w185${m.poster_path}`:'';
         const yr=m.release_date?.split('-')[0]||'?';
-        return`<div class="filmog-card">${poster?`<img src="${poster}" loading="lazy">`:`<div class="filmog-card-noimg">${esc(m.title.substring(0,20))}</div>`}<div class="filmog-card-info"><div class="filmog-card-title">${esc(m.title)}</div><div class="filmog-card-year">${yr}</div></div><button class="filmog-add-btn" onclick="preloadForm('${esc(m.title).replace(/'/g,"\\'")}','${esc(person.name).replace(/'/g,"\\'")}','${poster.replace(/'/g,"\\'")}','${yr}')">+ Agregar</button></div>`;
+        return`<div class="filmog-card">${poster?`<img src="${poster}" loading="lazy">`:`<div class="filmog-card-noimg">${esc(m.title.substring(0,20))}</div>`}<div class="filmog-card-info"><div class="filmog-card-title">${esc(displayTitle)}</div><div class="filmog-card-year">${yr}</div></div><button class="filmog-add-btn" onclick="preloadForm('${esc(displayTitle).replace(/'/g,"\\'")}','${esc(person.name).replace(/'/g,"\\'")}','${poster.replace(/'/g,"\\'")}','${yr}')">+ Agregar</button></div>`;
       }).join('')}</div>`:''}`;
   } catch(e){res.innerHTML=`<div style="font-size:13px;color:var(--text3);padding:10px 0">Error. Revisá tu API key.</div>`;}
 }
@@ -1812,10 +1891,10 @@ function setTop100View(mode, btn) { /* kept for compat */ }
 // ── DIRECTOR PHOTOS ──
 const dirPhotoCache = {};
 
-async function loadDirPhoto(name, elId) {
+async function loadDirPhoto(name, elId, directEl) {
   if(dirPhotoCache[name]) {
-    const el=document.getElementById(elId);
-    if(el) el.src=`https://image.tmdb.org/t/p/w185${dirPhotoCache[name]}`;
+    const el = directEl || (elId ? document.getElementById(elId) : null);
+    if(el) el.innerHTML=`<img src="https://image.tmdb.org/t/p/w185${dirPhotoCache[name]}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">`;
     return;
   }
   try {
@@ -1823,8 +1902,8 @@ async function loadDirPhoto(name, elId) {
     const person=data.results?.[0];
     if(person?.profile_path){
       dirPhotoCache[name]=person.profile_path;
-      const el=document.getElementById(elId);
-      if(el) el.src=`https://image.tmdb.org/t/p/w185${person.profile_path}`;
+      const el = directEl || (elId ? document.getElementById(elId) : null);
+      if(el) el.innerHTML=`<img src="https://image.tmdb.org/t/p/w185${person.profile_path}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">`;
     }
   } catch(e){}
 }
@@ -1909,7 +1988,7 @@ function renderHomeKPIs(){
   el.innerHTML = `
     <div class="home-hero-stat"><div class="home-hero-stat-val">${total.toLocaleString()}</div><div class="home-hero-stat-lbl">Películas</div></div>
     <div class="home-hero-stat"><div class="home-hero-stat-val">${avg}</div><div class="home-hero-stat-lbl">Nota media</div></div>
-    <div class="home-hero-stat"><div class="home-hero-stat-val">${perfect}</div><div class="home-hero-stat-lbl">Perfectas</div></div>
+    <div class="home-hero-stat"><div class="home-hero-stat-val" style="color:var(--gold2)">${perfect}</div><div class="home-hero-stat-lbl">Perfectas</div></div>
     <div class="home-hero-stat" style="border-right:none;"><div class="home-hero-stat-val">${countries}</div><div class="home-hero-stat-lbl">Países</div></div>`;
 }
 
@@ -3037,70 +3116,103 @@ function renderStats() {
   const avg=ratings.length?ratings.reduce((a,b)=>a+b,0)/ratings.length:0;
   const persRatings=FILMS.filter(f=>f.subscores?.personal!=null).map(f=>f.subscores.personal);
   const persAvg=persRatings.length?persRatings.reduce((a,b)=>a+b,0)/persRatings.length:0;
+  const rewatchCount=FILMS.filter(f=>(f.rewatchCount||1)>1).length;
+  const seenCountries=new Set(FILMS.map(f=>f.country).filter(Boolean));
+  const perfect=ratings.filter(r=>r===10).length;
   const dm={};
   FILMS.forEach(f=>{
-    if(!f.director||f.director.includes(','))return;
-    if(!dm[f.director])dm[f.director]={n:0,sum:0,psum:0,pn:0};
-    dm[f.director].n++;
-    if(f.rating!=null)dm[f.director].sum+=f.rating;
-    if(f.subscores?.personal!=null){dm[f.director].psum+=f.subscores.personal;dm[f.director].pn++;}
+    if(!f.director)return;
+    f.director.split(',').map(d=>d.trim()).forEach(d=>{
+      if(!d)return;
+      if(!dm[d])dm[d]={n:0,sum:0,psum:0,pn:0};
+      dm[d].n++;
+      if(f.rating!=null)dm[d].sum+=f.rating;
+      if(f.subscores?.personal!=null){dm[d].psum+=f.subscores.personal;dm[d].pn++;}
+    });
   });
-  statsAllDirs=Object.entries(dm).filter(([,v])=>v.n>=4).map(([name,v])=>({name,n:v.n,avg:v.sum/v.n,pavg:v.pn?v.psum/v.pn:null})).sort((a,b)=>b.avg-a.avg);
+  statsAllDirs=Object.entries(dm).filter(([,v])=>v.n>=4)
+    .map(([name,v])=>({name,n:v.n,avg:v.n?v.sum/v.n:0,pavg:v.pn?v.psum/v.pn:null}))
+    .sort((a,b)=>b.n-a.n);
   const cm={};
   FILMS.forEach(f=>{if(!f.country)return;if(!cm[f.country])cm[f.country]={n:0,sum:0,rn:0};cm[f.country].n++;if(f.rating!=null){cm[f.country].sum+=f.rating;cm[f.country].rn++;}});
   const topC=Object.entries(cm).filter(([,v])=>v.n>=10).map(([name,v])=>({name,n:v.n,avg:v.sum/v.rn})).sort((a,b)=>b.avg-a.avg).slice(0,12);
+  const yearMap={};
+  FILMS.forEach(f=>{if(f.year){yearMap[f.year]=(yearMap[f.year]||0)+1;}});
+  const years=Object.keys(yearMap).map(Number).sort((a,b)=>a-b);
+  const maxYear=Math.max(...Object.values(yearMap));
   const dist={};for(let i=0;i<=10;i++)dist[i]=0;
   ratings.forEach(r=>{const b=Math.round(r);dist[b]=(dist[b]||0)+1;});
   const maxD=Math.max(...Object.values(dist));
-  const rewatchCount=FILMS.filter(f=>(f.rewatchCount||1)>1).length;
-  const totalRewatches=FILMS.reduce((s,f)=>s+(f.rewatchCount||1)-1,0);
-  const seenCountries=new Set(FILMS.map(f=>f.country).filter(Boolean));
-
-  document.getElementById('stats-wrap').innerHTML=`
-    <div class="stats-kpis">
-      <div class="kpi"><div class="kpi-val">${FILMS.length.toLocaleString()}</div><div class="kpi-lbl">Películas vistas</div></div>
-      <div class="kpi"><div class="kpi-val">${avg.toFixed(2)}</div><div class="kpi-lbl">Nota objetiva promedio</div></div>
-      <div class="kpi"><div class="kpi-val pers">${persAvg.toFixed(2)}</div><div class="kpi-lbl">Gusto personal promedio</div></div>
-      <div class="kpi"><div class="kpi-val">${ratings.filter(r=>r===10).length}</div><div class="kpi-lbl">Notas perfectas</div></div>
-      <div class="kpi"><div class="kpi-val">${ratings.filter(r=>r>=9).length}</div><div class="kpi-lbl">Nota 9 o más</div></div>
-      <div class="kpi"><div class="kpi-val">${rewatchCount}</div><div class="kpi-lbl">Títulos re-vistos</div></div>
-      <div class="kpi"><div class="kpi-val">${totalRewatches}</div><div class="kpi-lbl">Re-visionados totales</div></div>
-      <div class="kpi"><div class="kpi-val">${seenCountries.size}</div><div class="kpi-lbl">Países representados</div></div>
+  const decadeMap={};
+  FILMS.forEach(f=>{
+    if(!f.year||!f.poster)return;
+    const dec=Math.floor(f.year/10)*10;
+    if(!decadeMap[dec])decadeMap[dec]={films:[],sum:0,n:0};
+    decadeMap[dec].films.push(f);
+    if(f.rating!=null){decadeMap[dec].sum+=f.rating;decadeMap[dec].n++;}
+  });
+  const decades=Object.entries(decadeMap)
+    .map(([d,v])=>({decade:Number(d),avg:v.n?v.sum/v.n:0,films:v.films.sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,10)}))
+    .sort((a,b)=>b.avg-a.avg).slice(0,4);
+  const w=document.getElementById('stats-wrap');
+  w.innerHTML=`
+  <div class="stats-hero">
+    <div class="stats-hero-name">Academia Otto Salamanca · Espacio Cinéfilo</div>
+    <div class="stats-hero-kpis">
+      <div class="stats-hero-kpi"><div class="stats-hero-val">${FILMS.length.toLocaleString()}</div><div class="stats-hero-lbl">Películas</div></div>
+      <div class="stats-hero-kpi"><div class="stats-hero-val">${seenCountries.size}</div><div class="stats-hero-lbl">Países</div></div>
+      <div class="stats-hero-kpi"><div class="stats-hero-val">${Object.keys(dm).length.toLocaleString()}</div><div class="stats-hero-lbl">Directores</div></div>
+      <div class="stats-hero-kpi"><div class="stats-hero-val gold">${perfect}</div><div class="stats-hero-lbl">Notas perfectas</div></div>
+      <div class="stats-hero-kpi"><div class="stats-hero-val">${avg.toFixed(2)}</div><div class="stats-hero-lbl">Nota media</div></div>
+      <div class="stats-hero-kpi"><div class="stats-hero-val purple">${persAvg.toFixed(2)}</div><div class="stats-hero-lbl">Gusto personal</div></div>
+      <div class="stats-hero-kpi"><div class="stats-hero-val">${rewatchCount}</div><div class="stats-hero-lbl">Re-vistos</div></div>
     </div>
-    <div class="stats-g2">
-      <div class="chart-box full">
-        <div class="chart-title">Distribución de notas</div>
-        <div class="dist-wrap">${Object.entries(dist).map(([s,c])=>`<div class="dbar-col"><div class="dbar" style="height:${maxD?c/maxD*100:0}%;background:${s>=9?'var(--gold2)':s>=7?'var(--gold)':s>=5?'var(--text3)':'var(--red)'}"></div><span class="dlbl">${s}</span></div>`).join('')}</div>
+  </div>
+  <div class="stats-content">
+    <div class="stats-section">
+      <div class="stats-section-hd"><span>Por año</span></div>
+      <div class="stats-year-chart">
+        ${years.map(y=>{const h=Math.max(4,Math.round((yearMap[y]||0)/maxYear*76));const col=yearMap[y]>200?'var(--gold2)':yearMap[y]>100?'var(--gold)':yearMap[y]>50?'#9b7fd4':'var(--bg4)';return`<div class="stats-year-bar" style="height:${h}px;background:${col};" title="${y}: ${yearMap[y]} películas"></div>`;}).join('')}
       </div>
-      <div class="chart-box" id="dirs-box">
-        <div class="chart-title">Top directores (mín. 4 películas) — clic para filtrar</div>
-        <div class="stats-search-wrap">
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:4px;"><span>${years[0]||''}</span><span>${years[years.length-1]||''}</span></div>
+    </div>
+    <div class="stats-grid2">
+      <div class="stats-section">
+        <div class="stats-section-hd"><span>Distribución de notas</span></div>
+        <div class="stats-dist">
+          ${Object.entries(dist).map(([s,c])=>{const h=maxD?Math.max(3,Math.round(c/maxD*76)):3;const col=Number(s)===10?'var(--gold2)':Number(s)>=9?'var(--gold)':Number(s)>=7?'#9b7fd4':Number(s)>=5?'var(--text3)':'var(--red)';return`<div class="stats-dist-col"><div class="stats-dist-bar" style="height:${h}px;background:${col};"></div><span class="stats-dist-lbl">${s}</span></div>`;}).join('')}
+        </div>
+      </div>
+      <div class="stats-section">
+        <div class="stats-section-hd"><span>Top países por promedio (mín. 10)</span></div>
+        <div class="stats-country-list">
+          ${topC.map(c=>`<div class="stats-country-row"><span class="stats-country-name">${esc(c.name)}</span><div class="stats-country-track"><div class="stats-country-fill" style="width:${c.avg/10*100}%"></div></div><span class="stats-country-val">${c.avg.toFixed(2)} · ${c.n}p</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="stats-section">
+      <div class="stats-section-hd">
+        <span>Directores más vistos</span>
+        <div class="stats-search-wrap" style="width:200px;">
           <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input class="stats-search" type="text" id="dir-search" placeholder="Buscar director..." oninput="filterDirs()">
         </div>
-        <div class="bar-chart" id="dirs-chart"></div>
       </div>
-      <div class="chart-box">
-        <div class="chart-title">Top países por promedio (mín. 10 películas)</div>
-        <div class="bar-chart">${topC.map(c=>`<div class="brow"><span class="blabel">${esc(c.name)}</span><div class="btrack"><div class="bfill" style="width:${c.avg/10*100}%;background:var(--purple)"></div></div><span class="bval">${c.avg.toFixed(2)} · ${c.n}p</span></div>`).join('')}</div>
+      <div class="stats-dirs-grid" id="dirs-chart"></div>
+    </div>
+    <div class="stats-section">
+      <div class="stats-section-hd"><span>Décadas mejor valoradas</span></div>
+      <div class="stats-decades">
+        ${decades.map(d=>`<div class="stats-decade-row"><div><div class="stats-decade-label">${d.decade}s</div><div style="font-size:9.5px;color:var(--text3);margin-top:3px;">⭐ ${d.avg.toFixed(2)}</div></div><div class="stats-decade-films">${d.films.map(f=>f.poster?`<img class="stats-decade-poster" src="https://image.tmdb.org/t/p/w92${f.poster}" loading="lazy" title="${esc(f.title)}" onclick="openModal(${f.id})">`:'').join('')}</div></div>`).join('')}
       </div>
-      <div class="map-wrap full" style="grid-column:1/-1">
-        <div class="chart-title">Mapa mundial — países con películas vistas</div>
-        <div class="map-svg-container" id="world-map-container">
-          <div style="font-size:12px;color:var(--text3);padding:20px;text-align:center;">Cargando mapa...</div>
-        </div>
-        <div class="map-legend">
-          <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--gold2)"></div>Países con películas vistas</div>
-          <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--bg4)"></div>Sin películas</div>
-        </div>
-        <div class="map-missing">
-          <div class="map-missing-title">Países sin representación cinematográfica en tu base:</div>
-          <div class="map-missing-tags" id="missing-countries"></div>
-        </div>
-      </div>
-    </div>`;
-
-  renderDirsChart(statsAllDirs.slice(0,15));
+    </div>
+    <div class="stats-section">
+      <div class="stats-section-hd"><span>Mapa mundial</span></div>
+      <div class="map-svg-container" id="world-map-container"><div style="font-size:12px;color:var(--text3);padding:20px;text-align:center;">Cargando mapa...</div></div>
+      <div class="map-missing"><div class="map-missing-title">Países sin representación:</div><div class="map-missing-tags" id="missing-countries"></div></div>
+    </div>
+  </div>`;
+  renderDirsChart(statsAllDirs.slice(0,10));
   renderWorldMap(seenCountries, cm);
 }
 
@@ -3197,17 +3309,31 @@ function renderWorldMap(seenCountries, cm) {
 
 function renderDirsChart(dirs) {
   const el=document.getElementById('dirs-chart');if(!el)return;
-  const maxA=dirs.length?Math.max(...dirs.map(d=>d.avg)):10;
-  el.innerHTML=dirs.map(d=>`<div class="brow">
-    <span class="blabel" onclick="goFilterDir('${d.name.replace(/'/g,"\\'")}')" title="${esc(d.name)}">${esc(d.name)}</span>
-    <div class="btrack"><div class="bfill" style="width:${d.avg/maxA*100}%"></div></div>
-    <span class="bval">${d.avg.toFixed(2)} · ${d.n}p${d.pavg!=null?` ❤️${d.pavg.toFixed(1)}`:''}</span>
-  </div>`).join('');
+  el.innerHTML=dirs.map(d=>{
+    const nameEsc=d.name.replace(/'/g,"\\'");
+    const initials=d.name.split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('');
+    const photo=getDirPhotoSrc(d.name,'');
+    const photoHtml=photo
+      ?`<img src="${photo}" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=stats-dir-photo-fallback>${initials}</div>'" alt="">`
+      :`<div class="stats-dir-photo-fallback">${initials}</div>`;
+    return`<div class="stats-dir-card" onclick="goFilterDir('${nameEsc}')">
+      <div class="stats-dir-photo">${photoHtml}</div>
+      <div class="stats-dir-name">${esc(d.name)}</div>
+      <div class="stats-dir-count">${d.n} película${d.n!==1?'s':''} · ${d.avg.toFixed(1)}</div>
+    </div>`;
+  }).join('');
+  // Lazy-load photos
+  dirs.forEach((d,i)=>{
+    if(!getDirPhotoSrc(d.name,'')) {
+      const imgs=el.querySelectorAll('.stats-dir-photo');
+      if(imgs[i]) loadDirPhoto(d.name, null, imgs[i]);
+    }
+  });
 }
 
 function filterDirs() {
-  const q=document.getElementById('dir-search').value.toLowerCase();
-  renderDirsChart((q?statsAllDirs.filter(d=>d.name.toLowerCase().includes(q)):statsAllDirs.slice(0,15)).slice(0,25));
+  const q=document.getElementById('dir-search')?.value.toLowerCase()||'';
+  renderDirsChart((q?statsAllDirs.filter(d=>d.name.toLowerCase().includes(q)):statsAllDirs).slice(0,10));
 }
 
 function goFilterDir(name) {
