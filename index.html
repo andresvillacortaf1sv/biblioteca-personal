@@ -385,6 +385,9 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .news-error{text-align:center;padding:60px;color:var(--text3);font-size:13px;}
 /* Source colors */
 .src-variety{color:#e8b040;}.src-deadline{color:#d95f5f;}.src-indiewire{color:#4caf82;}.src-thr{color:#9b7fd4;}.src-screen{color:#6b9fd4;}.src-default{color:var(--gold);}
+.news-noimg{background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;opacity:.15;}
+.news-featured-img.news-noimg{width:380px;height:230px;}
+.news-secondary-img.news-noimg{width:100%;height:90px;border-radius:3px;margin-bottom:9px;}
 .news-loading-wrap .home-loading{justify-content:center;}
 
 /* ── BLOG ───────────────────────────────────────────────────────────────────── */
@@ -2610,6 +2613,11 @@ async function loadNews(forceRefresh) {
   }
 }
 
+function newsImgHtml(url, cls) {
+  if(!url) return `<div class="${cls} news-noimg">🎬</div>`;
+  return `<div class="${cls}"><img src="${url}" loading="lazy" onerror="this.parentElement.className+=' news-noimg';this.remove();" alt=""></div>`;
+}
+
 function renderNews(data) {
   const el = document.getElementById('news-body');
   if(!el) return;
@@ -2619,16 +2627,11 @@ function renderNews(data) {
   const secondary = articles.filter(a=>a!==featured).slice(0,4);
   const bottom = articles.filter(a=>a!==featured && !secondary.includes(a)).slice(0,3);
 
-  const noImgFeat = `<div class="news-featured-noimg">🎬</div>`;
-  const noImgSec = `<div class="news-secondary-noimg">🎬</div>`;
-
   const featuredHtml = featured ? `
-    <div class="news-featured" onclick="window.open('${featured.sourceUrl||'#'}','_blank')">
-      ${featured.imageUrl
-        ? `<div class="news-featured-img"><img src="${featured.imageUrl}" alt="" onerror="this.parentElement.outerHTML='${noImgFeat}'"></div>`
-        : noImgFeat}
+    <div class="news-featured" onclick="window.open('${(featured.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
+      ${newsImgHtml(featured.imageUrl, 'news-featured-img')}
       <div class="news-featured-body">
-        <div class="news-featured-kicker ${sourceClass(featured.source||'')}" style="color:${catColor(featured.category)};">
+        <div class="news-featured-kicker" style="color:${catColor(featured.category)};">
           ${esc(featured.category||'')} · ${esc(featured.source||'')}
         </div>
         <div class="news-featured-title">${esc(featured.titleEs||featured.title||'')}</div>
@@ -2636,16 +2639,14 @@ function renderNews(data) {
         <div class="news-featured-meta">
           <span class="news-source-badge">${esc(featured.source||'')}</span>
           <span>${formatNewsDate(featured.pubDate)}</span>
-          <a class="news-read-link" href="${featured.sourceUrl||'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Leer original →</a>
+          ${featured.sourceUrl?`<a class="news-read-link" href="${featured.sourceUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Leer original →</a>`:''}
         </div>
       </div>
     </div>` : '';
 
   const secondaryHtml = `<div class="news-secondary-row">${secondary.map(a=>`
-    <div class="news-secondary" onclick="window.open('${a.sourceUrl||'#'}','_blank')">
-      ${a.imageUrl
-        ? `<div class="news-secondary-img"><img src="${a.imageUrl}" alt="" onerror="this.parentElement.outerHTML='${noImgSec}'"></div>`
-        : noImgSec}
+    <div class="news-secondary" onclick="window.open('${(a.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
+      ${newsImgHtml(a.imageUrl, 'news-secondary-img')}
       <div class="news-secondary-kicker" style="color:${catColor(a.category)};">${esc(a.category||'')} · ${esc(a.source||'')}</div>
       <div class="news-secondary-title">${esc(a.titleEs||a.title||'')}</div>
       <div class="news-secondary-summary">${esc(a.summaryEs||'')}</div>
@@ -2656,7 +2657,7 @@ function renderNews(data) {
     </div>`).join('')}</div>`;
 
   const bottomHtml = bottom.length ? `<div class="news-bottom-row">${bottom.map(a=>`
-    <div class="news-bottom" onclick="window.open('${a.sourceUrl||'#'}','_blank')">
+    <div class="news-bottom" onclick="window.open('${(a.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
       <div class="news-bottom-rule" style="background:${catColor(a.category)};"></div>
       <div class="news-bottom-kicker">${esc(a.category||'')} · ${esc(a.source||'')}</div>
       <div class="news-bottom-title">${esc(a.titleEs||a.title||'')}</div>
