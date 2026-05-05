@@ -2199,7 +2199,7 @@ REGLAS CRÍTICAS:
   recsEl.innerHTML='<div class="home-loading">Conectando con IA… <span style="font-size:10px;color:var(--text3);">(puede tardar ~10s)</span></div>';
 
   try{
-    const res = await fetch('/.netlify/functions/claude-proxy', {
+    const res = await fetch('/api/claude-proxy', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -2888,7 +2888,7 @@ async function loadNews(forceRefresh) {
   if(dateEl) dateEl.textContent = new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   try {
-    const res = await fetch('/.netlify/functions/news-feed', {
+    const res = await fetch('/api/news-feed', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({})
@@ -3173,7 +3173,7 @@ async function generateNewsletter() {
   const topFilms = [...FILMS].filter(f=>f.rating!=null).sort((a,b)=>b.rating-a.rating).slice(0,20);
 
   try {
-    const res = await fetch('/.netlify/functions/newsletter', {
+    const res = await fetch('/api/newsletter', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ films: topFilms })
@@ -3212,7 +3212,7 @@ async function sendNewsletter() {
 
   try {
     const subject = document.getElementById('nl-subject').textContent;
-    const res = await fetch('/.netlify/functions/send-email', {
+    const res = await fetch('/api/send-email', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ emails, subject, html: currentNewsletterHTML })
