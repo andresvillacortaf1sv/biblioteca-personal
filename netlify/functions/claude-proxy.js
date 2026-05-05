@@ -1,4 +1,15 @@
 exports.handler = async function(event) {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+      body: '',
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -9,54 +20,48 @@ exports.handler = async function(event) {
     'Content-Type': 'application/json',
   };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
   try {
     const body = JSON.parse(event.body);
-    const apiKey = process.env.GEMINI_API_KEY;
-    const model = 'gemini-2.0-flash';
+    const apiKey = process.env.GROQ_API_KEY;
 
-    // Convert Anthropic-style messages to Gemini format
+    // Extract prompt from Anthropic-style messages
     const userMessage = body.messages.find(m => m.role === 'user');
     const prompt = typeof userMessage.content === 'string'
       ? userMessage.content
       : userMessage.content.map(c => c.text || '').join('');
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            maxOutputTokens: body.max_tokens || 1200,
-            temperature: 0.7,
-          },
-        }),
-      }
-    );
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: body.max_tokens || 1200,
+        temperature: 0.7,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
 
-    const geminiData = await geminiRes.json();
+    const groqData = await groqRes.json();
 
-    if (!geminiRes.ok) {
+    if (!groqRes.ok) {
       return {
-        statusCode: geminiRes.status,
+        statusCode: groqRes.status,
         headers,
-        body: JSON.stringify({ error: geminiData }),
+        body: JSON.stringify({ error: groqData }),
       };
     }
 
-    // Convert Gemini response to Anthropic-style format so index.html works unchanged
-    const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Convert Groq response to Anthropic-style format
+    const text = groqData.choices?.[0]?.message?.content || '';
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         content: [{ type: 'text', text }],
-        usage: geminiData.usageMetadata,
+        usage: groqData.usage,
       }),
     };
   } catch (err) {
