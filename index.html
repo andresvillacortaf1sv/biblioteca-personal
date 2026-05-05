@@ -178,6 +178,8 @@ select:hover{border-color:var(--border2);}
 .stats-dist-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;}
 .stats-dist-bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;}
 .stats-dist-lbl{font-size:9px;color:var(--text3);}
+#dist-tip{position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:7px 11px;font-size:12px;color:var(--text);pointer-events:none;z-index:999;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.5);}
+#dist-tip strong{color:var(--gold2);}
 /* Two-col grid */
 .stats-grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
 /* Directors grid - circular photos like Letterboxd */
@@ -198,11 +200,12 @@ select:hover{border-color:var(--border2);}
 .stats-country-val{font-size:10.5px;color:var(--text3);white-space:nowrap;min-width:80px;text-align:right;}
 /* Decades */
 .stats-decades{display:flex;flex-direction:column;gap:20px;}
-.stats-decade-row{display:flex;align-items:flex-start;gap:16px;}
-.stats-decade-label{font-family:'Fraunces',serif;font-size:28px;font-weight:400;color:var(--text3);min-width:70px;line-height:1;}
-.stats-decade-films{display:flex;flex-wrap:wrap;gap:4px;}
-.stats-decade-poster{width:36px;height:54px;border-radius:3px;object-fit:cover;display:block;background:var(--bg3);transition:.15s;}
-.stats-decade-poster:hover{transform:scale(1.08);z-index:2;}
+.stats-decade-row{display:flex;align-items:flex-start;gap:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.stats-decade-row:last-child{border-bottom:none;}
+.stats-decade-label{font-family:'Fraunces',serif;font-size:32px;font-weight:400;color:var(--text3);min-width:80px;line-height:1;}
+.stats-decade-films{display:flex;flex-wrap:wrap;gap:6px;}
+.stats-decade-poster{width:58px;height:87px;border-radius:4px;object-fit:cover;display:block;background:var(--bg3);transition:.18s;cursor:pointer;}
+.stats-decade-poster:hover{transform:scale(1.1);z-index:2;box-shadow:0 4px 16px rgba(0,0,0,.5);}
 /* Keep old KPI for compat */
 .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;}
 .kpi-val{font-size:24px;font-weight:500;font-family:'Fraunces',serif;color:var(--gold2);margin-bottom:2px;}
@@ -1037,6 +1040,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
   </div>
 </div>
 
+<div id="dist-tip"></div>
 <div id="toast"></div>
 
 <script>
@@ -3143,16 +3147,17 @@ function renderStats() {
   const dist={};for(let i=0;i<=10;i++)dist[i]=0;
   ratings.forEach(r=>{const b=Math.round(r);dist[b]=(dist[b]||0)+1;});
   const maxD=Math.max(...Object.values(dist));
+  // Decades — include ALL films regardless of poster
   const decadeMap={};
   FILMS.forEach(f=>{
-    if(!f.year||!f.poster)return;
+    if(!f.year)return;
     const dec=Math.floor(f.year/10)*10;
     if(!decadeMap[dec])decadeMap[dec]={films:[],sum:0,n:0};
     decadeMap[dec].films.push(f);
     if(f.rating!=null){decadeMap[dec].sum+=f.rating;decadeMap[dec].n++;}
   });
   const decades=Object.entries(decadeMap)
-    .map(([d,v])=>({decade:Number(d),avg:v.n?v.sum/v.n:0,films:v.films.sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,10)}))
+    .map(([d,v])=>({decade:Number(d),avg:v.n?v.sum/v.n:0,films:v.films.sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,12)}))
     .sort((a,b)=>b.avg-a.avg).slice(0,4);
   const w=document.getElementById('stats-wrap');
   w.innerHTML=`
@@ -3180,7 +3185,7 @@ function renderStats() {
       <div class="stats-section">
         <div class="stats-section-hd"><span>Distribución de notas</span></div>
         <div class="stats-dist">
-          ${Object.entries(dist).map(([s,c])=>{const h=maxD?Math.max(3,Math.round(c/maxD*76)):3;const col=Number(s)===10?'var(--gold2)':Number(s)>=9?'var(--gold)':Number(s)>=7?'#9b7fd4':Number(s)>=5?'var(--text3)':'var(--red)';return`<div class="stats-dist-col"><div class="stats-dist-bar" style="height:${h}px;background:${col};"></div><span class="stats-dist-lbl">${s}</span></div>`;}).join('')}
+          ${Object.entries(dist).map(([s,c])=>{const h=maxD?Math.max(3,Math.round(c/maxD*76)):3;const col=Number(s)===10?'var(--gold2)':Number(s)>=9?'var(--gold)':Number(s)>=7?'#9b7fd4':Number(s)>=5?'var(--text3)':'var(--red)';const pct=ratings.length?((c/ratings.length)*100).toFixed(1):'0';return`<div class="stats-dist-col"><div class="stats-dist-bar" style="height:${h}px;background:${col};cursor:default;position:relative;" onmouseenter="showDistTip(event,'${s}',${c},'${pct}')" onmouseleave="hideDistTip()"></div><span class="stats-dist-lbl">${s}</span></div>`;}).join('')}
         </div>
       </div>
       <div class="stats-section">
@@ -3203,7 +3208,7 @@ function renderStats() {
     <div class="stats-section">
       <div class="stats-section-hd"><span>Décadas mejor valoradas</span></div>
       <div class="stats-decades">
-        ${decades.map(d=>`<div class="stats-decade-row"><div><div class="stats-decade-label">${d.decade}s</div><div style="font-size:9.5px;color:var(--text3);margin-top:3px;">⭐ ${d.avg.toFixed(2)}</div></div><div class="stats-decade-films">${d.films.map(f=>f.poster?`<img class="stats-decade-poster" src="https://image.tmdb.org/t/p/w92${f.poster}" loading="lazy" title="${esc(f.title)}" onclick="openModal(${f.id})">`:'').join('')}</div></div>`).join('')}
+        ${decades.map((d,di)=>`<div class="stats-decade-row"><div><div class="stats-decade-label">${d.decade}s</div><div style="font-size:9.5px;color:var(--text3);margin-top:3px;">⭐ ${d.avg.toFixed(2)}</div></div><div class="stats-decade-films" id="dec-films-${di}">${d.films.map((f,fi)=>{const pid='dp-'+di+'-'+fi;const src=f.poster?'https://image.tmdb.org/t/p/w185'+f.poster:'';return `<img id="${pid}" class="stats-decade-poster" src="${src}" loading="lazy" title="${esc(f.title)}" onclick="openModal(${f.id})" data-title="${esc(f.title).replace(/"/g,'&quot;')}" data-year="${f.year||''}" onerror="fetchDecadePoster(this)">`;}).join('')}</div></div>`).join('')}
       </div>
     </div>
     <div class="stats-section">
@@ -3214,6 +3219,51 @@ function renderStats() {
   </div>`;
   renderDirsChart(statsAllDirs.slice(0,10));
   renderWorldMap(seenCountries, cm);
+  // Fetch missing decade posters after a short delay
+  setTimeout(fetchAllMissingDecadePosters, 300);
+}
+
+function showDistTip(e, score, count, pct) {
+  const tip = document.getElementById('dist-tip');
+  if(!tip) return;
+  tip.innerHTML = `Nota <strong>${score}</strong> — <strong>${count}</strong> película${count!==1?'s':''} <span style="color:var(--text3)">(${pct}%)</span>`;
+  tip.style.display = 'block';
+  tip.style.left = (e.clientX - tip.offsetWidth/2) + 'px';
+  tip.style.top = (e.clientY - 44) + 'px';
+}
+function hideDistTip() {
+  const tip = document.getElementById('dist-tip');
+  if(tip) tip.style.display = 'none';
+}
+
+async function fetchDecadePoster(img) {
+  const title = img.dataset.title;
+  const year = img.dataset.year;
+  if(!title) return;
+  img.removeAttribute('onerror'); // prevent loop
+  try {
+    const data = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(title)}&language=es${year?'&year='+year:''}`).then(r=>r.json());
+    const m = data.results?.[0];
+    if(m?.poster_path) {
+      img.src = `https://image.tmdb.org/t/p/w185${m.poster_path}`;
+    } else {
+      // Try without year
+      const data2 = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(title)}`).then(r=>r.json());
+      const m2 = data2.results?.[0];
+      if(m2?.poster_path) img.src = `https://image.tmdb.org/t/p/w185${m2.poster_path}`;
+      else img.style.opacity = '0.2'; // hide broken images
+    }
+  } catch(e) { img.style.opacity='0.2'; }
+}
+
+async function fetchAllMissingDecadePosters() {
+  const imgs = document.querySelectorAll('.stats-decade-poster[src=""]');
+  // Fetch in small batches to avoid rate limiting
+  for(let i=0; i<imgs.length; i+=3) {
+    const batch = Array.from(imgs).slice(i, i+3);
+    await Promise.allSettled(batch.map(img => fetchDecadePoster(img)));
+    if(i+3 < imgs.length) await new Promise(r=>setTimeout(r,150));
+  }
 }
 
 // ── WORLD MAP ──
