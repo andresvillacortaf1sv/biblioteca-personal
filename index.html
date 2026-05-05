@@ -332,64 +332,60 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .fest-film-dir{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
 
 /* ── NOTICIAS ───────────────────────────────────────────────────────────────── */
-.news-wrap{padding:24px 32px;max-width:100%;}
-.news-masthead{border-bottom:2px solid var(--text);padding-bottom:10px;margin-bottom:5px;}
-.news-masthead-title{font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:-.8px;line-height:1;}
-.news-masthead-rule{display:flex;align-items:center;gap:10px;margin-top:7px;}
-.news-masthead-date{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);white-space:nowrap;}
-.news-masthead-line{flex:1;height:1px;background:var(--border);}
-.news-masthead-refresh{background:none;border:none;font-family:inherit;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);cursor:pointer;transition:.15s;padding:0;flex-shrink:0;}
-.news-masthead-refresh:hover{color:var(--gold2);}
-.news-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border);}
-/* Newspaper layout */
-.news-paper{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-/* Featured story */
-.news-featured{display:grid;grid-template-columns:42% 1fr;border-bottom:1px solid var(--border);cursor:pointer;}
-.news-featured:hover{background:rgba(255,255,255,.01);}
-.news-featured-img{width:100%;height:260px;overflow:hidden;background:var(--bg3);flex-shrink:0;}
-.news-featured-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s;}
-.news-featured:hover .news-featured-img img{transform:scale(1.02);}
-.news-featured-noimg{width:100%;height:260px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.12;}
-.news-featured-body{padding:18px 22px;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--border);}
-.news-featured-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:7px;font-weight:500;}
-.news-featured-title{font-family:'Fraunces',serif;font-size:18px;font-weight:400;line-height:1.25;letter-spacing:-.2px;margin-bottom:9px;transition:.15s;}
-.news-featured:hover .news-featured-title{color:var(--gold2);}
-.news-featured-summary{font-size:11.5px;color:var(--text2);line-height:1.7;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
-.news-featured-meta{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--text3);flex-wrap:wrap;}
+.news-wrap{padding:24px 32px;}
+.news-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.news-header-left{display:flex;align-items:baseline;gap:16px;}
+.news-header-title{font-family:'Fraunces',serif;font-size:26px;font-weight:400;letter-spacing:-.5px;}
+.news-header-date{font-size:10px;color:var(--text3);}
+.news-header-refresh{background:none;border:none;font-family:inherit;font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);cursor:pointer;transition:.15s;padding:0;}
+.news-header-refresh:hover{color:var(--gold2);}
+.news-sources{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:20px;}
+/* TIME/NYT style grid */
+.news-grid-outer{display:grid;grid-template-columns:1fr 2fr 1fr;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+/* Left column */
+.news-col-left{border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.news-col-right{border-left:1px solid var(--border);display:flex;flex-direction:column;}
+/* Center column */
+.news-col-center{display:flex;flex-direction:column;}
+.news-center-hero{cursor:pointer;border-bottom:1px solid var(--border);transition:.12s;}
+.news-center-hero:hover{background:rgba(255,255,255,.01);}
+.news-center-hero-img{width:100%;height:280px;overflow:hidden;background:var(--bg3);}
+.news-center-hero-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s;}
+.news-center-hero:hover .news-center-hero-img img{transform:scale(1.02);}
+.news-center-hero-body{padding:16px 20px;}
+.news-center-hero-cat{font-size:9px;text-transform:uppercase;letter-spacing:.16em;margin-bottom:8px;font-weight:500;}
+.news-center-hero-title{font-family:'Fraunces',serif;font-size:22px;font-weight:400;line-height:1.2;letter-spacing:-.3px;margin-bottom:8px;transition:.15s;}
+.news-center-hero:hover .news-center-hero-title{color:var(--gold2);}
+.news-center-hero-summary{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.news-center-hero-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3);}
+/* Side items */
+.news-side-item{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:.12s;flex:1;}
+.news-side-item:last-child{border-bottom:none;}
+.news-side-item:hover{background:rgba(255,255,255,.02);}
+.news-side-img{width:100%;height:110px;overflow:hidden;border-radius:4px;background:var(--bg3);margin-bottom:10px;}
+.news-side-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s;}
+.news-side-item:hover .news-side-img img{transform:scale(1.03);}
+.news-side-cat{font-size:8.5px;text-transform:uppercase;letter-spacing:.14em;margin-bottom:5px;font-weight:500;}
+.news-side-title{font-family:'Fraunces',serif;font-size:13px;font-weight:400;line-height:1.3;margin-bottom:5px;}
+.news-side-summary{font-size:10.5px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
+.news-side-meta{font-size:9px;color:var(--text3);display:flex;justify-content:space-between;}
+/* Bottom strip */
+.news-bottom-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);margin-top:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.news-strip-item{padding:12px 14px;border-right:1px solid var(--border);cursor:pointer;transition:.12s;}
+.news-strip-item:last-child{border-right:none;}
+.news-strip-item:hover{background:rgba(255,255,255,.02);}
+.news-strip-rule{height:2px;width:18px;margin-bottom:7px;}
+.news-strip-cat{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:4px;}
+.news-strip-title{font-family:'Fraunces',serif;font-size:12.5px;font-weight:400;line-height:1.3;margin-bottom:4px;}
+.news-strip-meta{font-size:9px;color:var(--text3);}
+/* Shared */
 .news-source-badge{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:2px 6px;font-size:9px;font-weight:500;color:var(--text2);}
 .news-read-link{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);text-decoration:none;margin-left:auto;transition:.15s;flex-shrink:0;}
 .news-read-link:hover{color:var(--gold2);}
-/* Secondary row */
-.news-secondary-row{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
-.news-secondary{padding:12px;border-right:1px solid var(--border);cursor:pointer;transition:.12s;}
-.news-secondary:last-child{border-right:none;}
-.news-secondary:hover{background:rgba(255,255,255,.02);}
-.news-secondary-img{width:100%;height:90px;overflow:hidden;border-radius:3px;background:var(--bg3);margin-bottom:9px;}
-.news-secondary-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s;}
-.news-secondary:hover .news-secondary-img img{transform:scale(1.04);}
-.news-secondary-noimg{width:100%;height:90px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;opacity:.12;border-radius:3px;margin-bottom:9px;}
-.news-secondary-kicker{font-size:8px;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px;font-weight:500;}
-.news-secondary-title{font-family:'Fraunces',serif;font-size:12.5px;font-weight:400;line-height:1.3;margin-bottom:6px;}
-.news-secondary-summary{font-size:10.5px;color:var(--text2);line-height:1.6;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.news-secondary-meta{font-size:9px;color:var(--text3);display:flex;align-items:center;justify-content:space-between;}
-/* Bottom text-only row */
-.news-bottom-row{display:grid;grid-template-columns:repeat(3,1fr);}
-.news-bottom{padding:12px 14px;border-right:1px solid var(--border);cursor:pointer;transition:.12s;}
-.news-bottom:last-child{border-right:none;}
-.news-bottom:hover{background:rgba(255,255,255,.02);}
-.news-bottom-rule{height:2px;width:18px;margin-bottom:7px;}
-.news-bottom-kicker{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:4px;}
-.news-bottom-title{font-family:'Fraunces',serif;font-size:12.5px;font-weight:400;line-height:1.3;margin-bottom:4px;}
-.news-bottom-meta{font-size:9px;color:var(--text3);}
-/* Loading/error */
+.news-noimg{background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:28px;opacity:.12;}
 .news-loading-wrap{display:flex;align-items:center;justify-content:center;padding:60px 0;}
 .news-error{text-align:center;padding:60px;color:var(--text3);font-size:13px;}
-/* Source colors */
 .src-variety{color:#e8b040;}.src-deadline{color:#d95f5f;}.src-indiewire{color:#4caf82;}.src-thr{color:#9b7fd4;}.src-screen{color:#6b9fd4;}.src-default{color:var(--gold);}
-.news-noimg{background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;opacity:.15;}
-.news-featured-img.news-noimg{width:380px;height:230px;}
-.news-secondary-img.news-noimg{width:100%;height:90px;border-radius:3px;margin-bottom:9px;}
-.news-loading-wrap .home-loading{justify-content:center;}
 
 /* ── BLOG ───────────────────────────────────────────────────────────────────── */
 .blog-wrap{padding:32px 36px;max-width:100%;}
@@ -790,15 +786,14 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 
 <div id="view-news" class="view">
   <div class="news-wrap" id="news-wrap">
-    <div class="news-masthead">
-      <div class="news-masthead-title">Noticias de Cine</div>
-      <div class="news-masthead-rule">
-        <div class="news-masthead-date" id="news-date"></div>
-        <div class="news-masthead-line"></div>
-        <button class="news-masthead-refresh" onclick="loadNews(true)">↺ Actualizar</button>
+    <div class="news-header">
+      <div class="news-header-left">
+        <div class="news-header-title">Actualidad</div>
+        <div class="news-header-date" id="news-date"></div>
       </div>
+      <button class="news-header-refresh" onclick="loadNews(true)">↺ Actualizar</button>
     </div>
-    <div class="news-kicker">Últimas 48 horas · Variety · Deadline · IndieWire · The Hollywood Reporter · Screen Daily</div>
+    <div class="news-sources">Últimas 48h · Variety · IndieWire · Screen Daily · Cineuropa · Letterboxd Journal · Asian Cinema</div>
     <div id="news-body">
       <div class="news-loading-wrap"><div class="home-loading">Buscando noticias de las últimas 48 horas…</div></div>
     </div>
@@ -2750,7 +2745,7 @@ async function loadNews(forceRefresh) {
 }
 
 function newsImgHtml(url, cls) {
-  if(!url) return `<div class="${cls} news-noimg">🎬</div>`;
+  if(!url) return `<div class="${cls} news-noimg" style="height:100%;">🎬</div>`;
   return `<div class="${cls}"><img src="${url}" loading="lazy" onerror="this.parentElement.className+=' news-noimg';this.remove();" alt=""></div>`;
 }
 
@@ -2759,66 +2754,73 @@ function renderNews(data) {
   if(!el) return;
 
   const articles = data.articles || [];
-  const featured = articles.find(a=>a.featured) || articles[0];
-  const secondary = articles.filter(a=>a!==featured).slice(0,4);
-  const bottom = articles.filter(a=>a!==featured && !secondary.includes(a)).slice(0,3);
+  if(!articles.length) { el.innerHTML='<div class="news-error">Sin noticias disponibles.</div>'; return; }
 
-  const featuredHtml = featured ? `
-    <div class="news-featured" onclick="window.open('${(featured.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
-      ${newsImgHtml(featured.imageUrl, 'news-featured-img')}
-      <div class="news-featured-body">
-        <div class="news-featured-kicker" style="color:${catColor(featured.category)};">
-          ${esc(featured.category||'')} · ${esc(featured.source||'')}
-        </div>
-        <div class="news-featured-title">${esc(featured.titleEs||featured.title||'')}</div>
-        <div class="news-featured-summary">${esc(featured.summaryEs||'')}</div>
-        <div class="news-featured-meta">
-          <span class="news-source-badge">${esc(featured.source||'')}</span>
-          <span>${formatNewsDate(featured.pubDate)}</span>
-          ${featured.sourceUrl?`<a class="news-read-link" href="${featured.sourceUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Leer original →</a>`:''}
+  // Layout: center hero + 2 side columns + bottom strip
+  const center = articles[0];
+  const leftItems = articles.slice(1, 3);   // 2 items left
+  const rightItems = articles.slice(3, 5);  // 2 items right
+  const bottomItems = articles.slice(5, 9); // up to 4 items bottom strip
+
+  const sideItem = (a) => `
+    <div class="news-side-item" onclick="window.open('${(a.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
+      ${a.imageUrl ? `<div class="news-side-img"><img src="${a.imageUrl}" loading="lazy" onerror="this.parentElement.className+=' news-noimg';this.remove();" alt=""></div>` : ''}
+      <div class="news-side-cat" style="color:${catColor(a.category)};">${esc(a.category||'')} · ${esc(a.source||'')}</div>
+      <div class="news-side-title">${esc(a.titleEs||a.title||'')}</div>
+      <div class="news-side-summary">${esc(a.summaryEs||'')}</div>
+      <div class="news-side-meta"><span>${formatNewsDate(a.pubDate)}</span><span style="color:var(--gold);">Leer →</span></div>
+    </div>`;
+
+  const centerHtml = `
+    <div class="news-center-hero" onclick="window.open('${(center.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
+      <div class="news-center-hero-img">
+        ${center.imageUrl
+          ? `<img src="${center.imageUrl}" loading="lazy" onerror="this.parentElement.className+=' news-noimg';this.remove();" alt="">`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:.1;background:var(--bg3);">🎬</div>`}
+      </div>
+      <div class="news-center-hero-body">
+        <div class="news-center-hero-cat" style="color:${catColor(center.category)};">${esc(center.category||'')} · ${esc(center.source||'')}</div>
+        <div class="news-center-hero-title">${esc(center.titleEs||center.title||'')}</div>
+        <div class="news-center-hero-summary">${esc(center.summaryEs||'')}</div>
+        <div class="news-center-hero-meta">
+          <span class="news-source-badge">${esc(center.source||'')}</span>
+          <span>${formatNewsDate(center.pubDate)}</span>
+          <a class="news-read-link" href="${center.sourceUrl||'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Leer original →</a>
         </div>
       </div>
+    </div>`;
+
+  const bottomHtml = bottomItems.length ? `
+    <div class="news-bottom-strip">
+      ${bottomItems.map(a=>`
+        <div class="news-strip-item" onclick="window.open('${(a.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
+          <div class="news-strip-rule" style="background:${catColor(a.category)};"></div>
+          <div class="news-strip-cat">${esc(a.category||'')} · ${esc(a.source||'')}</div>
+          <div class="news-strip-title">${esc(a.titleEs||a.title||'')}</div>
+          <div class="news-strip-meta">${formatNewsDate(a.pubDate)}</div>
+        </div>`).join('')}
     </div>` : '';
 
-  const secondaryHtml = `<div class="news-secondary-row">${secondary.map(a=>`
-    <div class="news-secondary" onclick="window.open('${(a.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
-      ${newsImgHtml(a.imageUrl, 'news-secondary-img')}
-      <div class="news-secondary-kicker" style="color:${catColor(a.category)};">${esc(a.category||'')} · ${esc(a.source||'')}</div>
-      <div class="news-secondary-title">${esc(a.titleEs||a.title||'')}</div>
-      <div class="news-secondary-summary">${esc(a.summaryEs||'')}</div>
-      <div class="news-secondary-meta">
-        <span>${formatNewsDate(a.pubDate)}</span>
-        <span style="color:var(--gold);">Leer →</span>
-      </div>
-    </div>`).join('')}</div>`;
-
-  const bottomHtml = bottom.length ? `<div class="news-bottom-row">${bottom.map(a=>`
-    <div class="news-bottom" onclick="window.open('${(a.sourceUrl||'#').replace(/'/g,'%27')}','_blank')">
-      <div class="news-bottom-rule" style="background:${catColor(a.category)};"></div>
-      <div class="news-bottom-kicker">${esc(a.category||'')} · ${esc(a.source||'')}</div>
-      <div class="news-bottom-title">${esc(a.titleEs||a.title||'')}</div>
-      <div class="news-bottom-meta">${formatNewsDate(a.pubDate)}</div>
-    </div>`).join('')}</div>` : '';
-
-  el.innerHTML = `<div class="news-paper">
-    ${featuredHtml}
-    ${secondary.length ? secondaryHtml : ''}
-    ${bottomHtml}
-  </div>`;
+  el.innerHTML = `
+    <div class="news-grid-outer">
+      <div class="news-col-left">${leftItems.map(sideItem).join('')}</div>
+      <div class="news-col-center">${centerHtml}</div>
+      <div class="news-col-right">${rightItems.map(sideItem).join('')}</div>
+    </div>
+    ${bottomHtml}`;
 }
 
 function renderNewsView() {
   const wrap = document.getElementById('view-news');
   wrap.innerHTML = `<div class="news-wrap" id="news-wrap">
-    <div class="news-masthead">
-      <div class="news-masthead-title">Noticias de Cine</div>
-      <div class="news-masthead-rule">
-        <div class="news-masthead-date" id="news-date"></div>
-        <div class="news-masthead-line"></div>
-        <button class="news-masthead-refresh" onclick="loadNews(true)">↺ Actualizar</button>
+    <div class="news-header">
+      <div class="news-header-left">
+        <div class="news-header-title">Actualidad</div>
+        <div class="news-header-date" id="news-date"></div>
       </div>
+      <button class="news-header-refresh" onclick="loadNews(true)">↺ Actualizar</button>
     </div>
-    <div class="news-kicker">Últimas 48 horas · Variety · Deadline · IndieWire · The Hollywood Reporter · Screen Daily</div>
+    <div class="news-sources">Últimas 48h · Variety · IndieWire · Screen Daily · Cineuropa · Asian Cinema</div>
     <div id="news-body"><div class="news-loading-wrap"><div class="home-loading">Cargando…</div></div></div>
   </div>`;
   loadNews(false);
