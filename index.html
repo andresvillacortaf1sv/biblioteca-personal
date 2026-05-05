@@ -331,61 +331,60 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .fest-film-dir{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
 
 /* ── NOTICIAS ───────────────────────────────────────────────────────────────── */
-.news-wrap{padding:32px 36px;max-width:1100px;}
-.news-masthead{border-bottom:3px solid var(--text);padding-bottom:14px;margin-bottom:6px;}
-.news-masthead-title{font-family:'Fraunces',serif;font-size:42px;font-weight:400;letter-spacing:-1px;line-height:1;color:var(--text);}
-.news-masthead-rule{display:flex;align-items:center;gap:12px;margin-top:10px;}
-.news-masthead-date{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--text3);}
+.news-wrap{padding:24px 32px;max-width:1100px;}
+.news-masthead{border-bottom:2px solid var(--text);padding-bottom:10px;margin-bottom:5px;}
+.news-masthead-title{font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:-.8px;line-height:1;}
+.news-masthead-rule{display:flex;align-items:center;gap:10px;margin-top:7px;}
+.news-masthead-date{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);white-space:nowrap;}
 .news-masthead-line{flex:1;height:1px;background:var(--border);}
-.news-masthead-refresh{background:none;border:none;font-family:inherit;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);cursor:pointer;transition:.15s;padding:0;flex-shrink:0;}
+.news-masthead-refresh{background:none;border:none;font-family:inherit;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);cursor:pointer;transition:.15s;padding:0;flex-shrink:0;}
 .news-masthead-refresh:hover{color:var(--gold2);}
-.news-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--text3);margin-bottom:20px;}
-/* Newspaper grid */
-.news-paper{display:grid;grid-template-columns:repeat(12,1fr);gap:0;border-top:1px solid var(--border);}
-/* Featured — full width top story */
-.news-featured{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
-.news-featured-img{aspect-ratio:16/9;overflow:hidden;background:var(--bg3);}
+.news-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+/* Newspaper layout */
+.news-paper{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+/* Featured story */
+.news-featured{display:grid;grid-template-columns:380px 1fr;border-bottom:1px solid var(--border);cursor:pointer;}
+.news-featured:hover{background:rgba(255,255,255,.01);}
+.news-featured-img{width:380px;height:230px;overflow:hidden;background:var(--bg3);flex-shrink:0;}
 .news-featured-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s;}
 .news-featured:hover .news-featured-img img{transform:scale(1.02);}
-.news-featured-body{padding:28px 32px;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--border);}
-.news-featured-kicker{font-size:9.5px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:10px;}
-.news-featured-title{font-family:'Fraunces',serif;font-size:26px;font-weight:400;line-height:1.2;letter-spacing:-.3px;margin-bottom:12px;cursor:pointer;}
-.news-featured-title:hover{color:var(--gold2);}
-.news-featured-summary{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:16px;}
-.news-featured-meta{display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--text3);}
-.news-source-badge{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:2px 8px;font-size:9.5px;font-weight:500;color:var(--text2);}
-.news-read-link{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);text-decoration:none;margin-left:auto;transition:.15s;flex-shrink:0;}
+.news-featured-noimg{width:380px;height:230px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.12;}
+.news-featured-body{padding:18px 22px;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--border);}
+.news-featured-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:7px;font-weight:500;}
+.news-featured-title{font-family:'Fraunces',serif;font-size:18px;font-weight:400;line-height:1.25;letter-spacing:-.2px;margin-bottom:9px;transition:.15s;}
+.news-featured:hover .news-featured-title{color:var(--gold2);}
+.news-featured-summary{font-size:11.5px;color:var(--text2);line-height:1.7;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+.news-featured-meta{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--text3);flex-wrap:wrap;}
+.news-source-badge{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:2px 6px;font-size:9px;font-weight:500;color:var(--text2);}
+.news-read-link{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);text-decoration:none;margin-left:auto;transition:.15s;flex-shrink:0;}
 .news-read-link:hover{color:var(--gold2);}
-/* Secondary stories — 4 col each */
-.news-secondary{grid-column:span 3;padding:18px 16px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;transition:.12s;}
+/* Secondary row */
+.news-secondary-row{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+.news-secondary{padding:12px;border-right:1px solid var(--border);cursor:pointer;transition:.12s;}
 .news-secondary:last-child{border-right:none;}
 .news-secondary:hover{background:rgba(255,255,255,.02);}
-.news-secondary-img{aspect-ratio:3/2;overflow:hidden;border-radius:4px;background:var(--bg3);margin-bottom:12px;}
+.news-secondary-img{width:100%;height:90px;overflow:hidden;border-radius:3px;background:var(--bg3);margin-bottom:9px;}
 .news-secondary-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s;}
-.news-secondary:hover .news-secondary-img img{transform:scale(1.03);}
-.news-secondary-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.16em;margin-bottom:6px;}
-.news-secondary-title{font-family:'Fraunces',serif;font-size:15px;font-weight:400;line-height:1.3;margin-bottom:8px;}
-.news-secondary-summary{font-size:11.5px;color:var(--text2);line-height:1.65;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.news-secondary-meta{font-size:10px;color:var(--text3);display:flex;align-items:center;justify-content:space-between;}
-/* Bottom row — 6 col each, text only */
-.news-bottom{grid-column:span 4;padding:16px;border-right:1px solid var(--border);cursor:pointer;transition:.12s;}
-.news-bottom:hover{background:rgba(255,255,255,.02);}
+.news-secondary:hover .news-secondary-img img{transform:scale(1.04);}
+.news-secondary-noimg{width:100%;height:90px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;opacity:.12;border-radius:3px;margin-bottom:9px;}
+.news-secondary-kicker{font-size:8px;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px;font-weight:500;}
+.news-secondary-title{font-family:'Fraunces',serif;font-size:12.5px;font-weight:400;line-height:1.3;margin-bottom:6px;}
+.news-secondary-summary{font-size:10.5px;color:var(--text2);line-height:1.6;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.news-secondary-meta{font-size:9px;color:var(--text3);display:flex;align-items:center;justify-content:space-between;}
+/* Bottom text-only row */
+.news-bottom-row{display:grid;grid-template-columns:repeat(3,1fr);}
+.news-bottom{padding:12px 14px;border-right:1px solid var(--border);cursor:pointer;transition:.12s;}
 .news-bottom:last-child{border-right:none;}
-.news-bottom-rule{height:2px;width:24px;background:var(--gold);margin-bottom:10px;}
-.news-bottom-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:6px;}
-.news-bottom-title{font-family:'Fraunces',serif;font-size:14px;font-weight:400;line-height:1.35;margin-bottom:6px;}
-.news-bottom-meta{font-size:10px;color:var(--text3);}
-/* Article view */
-.news-article-wrap{padding:40px 36px;max-width:700px;}
-.news-loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;gap:12px;}
+.news-bottom:hover{background:rgba(255,255,255,.02);}
+.news-bottom-rule{height:2px;width:18px;margin-bottom:7px;}
+.news-bottom-kicker{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:4px;}
+.news-bottom-title{font-family:'Fraunces',serif;font-size:12.5px;font-weight:400;line-height:1.3;margin-bottom:4px;}
+.news-bottom-meta{font-size:9px;color:var(--text3);}
+/* Loading/error */
+.news-loading-wrap{display:flex;align-items:center;justify-content:center;padding:60px 0;}
 .news-error{text-align:center;padding:60px;color:var(--text3);font-size:13px;}
 /* Source colors */
-.src-variety{color:#e8b040;}
-.src-deadline{color:#d95f5f;}
-.src-indiewire{color:#4caf82;}
-.src-thr{color:#9b7fd4;}
-.src-screen{color:#6b9fd4;}
-.src-default{color:var(--gold);}
+.src-variety{color:#e8b040;}.src-deadline{color:#d95f5f;}.src-indiewire{color:#4caf82;}.src-thr{color:#9b7fd4;}.src-screen{color:#6b9fd4;}.src-default{color:var(--gold);}
 .news-loading-wrap .home-loading{justify-content:center;}
 
 /* ── BLOG ───────────────────────────────────────────────────────────────────── */
@@ -2620,56 +2619,53 @@ function renderNews(data) {
   const secondary = articles.filter(a=>a!==featured).slice(0,4);
   const bottom = articles.filter(a=>a!==featured && !secondary.includes(a)).slice(0,3);
 
-  const noImg = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:.15;">🎬</div>`;
+  const noImgFeat = `<div class="news-featured-noimg">🎬</div>`;
+  const noImgSec = `<div class="news-secondary-noimg">🎬</div>`;
 
   const featuredHtml = featured ? `
-    <div class="news-featured">
-      <div class="news-featured-img">
-        ${featured.imageUrl
-          ? `<img src="${featured.imageUrl}" alt="" onerror="this.parentElement.innerHTML='${noImg}'">`
-          : noImg}
-      </div>
+    <div class="news-featured" onclick="window.open('${featured.sourceUrl||'#'}','_blank')">
+      ${featured.imageUrl
+        ? `<div class="news-featured-img"><img src="${featured.imageUrl}" alt="" onerror="this.parentElement.outerHTML='${noImgFeat}'"></div>`
+        : noImgFeat}
       <div class="news-featured-body">
         <div class="news-featured-kicker ${sourceClass(featured.source||'')}" style="color:${catColor(featured.category)};">
           ${esc(featured.category||'')} · ${esc(featured.source||'')}
         </div>
-        <div class="news-featured-title" onclick="window.open('${featured.sourceUrl||'#'}','_blank')">${esc(featured.titleEs||featured.title||'')}</div>
+        <div class="news-featured-title">${esc(featured.titleEs||featured.title||'')}</div>
         <div class="news-featured-summary">${esc(featured.summaryEs||'')}</div>
         <div class="news-featured-meta">
           <span class="news-source-badge">${esc(featured.source||'')}</span>
           <span>${formatNewsDate(featured.pubDate)}</span>
-          ${featured.sourceUrl?`<a class="news-read-link" href="${featured.sourceUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Leer original →</a>`:''}
+          <a class="news-read-link" href="${featured.sourceUrl||'#'}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Leer original →</a>
         </div>
       </div>
     </div>` : '';
 
-  const secondaryHtml = secondary.map(a => `
+  const secondaryHtml = `<div class="news-secondary-row">${secondary.map(a=>`
     <div class="news-secondary" onclick="window.open('${a.sourceUrl||'#'}','_blank')">
-      <div class="news-secondary-img">
-        ${a.imageUrl
-          ? `<img src="${a.imageUrl}" alt="" onerror="this.parentElement.innerHTML='${noImg}'">`
-          : noImg}
-      </div>
+      ${a.imageUrl
+        ? `<div class="news-secondary-img"><img src="${a.imageUrl}" alt="" onerror="this.parentElement.outerHTML='${noImgSec}'"></div>`
+        : noImgSec}
       <div class="news-secondary-kicker" style="color:${catColor(a.category)};">${esc(a.category||'')} · ${esc(a.source||'')}</div>
       <div class="news-secondary-title">${esc(a.titleEs||a.title||'')}</div>
       <div class="news-secondary-summary">${esc(a.summaryEs||'')}</div>
       <div class="news-secondary-meta">
         <span>${formatNewsDate(a.pubDate)}</span>
-        <span style="color:var(--gold);font-size:10px;">Leer →</span>
+        <span style="color:var(--gold);">Leer →</span>
       </div>
-    </div>`).join('');
+    </div>`).join('')}</div>`;
 
-  const bottomHtml = bottom.map(a => `
+  const bottomHtml = bottom.length ? `<div class="news-bottom-row">${bottom.map(a=>`
     <div class="news-bottom" onclick="window.open('${a.sourceUrl||'#'}','_blank')">
       <div class="news-bottom-rule" style="background:${catColor(a.category)};"></div>
       <div class="news-bottom-kicker">${esc(a.category||'')} · ${esc(a.source||'')}</div>
       <div class="news-bottom-title">${esc(a.titleEs||a.title||'')}</div>
       <div class="news-bottom-meta">${formatNewsDate(a.pubDate)}</div>
-    </div>`).join('');
+    </div>`).join('')}</div>` : '';
 
   el.innerHTML = `<div class="news-paper">
     ${featuredHtml}
-    ${secondaryHtml}
+    ${secondary.length ? secondaryHtml : ''}
     ${bottomHtml}
   </div>`;
 }
