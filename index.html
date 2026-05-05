@@ -863,40 +863,57 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 </div>
 
 <div id="view-newsletter" class="view">
-  <div style="padding:32px 36px;max-width:800px;">
+  <div style="padding:32px 36px;max-width:860px;">
     <div style="margin-bottom:28px;">
       <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.5px;margin-bottom:6px;">Newsletter</div>
-      <div style="font-size:12px;color:var(--text3);">Generá y previsualiza el boletín semanal de Espacio Cinéfilo para enviar a tus alumnos.</div>
+      <div style="font-size:12px;color:var(--text3);">Boletín semanal de Espacio Cinéfilo · Academia Otto Salamanca</div>
     </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:20px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:14px;">Configuración del envío</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-        <div>
-          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:5px;">Emails de destinatarios</label>
-          <textarea id="nl-emails" placeholder="uno@email.com&#10;otro@email.com&#10;(uno por línea)" style="width:100%;height:80px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;padding:8px 10px;outline:none;resize:none;box-sizing:border-box;"></textarea>
-        </div>
-        <div>
-          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:5px;">Nota al pie personalizada (opcional)</label>
-          <textarea id="nl-note" placeholder="Ej: Nos vemos en clase el jueves..." style="width:100%;height:80px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;padding:8px 10px;outline:none;resize:none;box-sizing:border-box;"></textarea>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <button onclick="generateNewsletter()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;">✦ Generar boletín</button>
-        <button id="nl-send-btn" onclick="sendNewsletter()" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 18px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;">📨 Enviar por email</button>
-        <span id="nl-status" style="font-size:12px;color:var(--text3);"></span>
+
+    <!-- PASO 1: Generar contenido -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:14px;">Paso 1 — Generar contenido</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6;">La IA busca noticias reales, genera la recomendación de la semana, convocatorias de festivales y una idea para tu editorial.</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button onclick="generateNewsletterStep1()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">✦ Generar borrador</button>
+        <span id="nl-status-1" style="font-size:12px;color:var(--text3);"></span>
       </div>
     </div>
-    <!-- Preview -->
+
+    <!-- PASO 2: Editorial (aparece después de generar) -->
+    <div id="nl-step2" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:6px;">Paso 2 — Tu editorial</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;" id="nl-editorial-idea"></div>
+      <textarea id="nl-editorial-text" placeholder="Escribí tu editorial aquí. Podés usar la idea de arriba como punto de partida..." style="width:100%;min-height:140px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;padding:10px 12px;outline:none;resize:vertical;box-sizing:border-box;line-height:1.7;"></textarea>
+      <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+        <button onclick="generateNewsletterStep2()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">📄 Generar vista previa</button>
+        <span id="nl-status-2" style="font-size:12px;color:var(--text3);"></span>
+      </div>
+    </div>
+
+    <!-- Configuración envío -->
+    <div id="nl-send-config" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:14px;">Paso 3 — Enviar</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:5px;">Emails destinatarios (uno por línea)</label>
+          <textarea id="nl-emails" placeholder="alumno@email.com&#10;otro@email.com" style="width:100%;height:90px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;padding:8px 10px;outline:none;resize:none;box-sizing:border-box;"></textarea>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:8px;">
+          <button onclick="sendNewsletter()" style="background:var(--green);color:#0b0b0e;border:none;border-radius:7px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">📨 Enviar por email</button>
+          <button onclick="copyNewsletterHTML()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 18px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;">Copiar HTML</button>
+          <span id="nl-send-status" style="font-size:11px;color:var(--text3);text-align:center;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista previa -->
     <div id="nl-preview-wrap" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);">Vista previa del boletín</div>
-        <button onclick="copyNewsletterHTML()" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;">Copiar HTML</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);">Vista previa</div>
+        <div style="font-size:11px;color:var(--text3);">Asunto: <strong id="nl-subject" style="color:var(--text);"></strong></div>
       </div>
       <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-        <div style="background:var(--bg3);padding:8px 14px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border);">
-          Asunto: <strong id="nl-subject" style="color:var(--text);"></strong>
-        </div>
-        <iframe id="nl-iframe" style="width:100%;height:600px;border:none;background:#0b0b0e;"></iframe>
+        <iframe id="nl-iframe" style="width:100%;height:700px;border:none;background:#f4f1eb;"></iframe>
       </div>
     </div>
   </div>
@@ -3162,16 +3179,14 @@ function openBlogPost(id) {
 // ── NEWSLETTER ────────────────────────────────────────────────────────────────
 
 let currentNewsletterHTML = '';
+let currentNewsletterContent = null;
+let currentNewsletterSubject = '';
 
-async function generateNewsletter() {
-  const status = document.getElementById('nl-status');
-  const preview = document.getElementById('nl-preview-wrap');
-  status.textContent = 'Generando boletín…';
+async function generateNewsletterStep1() {
+  const status = document.getElementById('nl-status-1');
+  status.textContent = 'Buscando noticias y generando borrador…';
   status.style.color = 'var(--text3)';
-
-  // Send top 20 rated films as context
   const topFilms = [...FILMS].filter(f=>f.rating!=null).sort((a,b)=>b.rating-a.rating).slice(0,20);
-
   try {
     const res = await fetch('/api/newsletter', {
       method: 'POST',
@@ -3180,14 +3195,13 @@ async function generateNewsletter() {
     });
     if(!res.ok) throw new Error(`Error ${res.status}`);
     const data = await res.json();
-
-    currentNewsletterHTML = data.html;
-    document.getElementById('nl-subject').textContent = data.subject;
-    const iframe = document.getElementById('nl-iframe');
-    iframe.srcdoc = data.html;
-    preview.style.display = 'block';
-    document.getElementById('nl-send-btn').style.display = 'inline-block';
-    status.textContent = '✓ Boletín generado';
+    currentNewsletterContent = data.content;
+    currentNewsletterSubject = data.subject;
+    const ideaEl = document.getElementById('nl-editorial-idea');
+    if(ideaEl) ideaEl.innerHTML = `<strong style="color:var(--gold);">💡 Idea para tu editorial:</strong> ${esc(data.content.editorialIdea||'')}`;
+    document.getElementById('nl-step2').style.display = 'block';
+    document.getElementById('nl-step2').scrollIntoView({behavior:'smooth', block:'nearest'});
+    status.textContent = '✓ Borrador listo — escribí tu editorial';
     status.style.color = 'var(--green)';
   } catch(e) {
     status.textContent = `Error: ${e.message}`;
@@ -3195,39 +3209,68 @@ async function generateNewsletter() {
   }
 }
 
+async function generateNewsletterStep2() {
+  const editorial = document.getElementById('nl-editorial-text')?.value.trim();
+  if(!editorial) { showToast('Escribí tu editorial antes de continuar'); return; }
+  if(!currentNewsletterContent) { showToast('Primero generá el borrador'); return; }
+  const status = document.getElementById('nl-status-2');
+  status.textContent = 'Generando vista previa…';
+  const topFilms = [...FILMS].filter(f=>f.rating!=null).sort((a,b)=>b.rating-a.rating).slice(0,20);
+  try {
+    const res = await fetch('/api/newsletter', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ films: topFilms, editorial })
+    });
+    if(!res.ok) throw new Error(`Error ${res.status}`);
+    const data = await res.json();
+    currentNewsletterHTML = data.html;
+    currentNewsletterSubject = data.subject;
+    document.getElementById('nl-subject').textContent = data.subject;
+    document.getElementById('nl-iframe').srcdoc = data.html;
+    document.getElementById('nl-preview-wrap').style.display = 'block';
+    document.getElementById('nl-send-config').style.display = 'block';
+    document.getElementById('nl-preview-wrap').scrollIntoView({behavior:'smooth', block:'nearest'});
+    status.textContent = '✓ Vista previa lista';
+    status.style.color = 'var(--green)';
+  } catch(e) {
+    status.textContent = `Error: ${e.message}`;
+    status.style.color = 'var(--red)';
+  }
+}
+
+async function generateNewsletter() { generateNewsletterStep1(); }
+
 function copyNewsletterHTML() {
   if(!currentNewsletterHTML) return;
-  navigator.clipboard.writeText(currentNewsletterHTML).then(()=>showToast('✓ HTML copiado al portapapeles'));
+  navigator.clipboard.writeText(currentNewsletterHTML).then(()=>showToast('✓ HTML copiado'));
 }
 
 async function sendNewsletter() {
   const emailsRaw = document.getElementById('nl-emails')?.value.trim();
-  if(!emailsRaw) { showToast('Agregá al menos un email destinatario'); return; }
+  if(!emailsRaw) { showToast('Agregá al menos un email'); return; }
+  if(!currentNewsletterHTML) { showToast('Primero generá la vista previa'); return; }
   const emails = emailsRaw.split('\n').map(e=>e.trim()).filter(e=>e.includes('@'));
   if(!emails.length) { showToast('No se encontraron emails válidos'); return; }
-
-  const status = document.getElementById('nl-status');
+  const status = document.getElementById('nl-send-status');
   status.textContent = `Enviando a ${emails.length} destinatario${emails.length!==1?'s':''}…`;
-  status.style.color = 'var(--text3)';
-
   try {
-    const subject = document.getElementById('nl-subject').textContent;
     const res = await fetch('/api/send-email', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ emails, subject, html: currentNewsletterHTML })
+      body: JSON.stringify({ emails, subject: currentNewsletterSubject, html: currentNewsletterHTML })
     });
     if(!res.ok) throw new Error(`Error ${res.status}`);
-    status.textContent = `✓ Enviado a ${emails.length} destinatario${emails.length!==1?'s':''}`;
+    const data = await res.json();
+    status.textContent = `✓ ${data.message}`;
     status.style.color = 'var(--green)';
-    showToast(`✓ Newsletter enviado a ${emails.length} personas`);
+    showToast(`✓ Newsletter enviado`);
   } catch(e) {
-    // If send-email function not configured yet, show instructions
-    status.textContent = '';
+    status.textContent = 'Copiá el HTML y envialo desde tu cliente de email';
     status.style.color = 'var(--text3)';
-    showToast('Copiá el HTML y pegalo en tu cliente de email');
   }
 }
+
 
 // ── COLLECTION ──
 function renderCollection() {
