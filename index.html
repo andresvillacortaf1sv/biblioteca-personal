@@ -331,7 +331,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .fest-film-dir{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
 
 /* ── NOTICIAS ───────────────────────────────────────────────────────────────── */
-.news-wrap{padding:24px 32px;max-width:1100px;}
+.news-wrap{padding:24px 32px;max-width:100%;}
 .news-masthead{border-bottom:2px solid var(--text);padding-bottom:10px;margin-bottom:5px;}
 .news-masthead-title{font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:-.8px;line-height:1;}
 .news-masthead-rule{display:flex;align-items:center;gap:10px;margin-top:7px;}
@@ -343,12 +343,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 /* Newspaper layout */
 .news-paper{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
 /* Featured story */
-.news-featured{display:grid;grid-template-columns:380px 1fr;border-bottom:1px solid var(--border);cursor:pointer;}
+.news-featured{display:grid;grid-template-columns:42% 1fr;border-bottom:1px solid var(--border);cursor:pointer;}
 .news-featured:hover{background:rgba(255,255,255,.01);}
-.news-featured-img{width:380px;height:230px;overflow:hidden;background:var(--bg3);flex-shrink:0;}
+.news-featured-img{width:100%;height:260px;overflow:hidden;background:var(--bg3);flex-shrink:0;}
 .news-featured-img img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s;}
 .news-featured:hover .news-featured-img img{transform:scale(1.02);}
-.news-featured-noimg{width:380px;height:230px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.12;}
+.news-featured-noimg{width:100%;height:260px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.12;}
 .news-featured-body{padding:18px 22px;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--border);}
 .news-featured-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:7px;font-weight:500;}
 .news-featured-title{font-family:'Fraunces',serif;font-size:18px;font-weight:400;line-height:1.25;letter-spacing:-.2px;margin-bottom:9px;transition:.15s;}
