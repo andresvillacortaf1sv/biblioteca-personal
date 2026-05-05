@@ -3223,7 +3223,7 @@ async function sendNewsletter() {
     showToast(`✓ Newsletter enviado a ${emails.length} personas`);
   } catch(e) {
     // If send-email function not configured yet, show instructions
-    status.textContent = 'Para enviar emails configurá Resend en Netlify (ver instrucciones)';
+    status.textContent = '';
     status.style.color = 'var(--text3)';
     showToast('Copiá el HTML y pegalo en tu cliente de email');
   }
