@@ -1,30 +1,15 @@
-exports.handler = async function(event) {
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: '',
-    };
-  }
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   try {
-    const body = JSON.parse(event.body);
+    const body = req.body;
     const apiKey = process.env.GROQ_API_KEY;
 
-    // Extract prompt from Anthropic-style messages
     const userMessage = body.messages.find(m => m.role === 'user');
     const prompt = typeof userMessage.content === 'string'
       ? userMessage.content
@@ -45,30 +30,11 @@ exports.handler = async function(event) {
     });
 
     const groqData = await groqRes.json();
+    if (!groqRes.ok) return res.status(groqRes.status).json({ error: groqData });
 
-    if (!groqRes.ok) {
-      return {
-        statusCode: groqRes.status,
-        headers,
-        body: JSON.stringify({ error: groqData }),
-      };
-    }
-
-    // Convert Groq response to Anthropic-style format
     const text = groqData.choices?.[0]?.message?.content || '';
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        content: [{ type: 'text', text }],
-        usage: groqData.usage,
-      }),
-    };
+    return res.status(200).json({ content: [{ type: 'text', text }] });
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: err.message }),
-    };
+    return res.status(500).json({ error: err.message });
   }
-};
+}
