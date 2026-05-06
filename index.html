@@ -503,8 +503,36 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .blog-empty-icon{font-size:36px;margin-bottom:12px;}
 .blog-empty-text{font-size:13px;}
 
-/* RANKING */
-.rank-toolbar{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap;}
+/* ── PREMIUM TOUCHES ──────────────────────────────────────────────────── */
+/* Festivals — elevated card hover */
+.fest-card{transition:.2s box-shadow,.2s border-color,.2s transform;}
+.fest-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.45);}
+
+/* Ranking filter bar selects */
+#rank-fc-dir:hover,#rank-fc-country:hover,#rank-fc-decade:hover{border-color:var(--border2);}
+
+/* Home hero — subtle gradient pulse on stat values */
+.home-hero-stat-val{transition:color .3s;}
+.home-hero:hover .home-hero-stat-val{color:var(--gold2);}
+
+/* Festival badge logo strip */
+.fest-logo-strip{display:flex;align-items:center;gap:8px;padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,.06);}
+.fest-logo-icon{font-size:20px;line-height:1;}
+.fest-logo-label{font-family:'Fraunces',serif;font-style:italic;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;}
+
+/* Scrollbar refinement */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--border2);}
+
+/* Nav active line animation */
+.nav-btn{position:relative;}
+.nav-btn.on::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--gold2);border-radius:1px;}
+
+/* Score group badge — gold glow on top scores */
+.score-group-badge[data-top="true"]{box-shadow:0 0 12px rgba(240,192,80,.2);}
+display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap;}
 .rank-view-btns{display:flex;gap:4px;margin-left:auto;}
 .rvbtn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text2);transition:.15s;}
 .rvbtn:hover{border-color:var(--border2);color:var(--text);}
@@ -645,7 +673,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
       <button class="nav-btn" onclick="switchView('collection',this)">Colección Física</button>
       <button class="nav-btn" onclick="switchView('festivals',this)">Festivales</button>
       <button class="nav-btn" onclick="switchView('news',this)">Noticias</button>
-      <button class="nav-btn" onclick="switchView('blog',this)">Blog</button>
       <button class="nav-btn" onclick="switchView('newsletter',this)">Newsletter</button>
       <button class="nav-btn" onclick="switchView('stats',this)">Estadísticas</button>
     </nav>
@@ -803,6 +830,30 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
       <button class="rvbtn" id="rank-view-grid" onclick="setRankViewUnified('grid',this)">⊞ Grilla</button>
     </div>
     <button class="rank-save-btn" onclick="saveRankingCurrent()">💾 Guardar</button>
+  </div>
+  <!-- Ranking filter bar -->
+  <div style="display:flex;gap:7px;align-items:center;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap;">
+    <select id="rank-fc-dir" onchange="renderRankingMain()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 8px;outline:none;font-family:inherit;flex-shrink:0;transition:.15s;">
+      <option value="">Todos los directores</option>
+    </select>
+    <select id="rank-fc-country" onchange="renderRankingMain()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 8px;outline:none;font-family:inherit;flex-shrink:0;transition:.15s;">
+      <option value="">Todos los países</option>
+    </select>
+    <select id="rank-fc-decade" onchange="renderRankingMain()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 8px;outline:none;font-family:inherit;flex-shrink:0;transition:.15s;">
+      <option value="">Todas las décadas</option>
+      <option value="2020">2020s</option>
+      <option value="2010">2010s</option>
+      <option value="2000">2000s</option>
+      <option value="1990">1990s</option>
+      <option value="1980">1980s</option>
+      <option value="1970">1970s</option>
+      <option value="1960">1960s</option>
+      <option value="1950">1950s</option>
+      <option value="1940">1940s</option>
+      <option value="pre1940">Antes de 1940</option>
+    </select>
+    <span id="rank-filter-count" style="margin-left:auto;font-size:12px;color:var(--text3);white-space:nowrap;flex-shrink:0;"></span>
+    <button onclick="clearRankFilters()" id="rank-clear-btn" style="display:none;background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;font-family:inherit;transition:.15s;flex-shrink:0;" onmouseover="this.style.color='var(--gold2)'" onmouseout="this.style.color='var(--text3)'">✕ Limpiar filtros</button>
   </div>
   <div class="rank-container" id="ranking-main"></div>
 </div>
@@ -1145,6 +1196,11 @@ function populateOpts() {
   const directors = [...new Set(FILMS.map(f=>f.director).filter(d=>d&&!d.includes(',')))].sort();
   ['fc-country','pc-country'].forEach(id => { const s=document.getElementById(id); countries.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;s.appendChild(o);}); });
   ['fc-director','pc-director'].forEach(id => { const s=document.getElementById(id); directors.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;s.appendChild(o);}); });
+  // Ranking filters
+  const rdSel=document.getElementById('rank-fc-dir');
+  const rcSel=document.getElementById('rank-fc-country');
+  if(rdSel) directors.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;rdSel.appendChild(o);});
+  if(rcSel) countries.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;rcSel.appendChild(o);});
 }
 
 // ── FILTERS ──
@@ -1530,16 +1586,42 @@ function renderRankingMain() {
   const mode=rankCurrentView;
   const container=document.getElementById('ranking-main');
   if(!container)return;
-  // Limit to top 1050 positions
+
+  // Read ranking filters
+  const filterDir=(document.getElementById('rank-fc-dir')?.value||'').trim();
+  const filterCountry=(document.getElementById('rank-fc-country')?.value||'').trim();
+  const filterDecadeRaw=document.getElementById('rank-fc-decade')?.value||'';
+  const filterDecade=filterDecadeRaw==='pre1940'?'pre1940':parseInt(filterDecadeRaw)||0;
+
+  // Show/hide clear button
+  const hasFilter=filterDir||filterCountry||filterDecadeRaw;
+  const clearBtn=document.getElementById('rank-clear-btn');
+  if(clearBtn) clearBtn.style.display=hasFilter?'inline':'none';
+
+  // Limit to top 1050 positions then apply filters
   const limitedOrder = order.slice(0, 1050);
   const groups={};
+  let totalShown=0;
   limitedOrder.forEach(id=>{
     const f=FILMS.find(x=>x.id===id);if(!f)return;
+    // Apply filters
+    if(filterDir && f.director!==filterDir) return;
+    if(filterCountry && f.country!==filterCountry) return;
+    if(filterDecade){
+      const yr=f.year||0;
+      if(filterDecade==='pre1940'){if(yr>=1940)return;}
+      else{if(yr<filterDecade||yr>=filterDecade+10)return;}
+    }
     const val=type==='obj'?f.rating:(f.subscores?.personal??null);
     const k=val!=null?String(val):'sin_nota';
     if(!groups[k])groups[k]=[];
     groups[k].push(f);
+    totalShown++;
   });
+
+  // Update count
+  const countEl=document.getElementById('rank-filter-count');
+  if(countEl) countEl.textContent=hasFilter?`${totalShown} película${totalShown!==1?'s':''} filtrada${totalShown!==1?'s':''}`:'';
   const sortedKeys=Object.keys(groups).sort((a,b)=>{if(a==='sin_nota')return 1;if(b==='sin_nota')return -1;return parseFloat(b)-parseFloat(a);});
   let globalPos=1; container.innerHTML='';
   sortedKeys.forEach(k=>{
@@ -1557,6 +1639,16 @@ function renderRankingMain() {
     });
     gDiv.appendChild(listEl); container.appendChild(gDiv);
   });
+}
+
+function clearRankFilters() {
+  const d=document.getElementById('rank-fc-dir');
+  const c=document.getElementById('rank-fc-country');
+  const dec=document.getElementById('rank-fc-decade');
+  if(d) d.value='';
+  if(c) c.value='';
+  if(dec) dec.value='';
+  renderRankingMain();
 }
 
 function renderRanking(type) { renderRankingMain(); }
@@ -2729,22 +2821,23 @@ const FESTIVALS_DATA = [
 ];
 
 // Festival logos map
+// Festival logos — inline SVG badges (no external deps, always render)
 const FESTIVAL_LOGOS = {
-  'cannes26':     'https://upload.wikimedia.org/wikipedia/en/thumb/c/cd/Cannes_film_festival_2018.png/200px-Cannes_film_festival_2018.png',
-  'venice26':     'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Venice_Film_Festival_logo.svg/200px-Venice_Film_Festival_logo.svg.png',
-  'tiff26':       'https://upload.wikimedia.org/wikipedia/en/thumb/4/47/TIFF_2018_logo.png/200px-TIFF_2018_logo.png',
-  'berlinale26':  'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Berlinale-logo.svg/200px-Berlinale-logo.svg.png',
-  'sundance26':   'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/SundanceFilmFestivalLogo.svg/200px-SundanceFilmFestivalLogo.svg.png',
-  'nyff26':       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Film_at_Lincoln_Center_logo_2020.svg/200px-Film_at_Lincoln_Center_logo_2020.svg.png',
-  'locarno26':    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Pardo_di_Locarno.svg/160px-Pardo_di_Locarno.svg.png',
-  'karlovy26':    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/KVIFF_logo.svg/200px-KVIFF_logo.svg.png',
-  'sxsw26':       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/SXSW_logo.svg/200px-SXSW_logo.svg.png',
-  'tribeca26':    'https://upload.wikimedia.org/wikipedia/en/thumb/0/0e/Tribeca_Film_Festival_logo.svg/200px-Tribeca_Film_Festival_logo.svg.png',
-  'idfa26':       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/IDFA_2014_logo.svg/200px-IDFA_2014_logo.svg.png',
-  'busan26':      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Busan_International_Film_Festival_Logo.svg/200px-Busan_International_Film_Festival_Logo.svg.png',
-  'telluride26':  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Telluride_Film_Festival_logo.svg/200px-Telluride_Film_Festival_logo.svg.png',
-  'sansebastion26':'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/San_Sebastian_International_Film_Festival_Logo.svg/200px-San_Sebastian_International_Film_Festival_Logo.svg.png',
-  'toronto_hot26':'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hot_Docs_2019_Film_Festival_logo.svg/200px-Hot_Docs_2019_Film_Festival_logo.svg.png',
+  'cannes26':      {icon:'🌴', label:'FESTIVAL DE CANNES', color:'#c9952e'},
+  'venice26':      {icon:'🦁', label:'MOSTRA DI VENEZIA', color:'#c9952e'},
+  'tiff26':        {icon:'◆',  label:'TIFF · TORONTO', color:'#eeeae3'},
+  'berlinale26':   {icon:'🐻', label:'BERLINALE', color:'#d95f5f'},
+  'sundance26':    {icon:'❄',  label:'SUNDANCE', color:'#6b9fd4'},
+  'nyff26':        {icon:'◉',  label:'NEW YORK FILM FESTIVAL', color:'#eeeae3'},
+  'locarno26':     {icon:'🐆', label:'LOCARNO', color:'#f0c050'},
+  'karlovy26':     {icon:'⬡',  label:'KARLOVY VARY IFF', color:'#4caf82'},
+  'sxsw26':        {icon:'✦',  label:'SXSW FILM', color:'#9b7fd4'},
+  'tribeca26':     {icon:'◈',  label:'TRIBECA', color:'#eeeae3'},
+  'idfa26':        {icon:'◉',  label:'IDFA · AMSTERDAM', color:'#6b9fd4'},
+  'busan26':       {icon:'◆',  label:'BIFF · BUSAN', color:'#d95f5f'},
+  'telluride26':   {icon:'⛰',  label:'TELLURIDE', color:'#c9952e'},
+  'sansebastion26':{icon:'⚓', label:'SAN SEBASTIÁN', color:'#4caf82'},
+  'toronto_hot26': {icon:'🎥', label:'HOT DOCS · TORONTO', color:'#eeeae3'},
 };
 
 function renderFestivals(){
@@ -2793,9 +2886,9 @@ function renderFestivals(){
           <div class="fest-badge ${f.status}">${badgeLabel}</div>
           <div style="font-size:9.5px;color:var(--text3);opacity:.6;">↗ sitio oficial</div>
         </div>
-        ${FESTIVAL_LOGOS[f.id]?`<div style="margin-bottom:10px;height:36px;display:flex;align-items:center;">
-          <img src="${FESTIVAL_LOGOS[f.id]}" alt="${esc(f.name)}" style="max-height:36px;max-width:120px;object-fit:contain;filter:brightness(0) invert(1);opacity:.75;"
-            onerror="this.style.display='none'">
+        ${FESTIVAL_LOGOS[f.id]?`<div class="fest-logo-strip">
+          <span class="fest-logo-icon">${FESTIVAL_LOGOS[f.id].icon}</span>
+          <span class="fest-logo-label" style="color:${FESTIVAL_LOGOS[f.id].color};">${FESTIVAL_LOGOS[f.id].label}</span>
         </div>`:''}
         <div class="fest-card-name">${esc(f.name)}</div>
         <div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${esc(f.edition)}</div>
