@@ -677,6 +677,15 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
         <!-- Últimas añadidas -->
         <div class="home-section-hd">
           <div class="home-section-hd-title">Últimas añadidas <span class="home-section-hd-badge" id="home-recent-badge"></span></div>
+          <button class="home-section-hd-action" onclick="switchView('films',document.querySelector('.nav-btn:nth-child(2)'))">Ver todas →</button>
+        </div>
+        <!-- Búsqueda rápida en inicio -->
+        <div style="margin-bottom:16px;position:relative;">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="home-search" type="text" placeholder="Buscar en tu biblioteca..." oninput="filterHomeGrid(this.value)"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px 8px 32px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:.15s;"
+            onfocus="this.style.borderColor='rgba(240,192,80,.4)'" onblur="this.style.borderColor='var(--border)'">
+          <div id="home-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;margin-top:4px;z-index:50;max-height:320px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
         </div>
         <div class="home-recent-grid" id="home-recent-films"></div>
 
@@ -740,6 +749,20 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
       <option value="8">8 o más</option>
       <option value="7">7 o más</option>
     </select>
+    <select id="fc-decade" onchange="applyFilters()">
+      <option value="">Todas las décadas</option>
+      <option value="2020">2020s</option>
+      <option value="2010">2010s</option>
+      <option value="2000">2000s</option>
+      <option value="1990">1990s</option>
+      <option value="1980">1980s</option>
+      <option value="1970">1970s</option>
+      <option value="1960">1960s</option>
+      <option value="1950">1950s</option>
+      <option value="1940">1940s</option>
+      <option value="1930">1930s</option>
+      <option value="1920">Antes de 1930</option>
+    </select>
     <span class="fcount" id="fcount"></span>
   </div>
   <div class="grid-wrap">
@@ -770,7 +793,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 
 <div id="view-ranking" class="view">
   <div class="rank-toolbar">
-    <div style="font-size:12px;color:var(--text2);" id="rank-mode-label"><strong style="color:var(--text)">Ranking Objetivo</strong> — arrastrá dentro del mismo grupo de nota</div>
+    <div style="font-size:12px;color:var(--text2);" id="rank-mode-label"><strong style="color:var(--text)">Top 1000 · Ranking Objetivo</strong> — arrastrá dentro del mismo grupo de nota</div>
     <div class="rank-view-btns">
       <button class="rvbtn on" id="rank-toggle-obj" onclick="setRankMode('obj')">⭐ Objetivo</button>
       <button class="rvbtn" id="rank-toggle-pers" onclick="setRankMode('pers')">❤️ Subjetivo</button>
@@ -863,57 +886,40 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 </div>
 
 <div id="view-newsletter" class="view">
-  <div style="padding:32px 36px;max-width:860px;">
+  <div style="padding:32px 36px;max-width:800px;">
     <div style="margin-bottom:28px;">
       <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.5px;margin-bottom:6px;">Newsletter</div>
-      <div style="font-size:12px;color:var(--text3);">Boletín semanal de Espacio Cinéfilo · Academia Otto Salamanca</div>
+      <div style="font-size:12px;color:var(--text3);">Generá y previsualiza el boletín semanal de Espacio Cinéfilo para enviar a tus alumnos.</div>
     </div>
-
-    <!-- PASO 1: Generar contenido -->
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:14px;">Paso 1 — Generar contenido</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6;">La IA busca noticias reales, genera la recomendación de la semana, convocatorias de festivales y una idea para tu editorial.</div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button onclick="generateNewsletterStep1()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">✦ Generar borrador</button>
-        <span id="nl-status-1" style="font-size:12px;color:var(--text3);"></span>
-      </div>
-    </div>
-
-    <!-- PASO 2: Editorial (aparece después de generar) -->
-    <div id="nl-step2" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:6px;">Paso 2 — Tu editorial</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;" id="nl-editorial-idea"></div>
-      <textarea id="nl-editorial-text" placeholder="Escribí tu editorial aquí. Podés usar la idea de arriba como punto de partida..." style="width:100%;min-height:140px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;padding:10px 12px;outline:none;resize:vertical;box-sizing:border-box;line-height:1.7;"></textarea>
-      <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
-        <button onclick="generateNewsletterStep2()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">📄 Generar vista previa</button>
-        <span id="nl-status-2" style="font-size:12px;color:var(--text3);"></span>
-      </div>
-    </div>
-
-    <!-- Configuración envío -->
-    <div id="nl-send-config" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:14px;">Paso 3 — Enviar</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:14px;">Configuración del envío</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
         <div>
-          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:5px;">Emails destinatarios (uno por línea)</label>
-          <textarea id="nl-emails" placeholder="alumno@email.com&#10;otro@email.com" style="width:100%;height:90px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;padding:8px 10px;outline:none;resize:none;box-sizing:border-box;"></textarea>
+          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:5px;">Emails de destinatarios</label>
+          <textarea id="nl-emails" placeholder="uno@email.com&#10;otro@email.com&#10;(uno por línea)" style="width:100%;height:80px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;padding:8px 10px;outline:none;resize:none;box-sizing:border-box;"></textarea>
         </div>
-        <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:8px;">
-          <button onclick="sendNewsletter()" style="background:var(--green);color:#0b0b0e;border:none;border-radius:7px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">📨 Enviar por email</button>
-          <button onclick="copyNewsletterHTML()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 18px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;">Copiar HTML</button>
-          <span id="nl-send-status" style="font-size:11px;color:var(--text3);text-align:center;"></span>
+        <div>
+          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);display:block;margin-bottom:5px;">Nota al pie personalizada (opcional)</label>
+          <textarea id="nl-note" placeholder="Ej: Nos vemos en clase el jueves..." style="width:100%;height:80px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;padding:8px 10px;outline:none;resize:none;box-sizing:border-box;"></textarea>
         </div>
       </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onclick="generateNewsletter()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;">✦ Generar boletín</button>
+        <button id="nl-send-btn" onclick="sendNewsletter()" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 18px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;">📨 Enviar por email</button>
+        <span id="nl-status" style="font-size:12px;color:var(--text3);"></span>
+      </div>
     </div>
-
-    <!-- Vista previa -->
+    <!-- Preview -->
     <div id="nl-preview-wrap" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);">Vista previa</div>
-        <div style="font-size:11px;color:var(--text3);">Asunto: <strong id="nl-subject" style="color:var(--text);"></strong></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);">Vista previa del boletín</div>
+        <button onclick="copyNewsletterHTML()" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;">Copiar HTML</button>
       </div>
       <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-        <iframe id="nl-iframe" style="width:100%;height:700px;border:none;background:#f4f1eb;"></iframe>
+        <div style="background:var(--bg3);padding:8px 14px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border);">
+          Asunto: <strong id="nl-subject" style="color:var(--text);"></strong>
+        </div>
+        <iframe id="nl-iframe" style="width:100%;height:600px;border:none;background:#0b0b0e;"></iframe>
       </div>
     </div>
   </div>
@@ -1148,11 +1154,17 @@ function applyFilters() {
   const dir=document.getElementById('fc-director').value;
   const sort=document.getElementById('fc-sort').value;
   const minR=parseFloat(document.getElementById('fc-rating').value)||0;
+  const decade=parseInt(document.getElementById('fc-decade')?.value)||0;
   filtered = FILMS.filter(f => {
     if (q && !f.title.toLowerCase().includes(q) && !(f.director||'').toLowerCase().includes(q)) return false;
     if (ctry && f.country!==ctry) return false;
     if (dir && f.director!==dir) return false;
     if (minR && (f.rating==null||f.rating<minR)) return false;
+    if (decade) {
+      const yr = f.year||0;
+      if(decade===1920) { if(yr>=1930) return false; }
+      else { if(yr<decade||yr>=decade+10) return false; }
+    }
     return true;
   });
   sortArr(filtered, sort);
@@ -1518,8 +1530,10 @@ function renderRankingMain() {
   const mode=rankCurrentView;
   const container=document.getElementById('ranking-main');
   if(!container)return;
+  // Limit to top 1050 positions
+  const limitedOrder = order.slice(0, 1050);
   const groups={};
-  order.forEach(id=>{
+  limitedOrder.forEach(id=>{
     const f=FILMS.find(x=>x.id===id);if(!f)return;
     const val=type==='obj'?f.rating:(f.subscores?.personal??null);
     const k=val!=null?String(val):'sin_nota';
@@ -1555,8 +1569,8 @@ function setRankMode(mode) {
   document.getElementById('rank-toggle-pers').classList.toggle('on',mode==='pers');
   const label=document.getElementById('rank-mode-label');
   if(label) label.innerHTML=mode==='obj'
-    ?'<strong style="color:var(--text)">Ranking Objetivo</strong> — arrastrá dentro del mismo grupo de nota'
-    :'<strong style="color:var(--purple)">Ranking Subjetivo</strong> — arrastrá dentro del mismo grupo de nota';
+    ?'<strong style="color:var(--text)">Top 1000 · Ranking Objetivo</strong> — arrastrá dentro del mismo grupo de nota'
+    :'<strong style="color:var(--purple)">Top 1000 · Ranking Subjetivo</strong> — arrastrá dentro del mismo grupo de nota';
   renderRankingMain();
 }
 
@@ -1954,7 +1968,7 @@ function renderTop100Content() {
   }
 }
 
-function setTop100View(mode, btn) { /* kept for compat */ }
+// (setTop100View is defined above)
 
 // ── DIRECTOR PHOTOS ──
 const dirPhotoCache = {};
@@ -2040,9 +2054,11 @@ function buildHomeMosaic() {
   // Pick 7 films with posters for mosaic background
   const withPoster = FILMS.filter(f=>f.poster).sort(()=>Math.random()-.5).slice(0,7);
   if(!withPoster.length) return;
-  el.innerHTML = withPoster.map(f=>
-    `<img class="home-hero-mosaic-img" src="https://image.tmdb.org/t/p/w342${f.poster}" loading="eager">`
-  ).join('');
+  el.innerHTML = withPoster.map(f=>{
+    // Support both TMDB paths (/xx.jpg) and full URLs
+    const src = f.poster.startsWith('http') ? f.poster : `https://image.tmdb.org/t/p/w500${f.poster}`;
+    return `<img class="home-hero-mosaic-img" src="${src}" loading="eager" onerror="this.style.display='none'">`;
+  }).join('');
 }
 
 function renderHomeKPIs(){
@@ -2067,8 +2083,9 @@ function renderHomeRecent(){
   const grid = document.getElementById('home-recent-films');
   if(!grid) return;
   grid.innerHTML = sorted.map(f => {
-    const img = f.poster
-      ? `<img src="https://image.tmdb.org/t/p/w185${f.poster}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=home-recent-tile-noimg>${esc(f.title)}</div>'">`
+    const posterSrc = f.poster ? (f.poster.startsWith('http') ? f.poster : `https://image.tmdb.org/t/p/w342${f.poster}`) : null;
+    const img = posterSrc
+      ? `<img src="${posterSrc}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML='<div class=home-recent-tile-noimg>${esc(f.title)}</div>'">`
       : `<div class="home-recent-tile-noimg">${esc(f.title)}</div>`;
     return `<div class="home-recent-tile" onclick="openModal(${f.id})">
       ${img}
@@ -2501,6 +2518,41 @@ function generateLocalCycle(){
 
 
 
+function filterHomeGrid(q) {
+  const resBox = document.getElementById('home-search-results');
+  if(!resBox) return;
+  const val = q.trim().toLowerCase();
+  if(!val) { resBox.style.display='none'; return; }
+  const matches = FILMS.filter(f =>
+    f.title.toLowerCase().includes(val) || (f.director||'').toLowerCase().includes(val)
+  ).slice(0,10);
+  if(!matches.length) {
+    resBox.style.display='block';
+    resBox.innerHTML=`<div style="padding:12px 14px;font-size:12px;color:var(--text3);">Sin resultados para "${esc(q)}"</div>`;
+    return;
+  }
+  resBox.style.display='block';
+  resBox.innerHTML = matches.map(f => {
+    const posterSrc = f.poster ? (f.poster.startsWith('http') ? f.poster : `https://image.tmdb.org/t/p/w92${f.poster}`) : null;
+    return `<div onclick="document.getElementById('home-search-results').style.display='none';document.getElementById('home-search').value='';openModal(${f.id})"
+      style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:.15s;"
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+      ${posterSrc ? `<img src="${posterSrc}" style="width:28px;height:42px;object-fit:cover;border-radius:3px;flex-shrink:0;">` : `<div style="width:28px;height:42px;background:var(--bg3);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);">🎬</div>`}
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(f.title)}</div>
+        <div style="font-size:10px;color:var(--text3);">${esc(f.director||'')} ${f.year?'· '+f.year:''}</div>
+      </div>
+      ${f.rating!=null?`<div style="font-size:12px;font-family:'Fraunces',serif;color:var(--gold2);flex-shrink:0;">${fmtR(f.rating)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+// Close search results on outside click
+document.addEventListener('click', e => {
+  const box = document.getElementById('home-search-results');
+  const inp = document.getElementById('home-search');
+  if(box && inp && !inp.contains(e.target) && !box.contains(e.target)) box.style.display='none';
+});
+
 function renderHomeRecs(recs, aiGenerated){
   const el=document.getElementById('home-recs-body');
   if(!el) return;
@@ -2676,6 +2728,25 @@ const FESTIVALS_DATA = [
   {id:'toronto_hot26',name:'Hot Docs Toronto',edition:'33ª edición',dates:'Abril–Mayo 2026',location:'Toronto, Canadá',award:'Special Jury Prize',url:'https://hotdocs.ca',startDate:'2026-04-24',endDate:'2026-05-04',juryPresident:'Por anunciar',winners:[],competition:[],note:'El festival de documentales más grande de América del Norte. Más de 200 docs en competición.'},
 ];
 
+// Festival logos map
+const FESTIVAL_LOGOS = {
+  'cannes26':     'https://upload.wikimedia.org/wikipedia/en/thumb/c/cd/Cannes_film_festival_2018.png/200px-Cannes_film_festival_2018.png',
+  'venice26':     'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Venice_Film_Festival_logo.svg/200px-Venice_Film_Festival_logo.svg.png',
+  'tiff26':       'https://upload.wikimedia.org/wikipedia/en/thumb/4/47/TIFF_2018_logo.png/200px-TIFF_2018_logo.png',
+  'berlinale26':  'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Berlinale-logo.svg/200px-Berlinale-logo.svg.png',
+  'sundance26':   'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/SundanceFilmFestivalLogo.svg/200px-SundanceFilmFestivalLogo.svg.png',
+  'nyff26':       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Film_at_Lincoln_Center_logo_2020.svg/200px-Film_at_Lincoln_Center_logo_2020.svg.png',
+  'locarno26':    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Pardo_di_Locarno.svg/160px-Pardo_di_Locarno.svg.png',
+  'karlovy26':    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/KVIFF_logo.svg/200px-KVIFF_logo.svg.png',
+  'sxsw26':       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/SXSW_logo.svg/200px-SXSW_logo.svg.png',
+  'tribeca26':    'https://upload.wikimedia.org/wikipedia/en/thumb/0/0e/Tribeca_Film_Festival_logo.svg/200px-Tribeca_Film_Festival_logo.svg.png',
+  'idfa26':       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/IDFA_2014_logo.svg/200px-IDFA_2014_logo.svg.png',
+  'busan26':      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Busan_International_Film_Festival_Logo.svg/200px-Busan_International_Film_Festival_Logo.svg.png',
+  'telluride26':  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Telluride_Film_Festival_logo.svg/200px-Telluride_Film_Festival_logo.svg.png',
+  'sansebastion26':'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/San_Sebastian_International_Film_Festival_Logo.svg/200px-San_Sebastian_International_Film_Festival_Logo.svg.png',
+  'toronto_hot26':'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hot_Docs_2019_Film_Festival_logo.svg/200px-Hot_Docs_2019_Film_Festival_logo.svg.png',
+};
+
 function renderFestivals(){
   const el=document.getElementById('festivals-body');
   if(!el)return;
@@ -2722,6 +2793,10 @@ function renderFestivals(){
           <div class="fest-badge ${f.status}">${badgeLabel}</div>
           <div style="font-size:9.5px;color:var(--text3);opacity:.6;">↗ sitio oficial</div>
         </div>
+        ${FESTIVAL_LOGOS[f.id]?`<div style="margin-bottom:10px;height:36px;display:flex;align-items:center;">
+          <img src="${FESTIVAL_LOGOS[f.id]}" alt="${esc(f.name)}" style="max-height:36px;max-width:120px;object-fit:contain;filter:brightness(0) invert(1);opacity:.75;"
+            onerror="this.style.display='none'">
+        </div>`:''}
         <div class="fest-card-name">${esc(f.name)}</div>
         <div style="font-size:10px;color:var(--text3);margin-bottom:6px;">${esc(f.edition)}</div>
         <div class="fest-card-dates">${esc(f.dates)}</div>
@@ -3179,14 +3254,16 @@ function openBlogPost(id) {
 // ── NEWSLETTER ────────────────────────────────────────────────────────────────
 
 let currentNewsletterHTML = '';
-let currentNewsletterContent = null;
-let currentNewsletterSubject = '';
 
-async function generateNewsletterStep1() {
-  const status = document.getElementById('nl-status-1');
-  status.textContent = 'Buscando noticias y generando borrador…';
+async function generateNewsletter() {
+  const status = document.getElementById('nl-status');
+  const preview = document.getElementById('nl-preview-wrap');
+  status.textContent = 'Generando boletín…';
   status.style.color = 'var(--text3)';
+
+  // Send top 20 rated films as context
   const topFilms = [...FILMS].filter(f=>f.rating!=null).sort((a,b)=>b.rating-a.rating).slice(0,20);
+
   try {
     const res = await fetch('/api/newsletter', {
       method: 'POST',
@@ -3195,82 +3272,54 @@ async function generateNewsletterStep1() {
     });
     if(!res.ok) throw new Error(`Error ${res.status}`);
     const data = await res.json();
-    currentNewsletterContent = data.content;
-    currentNewsletterSubject = data.subject;
-    const ideaEl = document.getElementById('nl-editorial-idea');
-    if(ideaEl) ideaEl.innerHTML = `<strong style="color:var(--gold);">💡 Idea para tu editorial:</strong> ${esc(data.content.editorialIdea||'')}`;
-    document.getElementById('nl-step2').style.display = 'block';
-    document.getElementById('nl-step2').scrollIntoView({behavior:'smooth', block:'nearest'});
-    status.textContent = '✓ Borrador listo — escribí tu editorial';
-    status.style.color = 'var(--green)';
-  } catch(e) {
-    status.textContent = `Error: ${e.message}`;
-    status.style.color = 'var(--red)';
-  }
-}
 
-async function generateNewsletterStep2() {
-  const editorial = document.getElementById('nl-editorial-text')?.value.trim();
-  if(!editorial) { showToast('Escribí tu editorial antes de continuar'); return; }
-  if(!currentNewsletterContent) { showToast('Primero generá el borrador'); return; }
-  const status = document.getElementById('nl-status-2');
-  status.textContent = 'Generando vista previa…';
-  const topFilms = [...FILMS].filter(f=>f.rating!=null).sort((a,b)=>b.rating-a.rating).slice(0,20);
-  try {
-    const res = await fetch('/api/newsletter', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ films: topFilms, editorial })
-    });
-    if(!res.ok) throw new Error(`Error ${res.status}`);
-    const data = await res.json();
     currentNewsletterHTML = data.html;
-    currentNewsletterSubject = data.subject;
     document.getElementById('nl-subject').textContent = data.subject;
-    document.getElementById('nl-iframe').srcdoc = data.html;
-    document.getElementById('nl-preview-wrap').style.display = 'block';
-    document.getElementById('nl-send-config').style.display = 'block';
-    document.getElementById('nl-preview-wrap').scrollIntoView({behavior:'smooth', block:'nearest'});
-    status.textContent = '✓ Vista previa lista';
+    const iframe = document.getElementById('nl-iframe');
+    iframe.srcdoc = data.html;
+    preview.style.display = 'block';
+    document.getElementById('nl-send-btn').style.display = 'inline-block';
+    status.textContent = '✓ Boletín generado';
     status.style.color = 'var(--green)';
   } catch(e) {
     status.textContent = `Error: ${e.message}`;
     status.style.color = 'var(--red)';
   }
 }
-
-async function generateNewsletter() { generateNewsletterStep1(); }
 
 function copyNewsletterHTML() {
   if(!currentNewsletterHTML) return;
-  navigator.clipboard.writeText(currentNewsletterHTML).then(()=>showToast('✓ HTML copiado'));
+  navigator.clipboard.writeText(currentNewsletterHTML).then(()=>showToast('✓ HTML copiado al portapapeles'));
 }
 
 async function sendNewsletter() {
   const emailsRaw = document.getElementById('nl-emails')?.value.trim();
-  if(!emailsRaw) { showToast('Agregá al menos un email'); return; }
-  if(!currentNewsletterHTML) { showToast('Primero generá la vista previa'); return; }
+  if(!emailsRaw) { showToast('Agregá al menos un email destinatario'); return; }
   const emails = emailsRaw.split('\n').map(e=>e.trim()).filter(e=>e.includes('@'));
   if(!emails.length) { showToast('No se encontraron emails válidos'); return; }
-  const status = document.getElementById('nl-send-status');
+
+  const status = document.getElementById('nl-status');
   status.textContent = `Enviando a ${emails.length} destinatario${emails.length!==1?'s':''}…`;
+  status.style.color = 'var(--text3)';
+
   try {
+    const subject = document.getElementById('nl-subject').textContent;
     const res = await fetch('/api/send-email', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ emails, subject: currentNewsletterSubject, html: currentNewsletterHTML })
+      body: JSON.stringify({ emails, subject, html: currentNewsletterHTML })
     });
     if(!res.ok) throw new Error(`Error ${res.status}`);
-    const data = await res.json();
-    status.textContent = `✓ ${data.message}`;
+    status.textContent = `✓ Enviado a ${emails.length} destinatario${emails.length!==1?'s':''}`;
     status.style.color = 'var(--green)';
-    showToast(`✓ Newsletter enviado`);
+    showToast(`✓ Newsletter enviado a ${emails.length} personas`);
   } catch(e) {
-    status.textContent = 'Copiá el HTML y envialo desde tu cliente de email';
+    // If send-email function not configured yet, show instructions
+    status.textContent = 'Para enviar emails configurá Resend en Netlify (ver instrucciones)';
     status.style.color = 'var(--text3)';
+    showToast('Copiá el HTML y pegalo en tu cliente de email');
   }
 }
-
 
 // ── COLLECTION ──
 function renderCollection() {
