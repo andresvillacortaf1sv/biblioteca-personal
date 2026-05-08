@@ -1772,35 +1772,48 @@ function buildOrder(type) {
   const getScore = f => type==='obj' ? (f.rating??-1) : (f.subscores?.personal??-1);
   const storageKey = type==='obj' ? 'cl_rankorder' : 'cl_rankorder_pers';
 
-  // Load any previously saved custom order
-  let savedOrder = [];
-  try { savedOrder = JSON.parse(localStorage.getItem(storageKey)||'[]'); } catch(e) {}
-
   // Sort ALL rated films by score — fast O(n log n)
   const allRated = FILMS.filter(f=>getScore(f)>-1).sort((a,b)=>getScore(b)-getScore(a));
 
-  // Top 1050 by score
+  // Top 1050 by score — these are the only valid entries
   const top = allRated.slice(0, LIMIT);
   const topIds = new Set(top.map(f=>f.id));
 
-  // If no saved order, just return top 1050 sorted
-  const validSaved = savedOrder.filter(id=>topIds.has(id));
-  if(!validSaved.length) return top.map(f=>f.id);
+  // Load saved custom order (only drag-drop positions within same score groups)
+  let savedOrder = [];
+  try { savedOrder = JSON.parse(localStorage.getItem(storageKey)||'[]'); } catch(e) {}
 
-  // Merge: only insert films that are in top1050 but not in saved order
-  const savedSet = new Set(validSaved);
-  const toInsert = top.filter(f=>!savedSet.has(f.id)); // usually very few
+  // Only honor saved IDs that are still in the current top 1050
+  const validSaved = savedOrder.filter(id => topIds.has(id));
 
-  const result = [...validSaved];
-  for(const nf of toInsert){
-    const ns = getScore(nf);
-    let insertAt = result.length;
-    for(let i=0;i<result.length;i++){
-      const ef = FILMS.find(x=>x.id===result[i]);
-      if(ef && getScore(ef)<ns){insertAt=i;break;}
-    }
-    result.splice(insertAt,0,nf.id);
-  }
+  // If saved order covers all top 1050, use it (preserves drag-drop)
+  if(validSaved.length === top.length) return validSaved;
+
+  // Otherwise: build fresh from score sort — no stale data
+  // Group films by score value, preserve saved order within each group
+  const byScore = {};
+  top.forEach(f => {
+    const s = String(getScore(f));
+    if(!byScore[s]) byScore[s] = [];
+    byScore[s].push(f.id);
+  });
+
+  const savedPos = {};
+  validSaved.forEach((id, i) => { savedPos[id] = i; });
+
+  const result = [];
+  const scores = Object.keys(byScore).sort((a,b) => parseFloat(b)-parseFloat(a));
+  scores.forEach(s => {
+    const group = byScore[s];
+    // Sort within group: saved order first, then by original sort
+    group.sort((a, b) => {
+      const pa = savedPos[a] ?? 99999;
+      const pb = savedPos[b] ?? 99999;
+      return pa - pb;
+    });
+    group.forEach(id => result.push(id));
+  });
+
   return result;
 }
 
