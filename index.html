@@ -1829,9 +1829,11 @@ function renderRankingMain() {
   const limitedOrder = order.slice(0, 1050);
   const groups={};
   let totalShown=0;
+  let seqPos=0; // sequential counter for unfiltered view
   limitedOrder.forEach((id, idx)=>{
     const f=FILMS.find(x=>x.id===id);if(!f)return;
-    const realPos = idx + 1; // real ranking position regardless of filters
+    seqPos++;
+    const realPos = seqPos; // position among valid films only
     // Apply filters
     if(filterDir && f.director!==filterDir) return;
     if(filterCountry && f.country!==filterCountry) return;
