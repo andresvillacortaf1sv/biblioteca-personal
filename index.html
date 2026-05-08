@@ -1772,25 +1772,17 @@ function buildOrder(type) {
   const getScore = f => type==='obj' ? (f.rating??-1) : (f.subscores?.personal??-1);
   const storageKey = type==='obj' ? 'cl_rankorder' : 'cl_rankorder_pers';
 
-  // Sort ALL rated films by score — fast O(n log n)
+  // Always sort by score first — this is the source of truth for positions
   const allRated = FILMS.filter(f=>getScore(f)>-1).sort((a,b)=>getScore(b)-getScore(a));
-
-  // Top 1050 by score — these are the only valid entries
   const top = allRated.slice(0, LIMIT);
-  const topIds = new Set(top.map(f=>f.id));
 
-  // Load saved custom order (only drag-drop positions within same score groups)
+  // Load saved order — ONLY used to reorder within same-score groups (drag-drop)
   let savedOrder = [];
   try { savedOrder = JSON.parse(localStorage.getItem(storageKey)||'[]'); } catch(e) {}
+  const savedPos = {};
+  savedOrder.forEach((id, i) => { savedPos[id] = i; });
 
-  // Only honor saved IDs that are still in the current top 1050
-  const validSaved = savedOrder.filter(id => topIds.has(id));
-
-  // If saved order covers all top 1050, use it (preserves drag-drop)
-  if(validSaved.length === top.length) return validSaved;
-
-  // Otherwise: build fresh from score sort — no stale data
-  // Group films by score value, preserve saved order within each group
+  // Group by exact score, then sort within each group by saved position
   const byScore = {};
   top.forEach(f => {
     const s = String(getScore(f));
@@ -1798,19 +1790,15 @@ function buildOrder(type) {
     byScore[s].push(f.id);
   });
 
-  const savedPos = {};
-  validSaved.forEach((id, i) => { savedPos[id] = i; });
-
   const result = [];
   const scores = Object.keys(byScore).sort((a,b) => parseFloat(b)-parseFloat(a));
   scores.forEach(s => {
-    const group = byScore[s];
-    // Sort within group: saved order first, then by original sort
-    group.sort((a, b) => {
-      const pa = savedPos[a] ?? 99999;
-      const pb = savedPos[b] ?? 99999;
-      return pa - pb;
-    });
+    const group = byScore[s].slice();
+    // Only reorder within group if ALL members of the group are in savedOrder
+    const allSaved = group.every(id => savedPos[id] !== undefined);
+    if(allSaved) {
+      group.sort((a,b) => savedPos[a] - savedPos[b]);
+    }
     group.forEach(id => result.push(id));
   });
 
@@ -1818,6 +1806,13 @@ function buildOrder(type) {
 }
 
 function initRanking(type) {
+  // Clear any stale localStorage from old versions (had 2912 entries)
+  ['cl_rankorder','cl_rankorder_pers'].forEach(k => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(k)||'[]');
+      if(saved.length > 1050) localStorage.removeItem(k);
+    } catch(e) { localStorage.removeItem(k); }
+  });
   if(type==='obj'||type===undefined) { rankObjOrder=buildOrder('obj'); rankCurrentMode='obj'; }
   else { rankPersOrder=buildOrder('pers'); rankCurrentMode='pers'; }
   populateRankFilters();
