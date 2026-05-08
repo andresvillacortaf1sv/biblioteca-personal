@@ -1768,26 +1768,40 @@ function confirmDel(id) {
 
 // ── RANKING ──
 function buildOrder(type) {
-  const storageKey=type==='obj'?'cl_rankorder':'cl_rankorder_pers';
-  let order=[];
-  try{order=JSON.parse(localStorage.getItem(storageKey)||'[]');}catch(e){}
-  const validIds=new Set(FILMS.map(f=>f.id));
-  order=order.filter(id=>validIds.has(id));
-  const inOrder=new Set(order);
-  const source=type==='obj'
-    ?FILMS.filter(f=>f.rating!=null&&!inOrder.has(f.id)).sort((a,b)=>(b.rating??-1)-(a.rating??-1))
-    :FILMS.filter(f=>f.subscores?.personal!=null&&!inOrder.has(f.id)).sort((a,b)=>(b.subscores.personal??-1)-(a.subscores.personal??-1));
-  source.forEach(nf=>{
-    const score=type==='obj'?(nf.rating??-1):(nf.subscores?.personal??-1);
-    let insertAt=order.length;
-    for(let i=0;i<order.length;i++){
-      const ef=FILMS.find(x=>x.id===order[i]);
-      const es=ef?(type==='obj'?(ef.rating??-1):(ef.subscores?.personal??-1)):-1;
-      if(es<score){insertAt=i;break;}
+  const LIMIT = 1050;
+  const getScore = f => type==='obj' ? (f.rating??-1) : (f.subscores?.personal??-1);
+  const storageKey = type==='obj' ? 'cl_rankorder' : 'cl_rankorder_pers';
+
+  // Load any previously saved custom order
+  let savedOrder = [];
+  try { savedOrder = JSON.parse(localStorage.getItem(storageKey)||'[]'); } catch(e) {}
+
+  // Sort ALL rated films by score — fast O(n log n)
+  const allRated = FILMS.filter(f=>getScore(f)>-1).sort((a,b)=>getScore(b)-getScore(a));
+
+  // Top 1050 by score
+  const top = allRated.slice(0, LIMIT);
+  const topIds = new Set(top.map(f=>f.id));
+
+  // If no saved order, just return top 1050 sorted
+  const validSaved = savedOrder.filter(id=>topIds.has(id));
+  if(!validSaved.length) return top.map(f=>f.id);
+
+  // Merge: only insert films that are in top1050 but not in saved order
+  const savedSet = new Set(validSaved);
+  const toInsert = top.filter(f=>!savedSet.has(f.id)); // usually very few
+
+  const result = [...validSaved];
+  for(const nf of toInsert){
+    const ns = getScore(nf);
+    let insertAt = result.length;
+    for(let i=0;i<result.length;i++){
+      const ef = FILMS.find(x=>x.id===result[i]);
+      if(ef && getScore(ef)<ns){insertAt=i;break;}
     }
-    order.splice(insertAt,0,nf.id);
-  });
-  return order;
+    result.splice(insertAt,0,nf.id);
+  }
+  return result;
 }
 
 function initRanking(type) {
@@ -1913,8 +1927,8 @@ function saveRankingCurrent() { saveRanking(rankCurrentMode); }
 
 function saveRanking(type) {
   const key=type==='obj'?'cl_rankorder':'cl_rankorder_pers';
-  const order=type==='obj'?rankObjOrder:rankPersOrder;
-  try{localStorage.setItem(key,JSON.stringify(order));showToast('✓ Orden guardado');}catch(e){showToast('Error al guardar');}
+  const order=(type==='obj'?rankObjOrder:rankPersOrder).slice(0,1050);
+  try{localStorage.setItem(key,JSON.stringify(order));showToast('✓ Orden guardado (Top 1050)');}catch(e){showToast('Error al guardar');}
 }
 
 function makeRankItem(f,pos,canDrag,k,type) {
