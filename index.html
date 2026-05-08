@@ -1768,26 +1768,41 @@ function confirmDel(id) {
 
 // ── RANKING ──
 function buildOrder(type) {
-  const storageKey=type==='obj'?'cl_rankorder':'cl_rankorder_pers';
-  let order=[];
-  try{order=JSON.parse(localStorage.getItem(storageKey)||'[]');}catch(e){}
-  const validIds=new Set(FILMS.map(f=>f.id));
-  order=order.filter(id=>validIds.has(id));
-  const inOrder=new Set(order);
-  const source=type==='obj'
-    ?FILMS.filter(f=>f.rating!=null&&!inOrder.has(f.id)).sort((a,b)=>(b.rating??-1)-(a.rating??-1))
-    :FILMS.filter(f=>f.subscores?.personal!=null&&!inOrder.has(f.id)).sort((a,b)=>(b.subscores.personal??-1)-(a.subscores.personal??-1));
-  source.forEach(nf=>{
-    const score=type==='obj'?(nf.rating??-1):(nf.subscores?.personal??-1);
-    let insertAt=order.length;
-    for(let i=0;i<order.length;i++){
-      const ef=FILMS.find(x=>x.id===order[i]);
-      const es=ef?(type==='obj'?(ef.rating??-1):(ef.subscores?.personal??-1)):-1;
-      if(es<score){insertAt=i;break;}
+  const storageKey = type==='obj' ? 'cl_rankorder' : 'cl_rankorder_pers';
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
+
+  // Validate saved IDs — keep only those that still exist in FILMS
+  const validIds = new Set(FILMS.map(f => f.id));
+  const savedValid = saved.filter(id => validIds.has(id));
+  const savedSet = new Set(savedValid);
+
+  // Get score for a film
+  const score = f => type==='obj' ? (f.rating ?? -1) : (f.subscores?.personal ?? -1);
+
+  // Films not yet in saved order
+  const unsorted = FILMS
+    .filter(f => score(f) > -1 && !savedSet.has(f.id))
+    .sort((a, b) => score(b) - score(a));
+
+  if (!savedValid.length) {
+    // No saved order — just return sorted by score
+    return unsorted.map(f => f.id);
+  }
+
+  // Merge unsorted films into saved order by score position
+  const result = [...savedValid];
+  for (const nf of unsorted) {
+    const ns = score(nf);
+    // Find insertion point: after all saved films with higher/equal score
+    let insertAt = result.length;
+    for (let i = 0; i < result.length; i++) {
+      const ef = FILMS.find(x => x.id === result[i]);
+      if (ef && score(ef) < ns) { insertAt = i; break; }
     }
-    order.splice(insertAt,0,nf.id);
-  });
-  return order;
+    result.splice(insertAt, 0, nf.id);
+  }
+  return result;
 }
 
 function initRanking(type) {
