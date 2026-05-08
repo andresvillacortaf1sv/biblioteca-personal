@@ -65,7 +65,6 @@ select:hover{border-color:var(--border2);}
 .overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:14px;}
 .overlay.on{display:flex;}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-height:92vh;overflow-y:auto;position:relative;}
-.ov-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-height:90vh;overflow-y:auto;}
 .modal::-webkit-scrollbar{width:3px;}
 .modal::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
 .mclose{position:absolute;top:11px;right:11px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:15px;z-index:10;transition:.15s;}
@@ -1049,8 +1048,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
           onfocus="this.style.borderColor='rgba(240,192,80,.4)'" onblur="this.style.borderColor='var(--border)'">
         <div id="wl-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;margin-top:4px;z-index:50;max-height:280px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
       </div>
-      <button onclick="pickRandomWl()" style="background:linear-gradient(135deg,rgba(155,127,212,.2),rgba(201,149,46,.15));border:1px solid rgba(155,127,212,.35);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text);cursor:pointer;font-family:inherit;transition:.15s;font-weight:500;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='rgba(155,127,212,.35)'">🎲 Elegir aleatoria</button>
-      <button onclick="openWlTMDB()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">🔍 Buscar en TMDB</button>
+      <button onclick="pickRandomWl()" style="background:linear-gradient(135deg,rgba(155,127,212,.2),rgba(201,149,46,.15));border:1px solid rgba(155,127,212,.35);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text);cursor:pointer;font-family:inherit;transition:.15s;font-weight:500;">🎲 Elegir aleatoria</button>
+      <button onclick="openWlTMDB()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;">🔍 Buscar en TMDB</button>
       <span id="wl-count" style="margin-left:auto;font-size:12px;color:var(--text3);"></span>
     </div>
     <!-- Filters -->
@@ -1125,32 +1124,20 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
       </div>
     </div>
     <div id="cmp-result" style="display:none;"></div>
-    <!-- External scores comparison -->
     <div id="cmp-external" style="display:none;margin-top:20px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="font-size:12px;font-weight:500;">🌐 Notas en plataformas externas</div>
-        <button onclick="loadCmpExternal()" id="cmp-ext-btn" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">Cargar notas externas</button>
+        <button onclick="loadCmpExternal()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;">Cargar notas externas</button>
       </div>
       <div id="cmp-ext-content"></div>
     </div>
   </div>
 </div>
-<div class="overlay" id="ov-wl-random" onclick="if(event.target===this)closeOv('ov-wl-random')">
-  <div class="ov-panel" onclick="event.stopPropagation()" style="max-width:380px;padding:28px;text-align:center;">
-    <div style="font-size:32px;margin-bottom:8px;">🎲</div>
-    <div style="font-family:'Fraunces',serif;font-size:18px;margin-bottom:20px;color:var(--text2);">Tu película para esta noche</div>
-    <div id="wl-random-card" style="margin-bottom:20px;"></div>
-    <div style="display:flex;gap:10px;justify-content:center;">
-      <button onclick="pickRandomWl()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 16px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">🎲 Otra</button>
-      <button onclick="closeOv('ov-wl-random')" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">¡Esta!</button>
-    </div>
-  </div>
-</div>
 <div class="overlay" id="ov-wl-tmdb" onclick="if(event.target===this)closeOv('ov-wl-tmdb')">
-  <div class="ov-panel" onclick="event.stopPropagation()" style="max-width:520px;padding:24px;">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;padding:24px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
       <div style="font-family:'Fraunces',serif;font-size:18px;">🔍 Buscar en TMDB</div>
-      <button onclick="closeOv('ov-wl-tmdb')" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;line-height:1;">✕</button>
+      <button onclick="closeOv('ov-wl-tmdb')" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;">✕</button>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
       <input id="wl-tmdb-q" type="text" placeholder="Título de la película..." onkeydown="if(event.key==='Enter')wlTMDBSearch()"
@@ -1159,6 +1146,17 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
       <button onclick="wlTMDBSearch()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Buscar</button>
     </div>
     <div id="wl-tmdb-results" style="max-height:380px;overflow-y:auto;"></div>
+  </div>
+</div>
+<div class="overlay" id="ov-wl-random" onclick="if(event.target===this)closeOv('ov-wl-random')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:360px;padding:28px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:8px;">🎲</div>
+    <div style="font-family:'Fraunces',serif;font-size:18px;margin-bottom:20px;color:var(--text2);">Tu película para esta noche</div>
+    <div id="wl-random-card" style="margin-bottom:20px;"></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="pickRandomWl()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 16px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;">🎲 Otra</button>
+      <button onclick="closeOv('ov-wl-random')" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">¡Esta!</button>
+    </div>
   </div>
 </div>
 <div class="overlay" id="ov-detail" onclick="closeOv('ov-detail')">
@@ -1387,6 +1385,7 @@ function populateRankFilters() {
   const dirs   = [...new Set(ranked.map(f=>f.director).filter(d=>d&&!d.includes(',')))].sort();
   const countries = [...new Set(ranked.map(f=>f.country).filter(Boolean))].sort();
 
+  // Decades present
   const decadeSet = new Set();
   ranked.forEach(f=>{
     if(!f.year) return;
@@ -1399,9 +1398,9 @@ function populateRankFilters() {
   const rdSel  = document.getElementById('rank-fc-dir');
   const rcSel  = document.getElementById('rank-fc-country');
   const rdecSel= document.getElementById('rank-fc-decade');
-  // Selects may not exist yet (view not rendered) — populate when available
   if(!rdSel||!rcSel||!rdecSel) return;
 
+  // Save current values
   const curDir=rdSel.value, curCtr=rcSel.value, curDec=rdecSel.value;
 
   rdSel.innerHTML  = '<option value="">Todos los directores</option>';
@@ -1413,6 +1412,7 @@ function populateRankFilters() {
   const decLabels={'2020':'2020s','2010':'2010s','2000':'2000s','1990':'1990s','1980':'1980s','1970':'1970s','1960':'1960s','1950':'1950s','1940':'1940s','pre1940':'Antes de 1940'};
   decades.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=decLabels[d]||d;rdecSel.appendChild(o);});
 
+  // Restore if still valid
   if(dirs.includes(curDir)) rdSel.value=curDir;
   if(countries.includes(curCtr)) rcSel.value=curCtr;
   if(decades.includes(curDec)||curDec==='') rdecSel.value=curDec;
@@ -1774,21 +1774,16 @@ function buildOrder(type) {
   const validIds=new Set(FILMS.map(f=>f.id));
   order=order.filter(id=>validIds.has(id));
   const inOrder=new Set(order);
-  const getScore=f=>type==='obj'?(f.rating??-1):(f.subscores?.personal??-1);
-  const newFilms=type==='obj'
-    ?FILMS.filter(f=>f.rating!=null&&!inOrder.has(f.id)).sort((a,b)=>getScore(b)-getScore(a))
-    :FILMS.filter(f=>f.subscores?.personal!=null&&!inOrder.has(f.id)).sort((a,b)=>getScore(b)-getScore(a));
-  if(!order.length){
-    // No saved order — fast path: just return sorted
-    return newFilms.map(f=>f.id);
-  }
-  // Has saved order: insert new films at correct score position
-  newFilms.forEach(nf=>{
-    const ns=getScore(nf);
+  const source=type==='obj'
+    ?FILMS.filter(f=>f.rating!=null&&!inOrder.has(f.id)).sort((a,b)=>(b.rating??-1)-(a.rating??-1))
+    :FILMS.filter(f=>f.subscores?.personal!=null&&!inOrder.has(f.id)).sort((a,b)=>(b.subscores.personal??-1)-(a.subscores.personal??-1));
+  source.forEach(nf=>{
+    const score=type==='obj'?(nf.rating??-1):(nf.subscores?.personal??-1);
     let insertAt=order.length;
     for(let i=0;i<order.length;i++){
       const ef=FILMS.find(x=>x.id===order[i]);
-      if(ef&&getScore(ef)<ns){insertAt=i;break;}
+      const es=ef?(type==='obj'?(ef.rating??-1):(ef.subscores?.personal??-1)):-1;
+      if(es<score){insertAt=i;break;}
     }
     order.splice(insertAt,0,nf.id);
   });
@@ -1798,22 +1793,14 @@ function buildOrder(type) {
 function initRanking(type) {
   if(type==='obj'||type===undefined) { rankObjOrder=buildOrder('obj'); rankCurrentMode='obj'; }
   else { rankPersOrder=buildOrder('pers'); rankCurrentMode='pers'; }
-  // Reset toolbar buttons to match mode
-  const objBtn=document.getElementById('rank-toggle-obj');
-  const persBtn=document.getElementById('rank-toggle-pers');
-  if(objBtn) objBtn.classList.toggle('on', rankCurrentMode==='obj');
-  if(persBtn) persBtn.classList.toggle('on', rankCurrentMode==='pers');
   populateRankFilters();
   renderRankingMain();
 }
 
 function renderRankingMain() {
   const type=rankCurrentMode;
-  // Safety: rebuild order if empty
-  if(type==='obj' && !rankObjOrder.length) rankObjOrder=buildOrder('obj');
-  if(type==='pers' && !rankPersOrder.length) rankPersOrder=buildOrder('pers');
   const order=type==='obj'?rankObjOrder:rankPersOrder;
-  const mode=rankCurrentView||'list';
+  const mode=rankCurrentView;
   const container=document.getElementById('ranking-main');
   if(!container)return;
 
@@ -1933,24 +1920,21 @@ function saveRanking(type) {
 function makeRankItem(f,pos,canDrag,k,type) {
   const el=document.createElement('div');el.className='rank-item';el.dataset.id=f.id;
   if(canDrag)setupDrag(el,f.id,k,type);
-  const poster=f.poster&&f.poster!=='null'?(f.poster.startsWith('http')?f.poster:`https://image.tmdb.org/t/p/w92${f.poster}`):null;
-  const img=poster?`<img class="rank-poster-sm" src="${esc(poster)}" loading="lazy" onerror="this.className='rank-noimg-sm';this.textContent='?'">`:`<div class="rank-noimg-sm">${esc(f.title[0]||'?')}</div>`;
-  el.innerHTML=`<span class="rank-pos">#${pos}</span>${img}<div class="rank-info"><div class="rank-title">${esc(f.title)}</div><div class="rank-meta">${f.director?esc(f.director.split(',')[0]):'—'} · ${f.year||'?'}</div></div>
-    <button onclick="event.stopPropagation();openForm(${f.id})" title="Editar" style="background:none;border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:11px;color:var(--text3);cursor:pointer;flex-shrink:0;transition:.15s;opacity:0;margin-left:auto;" class="rank-edit-btn">✏️</button>
-    ${canDrag?'<span class="rank-handle">⠿</span>':''}`;
+  const img=f.poster?`<img class="rank-poster-sm" src="${esc(f.poster)}" loading="lazy" onerror="this.className='rank-noimg-sm';this.textContent='?'">`:`<div class="rank-noimg-sm">${esc(f.title[0]||'?')}</div>`;
+  el.innerHTML=`<span class="rank-pos">#${pos}</span>${img}<div class="rank-info"><div class="rank-title">${esc(f.title)}</div><div class="rank-meta">${f.director?esc(f.director.split(',')[0]):'—'} · ${f.year||'?'}</div></div><button class="rank-edit-btn" onclick="event.stopPropagation();openForm(${f.id})" title="Editar" style="background:none;border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:11px;color:var(--text3);cursor:pointer;flex-shrink:0;transition:.15s;opacity:0;margin-left:auto;">✏️</button>${canDrag?'<span class="rank-handle">⠿</span>':''}`;
   el.addEventListener('mouseenter',()=>{const b=el.querySelector('.rank-edit-btn');if(b)b.style.opacity='1';});
   el.addEventListener('mouseleave',()=>{const b=el.querySelector('.rank-edit-btn');if(b)b.style.opacity='0';});
+  return el;
 }
 
 function makeRankCard(f,pos,canDrag,k,type) {
   const el=document.createElement('div');el.className='rank-card';el.dataset.id=f.id;
   if(canDrag)setupDrag(el,f.id,k,type);
-  el.innerHTML=`<div class="rank-card-pos">#${pos}</div>${f.poster?`<img src="${esc(f.poster)}" loading="lazy" onerror="this.outerHTML='<div class=rank-card-noimg>${esc(f.title.substring(0,20))}</div>'">`:`<div class="rank-card-noimg">${esc(f.title.substring(0,24))}</div>`}
-    <div class="rank-card-info"><div class="rank-card-title">${esc(f.title)}</div></div>
-    <button onclick="event.stopPropagation();openForm(${f.id})" title="Editar" style="position:absolute;bottom:6px;right:6px;background:rgba(11,11,14,.75);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-size:11px;color:var(--text2);cursor:pointer;opacity:0;transition:.15s;" class="rank-card-edit-btn">✏️</button>`;
   el.style.position='relative';
+  el.innerHTML=`<div class="rank-card-pos">#${pos}</div>${f.poster?`<img src="${esc(f.poster)}" loading="lazy" onerror="this.outerHTML='<div class=rank-card-noimg>${esc(f.title.substring(0,20))}</div>'">`:`<div class="rank-card-noimg">${esc(f.title.substring(0,24))}</div>`}<div class="rank-card-info"><div class="rank-card-title">${esc(f.title)}</div></div><button class="rank-card-edit-btn" onclick="event.stopPropagation();openForm(${f.id})" style="position:absolute;bottom:6px;right:6px;background:rgba(11,11,14,.8);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-size:11px;color:var(--text2);cursor:pointer;opacity:0;transition:.15s;">✏️</button>`;
   el.addEventListener('mouseenter',()=>{const b=el.querySelector('.rank-card-edit-btn');if(b)b.style.opacity='1';});
   el.addEventListener('mouseleave',()=>{const b=el.querySelector('.rank-card-edit-btn');if(b)b.style.opacity='0';});
+  return el;
 }
 
 function setupDrag(el,filmId,scoreKey,type) {
@@ -3988,7 +3972,7 @@ function switchView(view,el) {
   if(view==='home') { setTimeout(()=>initHome(false),50); }
   else if(view==='watchlist') renderWatchlist();
   else if(view==='compare') cmpReset();
-  else if(view==='ranking') { setTimeout(()=>initRanking('obj'), 0); }
+  else if(view==='ranking') initRanking('obj');
   else if(view==='rewatched') renderRewatched();
   else if(view==='collection') renderCollection();
   else if(view==='festivals') renderFestivals();
@@ -4074,136 +4058,11 @@ function markWlWatched(id){
   removeFromWatchlist(id);
 }
 
-function pickRandomWl(){
-  const wl=getWatchlist();
-  if(!wl.length){showToast('Tu watchlist está vacía');return;}
-  const item=wl[Math.floor(Math.random()*wl.length)];
-  const posterSrc=item.poster?(item.poster.startsWith('http')?item.poster:`https://image.tmdb.org/t/p/w342${item.poster}`):null;
-  const pLabel={alta:'🔴 Alta prioridad',media:'🟡 Media prioridad',baja:'🟢 Baja prioridad'}[item.priority]||'';
-  document.getElementById('wl-random-card').innerHTML=`
-    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-      ${posterSrc?`<img src="${posterSrc}" style="width:120px;aspect-ratio:2/3;object-fit:cover;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);">`:`<div style="width:120px;aspect-ratio:2/3;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);">Sin poster</div>`}
-      <div>
-        <div style="font-family:'Fraunces',serif;font-size:18px;margin-bottom:4px;">${esc(item.title)}</div>
-        ${item.year?`<div style="font-size:12px;color:var(--text3);margin-bottom:6px;">${item.year}</div>`:''}
-        <div style="font-size:11px;color:var(--text3);">${pLabel}</div>
-      </div>
-    </div>`;
-  document.getElementById('ov-wl-random').classList.add('on');
-}
-
-function openWlTMDB(){
-  document.getElementById('ov-wl-tmdb').classList.add('on');
-  document.getElementById('wl-tmdb-results').innerHTML='';
-  document.getElementById('wl-tmdb-q').value='';
-  setTimeout(()=>document.getElementById('wl-tmdb-q').focus(),80);
-}
-
-async function wlTMDBSearch(){
-  const q=document.getElementById('wl-tmdb-q').value.trim();
-  if(!q){showToast('Escribe un título');return;}
-  const box=document.getElementById('wl-tmdb-results');
-  box.innerHTML=`<div style="font-size:12px;color:var(--text3);padding:12px;">Buscando...</div>`;
-  try{
-    const data=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=es&include_adult=false`).then(r=>r.json());
-    if(!data.results?.length){box.innerHTML=`<div style="font-size:12px;color:var(--text3);padding:12px;">Sin resultados para "${esc(q)}"</div>`;return;}
-    const wlIds=new Set(getWatchlist().map(w=>String(w.id)));
-    box.innerHTML=data.results.slice(0,10).map(m=>{
-      const yr=m.release_date?.split('-')[0]||'';
-      const ps=m.poster_path?`https://image.tmdb.org/t/p/w92${m.poster_path}`:null;
-      const inWl=wlIds.has('tmdb_'+m.id);
-      const pp=m.poster_path?esc(m.poster_path):'';
-      const safeTitle=esc(m.title).replace(/'/g,"&#39;");
-      return`<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:.15s;${inWl?'opacity:.5;':''}"
-        onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"
-        onclick="${inWl?'':` addToWlTMDB(${m.id},'${safeTitle}','${yr}','${pp}')`}">
-        ${ps?`<img src="${ps}" style="width:36px;height:54px;object-fit:cover;border-radius:4px;flex-shrink:0;">`:`<div style="width:36px;height:54px;background:var(--bg3);border-radius:4px;flex-shrink:0;"></div>`}
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.title)}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${yr}${m.vote_average?` · ⭐ ${m.vote_average.toFixed(1)}/10`:''}</div>
-          ${m.overview?`<div style="font-size:11px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.overview.substring(0,90))}...</div>`:''}
-        </div>
-        <div style="font-size:11px;color:${inWl?'var(--text3)':'var(--gold2)'};flex-shrink:0;padding-left:8px;">${inWl?'✓ En lista':'+ Agregar'}</div>
-      </div>`;
-    }).join('');
-  }catch(e){box.innerHTML=`<div style="font-size:12px;color:var(--text3);padding:12px;">Error de conexión</div>`;}
-}
-
-function addToWlTMDB(tmdbId,title,year,posterPath){
-  const wl=getWatchlist();
-  const uid='tmdb_'+tmdbId;
-  if(wl.find(w=>String(w.id)===uid)){showToast('Ya está en tu watchlist');return;}
-  const poster=posterPath?`https://image.tmdb.org/t/p/w500${posterPath}`:null;
-  wl.unshift({id:uid,tmdbId,title,year:year||null,director:'',poster,priority:'media',added:Date.now()});
-  saveWatchlist(wl);
-  showToast(`"${title}" añadida a Watchlist`);
-  wlTMDBSearch();
-}
-
-// ── COMPARADOR EXTERNO ────────────────────────────────────────────────────
-async function loadCmpExternal(){
-  if(!cmpFilm.a||!cmpFilm.b){showToast('Seleccioná dos películas primero');return;}
-  const btn=document.getElementById('cmp-ext-btn');
-  btn.textContent='Cargando...';btn.disabled=true;
-  const extCont=document.getElementById('cmp-ext-content');
-  extCont.innerHTML=`<div style="font-size:12px;color:var(--text3);padding:12px 0;">Consultando TMDB...</div>`;
-
-  async function getTMDBData(f){
-    try{
-      const sr=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(f.title)}&language=en-US${f.year?'&year='+f.year:''}`).then(r=>r.json());
-      if(!sr.results?.length) return null;
-      const m=sr.results[0];
-      const ext=await fetch(`https://api.themoviedb.org/3/movie/${m.id}/external_ids?api_key=${TMDB_KEY}`).then(r=>r.json()).catch(()=>({}));
-      const imdbId=ext.imdb_id||'';
-      const slug=encodeURIComponent(f.title);
-      const slugYear=encodeURIComponent(f.title+(f.year?' '+f.year:''));
-      return {
-        tmdb:{score:m.vote_average?.toFixed(1)||null,votes:m.vote_count,url:`https://www.themoviedb.org/movie/${m.id}`},
-        letterboxd:{score:null,url:`https://letterboxd.com/search/${slug}/`},
-        mubi:{score:null,url:`https://mubi.com/search?q=${slug}`},
-        rt:{score:null,url:`https://www.rottentomatoes.com/search?search=${slugYear}`},
-        mc:{score:null,url:`https://www.metacritic.com/search/${slug}/`},
-        imdb:{score:null,url:imdbId?`https://www.imdb.com/title/${imdbId}/`:`https://www.imdb.com/find/?q=${slug}`},
-      };
-    }catch(e){return null;}
-  }
-
-  const [sA,sB]=await Promise.all([getTMDBData(cmpFilm.a),getTMDBData(cmpFilm.b)]);
-  btn.textContent='↺ Recargar';btn.disabled=false;
-
-  const platforms=[
-    {key:'tmdb',    label:'TMDB',            icon:'🎬'},
-    {key:'letterboxd',label:'Letterboxd',    icon:'📽'},
-    {key:'mubi',    label:'MUBI',            icon:'🎞'},
-    {key:'rt',      label:'Rotten Tomatoes', icon:'🍅'},
-    {key:'mc',      label:'Metacritic',      icon:'🟡'},
-    {key:'imdb',    label:'IMDb',            icon:'⭐'},
-  ];
-
-  extCont.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-    <div style="display:grid;grid-template-columns:150px 1fr 1fr;background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;font-size:11px;font-weight:500;gap:8px;">
-      <div style="color:var(--text3);">Plataforma</div>
-      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Fraunces',serif;font-style:italic;">${esc(cmpFilm.a.title)}</div>
-      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Fraunces',serif;font-style:italic;">${esc(cmpFilm.b.title)}</div>
-    </div>
-    ${platforms.map(p=>{
-      const da=sA?.[p.key], db=sB?.[p.key];
-      const cellA=da?`<a href="${da.url}" target="_blank" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:6px;">
-        ${da.score?`<span style="font-family:'Fraunces',serif;font-size:17px;color:var(--gold2);">${da.score}</span>${p.key==='tmdb'&&da.votes?`<span style="font-size:10px;color:var(--text3);">(${Number(da.votes).toLocaleString()})</span>`:''}`:''}<span style="font-size:10px;color:var(--text3);">${da.score?'':'Ver'} ↗</span></a>`:
-        `<a href="https://www.google.com/search?q=${encodeURIComponent(cmpFilm.a.title+' '+p.label)}" target="_blank" style="font-size:11px;color:var(--text3);">Buscar ↗</a>`;
-      const cellB=db?`<a href="${db.url}" target="_blank" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:6px;">
-        ${db.score?`<span style="font-family:'Fraunces',serif;font-size:17px;color:var(--gold2);">${db.score}</span>`:''}<span style="font-size:10px;color:var(--text3);">${db.score?'':'Ver'} ↗</span></a>`:
-        `<a href="https://www.google.com/search?q=${encodeURIComponent(cmpFilm.b.title+' '+p.label)}" target="_blank" style="font-size:11px;color:var(--text3);">Buscar ↗</a>`;
-      return`<div style="display:grid;grid-template-columns:150px 1fr 1fr;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center;gap:8px;">
-        <div style="font-size:12px;font-weight:500;">${p.icon} ${p.label}</div>
-        <div>${cellA}</div>
-        <div>${cellB}</div>
-      </div>`;
-    }).join('')}
-    <div style="padding:10px 16px;font-size:10px;color:var(--text3);">
-      Solo TMDB devuelve nota directa vía API pública. Las demás plataformas dirigen al enlace de búsqueda.
-    </div>
-  </div>`;
+function openWlAddCustom(){
+  const t=prompt("Título de la película:");
+  if(!t)return;
+  const y=prompt("Año (opcional):");
+  addToWatchlist(null,t.trim(),y?parseInt(y):null);
 }
 
 function renderWatchlist(){
@@ -4342,12 +4201,10 @@ function selectCmpFilm(side,filmId){
   const inp=document.getElementById("cmp-"+side+"-input");
   if(inp) inp.value=f.title;
   renderCmpCard(side,f);
-  if(cmpFilm.a&&cmpFilm.b) {
+  if(cmpFilm.a&&cmpFilm.b){
     renderCmpResult();
-    document.getElementById('cmp-external').style.display='block';
-    document.getElementById('cmp-ext-content').innerHTML='';
-    document.getElementById('cmp-ext-btn').textContent='Cargar notas externas';
-    document.getElementById('cmp-ext-btn').disabled=false;
+    const ext=document.getElementById('cmp-external');
+    if(ext){ext.style.display='block';document.getElementById('cmp-ext-content').innerHTML='';}
   }
 }
 
@@ -4398,6 +4255,129 @@ function cmpReset(){
   const ext=document.getElementById('cmp-external');
   if(ext) ext.style.display='none';
 }
+
+// ── WATCHLIST TMDB SEARCH ─────────────────────────────────────────────────
+function openWlTMDB(){
+  document.getElementById('ov-wl-tmdb').classList.add('on');
+  document.getElementById('wl-tmdb-results').innerHTML='';
+  document.getElementById('wl-tmdb-q').value='';
+  setTimeout(()=>document.getElementById('wl-tmdb-q').focus(),80);
+}
+
+async function wlTMDBSearch(){
+  const q=document.getElementById('wl-tmdb-q').value.trim();
+  if(!q){showToast('Escribe un título');return;}
+  const box=document.getElementById('wl-tmdb-results');
+  box.innerHTML='<div style="font-size:12px;color:var(--text3);padding:12px;">Buscando...</div>';
+  try{
+    const data=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=es&include_adult=false`).then(r=>r.json());
+    if(!data.results?.length){box.innerHTML=`<div style="font-size:12px;color:var(--text3);padding:12px;">Sin resultados para "${esc(q)}"</div>`;return;}
+    const wlIds=new Set(getWatchlist().map(w=>String(w.id)));
+    box.innerHTML=data.results.slice(0,10).map(m=>{
+      const yr=m.release_date?.split('-')[0]||'';
+      const ps=m.poster_path?`https://image.tmdb.org/t/p/w92${m.poster_path}`:null;
+      const inWl=wlIds.has('tmdb_'+m.id);
+      const pp=m.poster_path||'';
+      const safeTitle=(m.title||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:.15s;${inWl?'opacity:.5;':''}"
+        onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"
+        onclick="${inWl?'':` addToWlTMDB(${m.id},'${safeTitle}','${yr}','${pp}')`}">
+        ${ps?`<img src="${ps}" style="width:36px;height:54px;object-fit:cover;border-radius:4px;flex-shrink:0;">`:`<div style="width:36px;height:54px;background:var(--bg3);border-radius:4px;flex-shrink:0;"></div>`}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.title)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${yr}${m.vote_average?` · ⭐ ${m.vote_average.toFixed(1)}/10`:''}</div>
+        </div>
+        <div style="font-size:11px;color:${inWl?'var(--text3)':'var(--gold2)'};flex-shrink:0;">${inWl?'✓ En lista':'+ Agregar'}</div>
+      </div>`;
+    }).join('');
+  }catch(e){box.innerHTML='<div style="font-size:12px;color:var(--text3);padding:12px;">Error de conexión</div>';}
+}
+
+function addToWlTMDB(tmdbId,title,year,posterPath){
+  const wl=getWatchlist();
+  const uid='tmdb_'+tmdbId;
+  if(wl.find(w=>String(w.id)===uid)){showToast('Ya está en tu watchlist');return;}
+  const poster=posterPath?`https://image.tmdb.org/t/p/w500${posterPath}`:null;
+  wl.unshift({id:uid,tmdbId,title,year:year||null,director:'',poster,priority:'media',added:Date.now()});
+  saveWatchlist(wl);
+  showToast(`"${title}" añadida a Watchlist`);
+  wlTMDBSearch();
+}
+
+// ── WATCHLIST RANDOM PICK ─────────────────────────────────────────────────
+function pickRandomWl(){
+  const wl=getWatchlist();
+  if(!wl.length){showToast('Tu watchlist está vacía');return;}
+  const item=wl[Math.floor(Math.random()*wl.length)];
+  const ps=item.poster?(item.poster.startsWith('http')?item.poster:`https://image.tmdb.org/t/p/w342${item.poster}`):null;
+  const pLabel={alta:'🔴 Alta prioridad',media:'🟡 Media prioridad',baja:'🟢 Baja prioridad'}[item.priority]||'';
+  document.getElementById('wl-random-card').innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      ${ps?`<img src="${ps}" style="width:120px;aspect-ratio:2/3;object-fit:cover;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);">`:`<div style="width:120px;aspect-ratio:2/3;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);">Sin poster</div>`}
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:18px;margin-bottom:4px;">${esc(item.title)}</div>
+        ${item.year?`<div style="font-size:12px;color:var(--text3);margin-bottom:6px;">${item.year}</div>`:''}
+        <div style="font-size:11px;color:var(--text3);">${pLabel}</div>
+      </div>
+    </div>`;
+  document.getElementById('ov-wl-random').classList.add('on');
+}
+
+// ── COMPARADOR EXTERNO ────────────────────────────────────────────────────
+async function loadCmpExternal(){
+  if(!cmpFilm.a||!cmpFilm.b){showToast('Seleccioná dos películas primero');return;}
+  const extCont=document.getElementById('cmp-ext-content');
+  extCont.innerHTML='<div style="font-size:12px;color:var(--text3);padding:12px 0;">Consultando TMDB...</div>';
+
+  async function getTMDBData(f){
+    try{
+      const sr=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(f.title)}&language=en-US${f.year?'&year='+f.year:''}`).then(r=>r.json());
+      if(!sr.results?.length)return null;
+      const m=sr.results[0];
+      const ext=await fetch(`https://api.themoviedb.org/3/movie/${m.id}/external_ids?api_key=${TMDB_KEY}`).then(r=>r.json()).catch(()=>({}));
+      const imdbId=ext.imdb_id||'';
+      const slug=encodeURIComponent(f.title);
+      return {
+        tmdb:{score:m.vote_average?.toFixed(1)||null,votes:m.vote_count,url:`https://www.themoviedb.org/movie/${m.id}`},
+        letterboxd:{url:`https://letterboxd.com/search/${slug}/`},
+        mubi:{url:`https://mubi.com/search?q=${slug}`},
+        rt:{url:`https://www.rottentomatoes.com/search?search=${slug}`},
+        mc:{url:`https://www.metacritic.com/search/${slug}/`},
+        imdb:{url:imdbId?`https://www.imdb.com/title/${imdbId}/`:`https://www.imdb.com/find/?q=${slug}`},
+      };
+    }catch(e){return null;}
+  }
+
+  const [sA,sB]=await Promise.all([getTMDBData(cmpFilm.a),getTMDBData(cmpFilm.b)]);
+
+  const platforms=[
+    {key:'tmdb',    label:'TMDB',            icon:'🎬'},
+    {key:'letterboxd',label:'Letterboxd',    icon:'📽'},
+    {key:'mubi',    label:'MUBI',            icon:'🎞'},
+    {key:'rt',      label:'Rotten Tomatoes', icon:'🍅'},
+    {key:'mc',      label:'Metacritic',      icon:'🟡'},
+    {key:'imdb',    label:'IMDb',            icon:'⭐'},
+  ];
+
+  extCont.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:150px 1fr 1fr;background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;font-size:11px;font-weight:500;gap:8px;">
+      <div style="color:var(--text3);">Plataforma</div>
+      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Fraunces',serif;font-style:italic;">${esc(cmpFilm.a.title)}</div>
+      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Fraunces',serif;font-style:italic;">${esc(cmpFilm.b.title)}</div>
+    </div>
+    ${platforms.map(p=>{
+      const da=sA?.[p.key],db=sB?.[p.key];
+      const makeCell=(d,film)=>d?`<a href="${d.url}" target="_blank" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:6px;">${d.score?`<span style="font-family:'Fraunces',serif;font-size:17px;color:var(--gold2);">${d.score}</span>${p.key==='tmdb'&&d.votes?`<span style="font-size:10px;color:var(--text3);">(${Number(d.votes).toLocaleString()})</span>`:''}`:''}<span style="font-size:10px;color:var(--text3);">${d.score?'':'Ver'} ↗</span></a>`:`<a href="https://www.google.com/search?q=${encodeURIComponent(film.title+' '+p.label)}" target="_blank" style="font-size:11px;color:var(--text3);">Buscar ↗</a>`;
+      return `<div style="display:grid;grid-template-columns:150px 1fr 1fr;padding:11px 16px;border-bottom:1px solid var(--border);align-items:center;gap:8px;">
+        <div style="font-size:12px;font-weight:500;">${p.icon} ${p.label}</div>
+        <div>${makeCell(da,cmpFilm.a)}</div>
+        <div>${makeCell(db,cmpFilm.b)}</div>
+      </div>`;
+    }).join('')}
+    <div style="padding:10px 16px;font-size:10px;color:var(--text3);">Solo TMDB devuelve nota directa vía API. Las demás plataformas dirigen al enlace de búsqueda.</div>
+  </div>`;
+}
+
 
 boot();
 </script>
