@@ -1768,41 +1768,31 @@ function confirmDel(id) {
 
 // ── RANKING ──
 function buildOrder(type) {
-  const storageKey = type==='obj' ? 'cl_rankorder' : 'cl_rankorder_pers';
-  let saved = [];
-  try { saved = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
-
-  // Validate saved IDs — keep only those that still exist in FILMS
-  const validIds = new Set(FILMS.map(f => f.id));
-  const savedValid = saved.filter(id => validIds.has(id));
-  const savedSet = new Set(savedValid);
-
-  // Get score for a film
-  const score = f => type==='obj' ? (f.rating ?? -1) : (f.subscores?.personal ?? -1);
-
-  // Films not yet in saved order
-  const unsorted = FILMS
-    .filter(f => score(f) > -1 && !savedSet.has(f.id))
-    .sort((a, b) => score(b) - score(a));
-
-  if (!savedValid.length) {
-    // No saved order — just return sorted by score
-    return unsorted.map(f => f.id);
+  const storageKey=type==='obj'?'cl_rankorder':'cl_rankorder_pers';
+  let order=[];
+  try{order=JSON.parse(localStorage.getItem(storageKey)||'[]');}catch(e){}
+  const validIds=new Set(FILMS.map(f=>f.id));
+  order=order.filter(id=>validIds.has(id));
+  const inOrder=new Set(order);
+  const getScore=f=>type==='obj'?(f.rating??-1):(f.subscores?.personal??-1);
+  const newFilms=type==='obj'
+    ?FILMS.filter(f=>f.rating!=null&&!inOrder.has(f.id)).sort((a,b)=>getScore(b)-getScore(a))
+    :FILMS.filter(f=>f.subscores?.personal!=null&&!inOrder.has(f.id)).sort((a,b)=>getScore(b)-getScore(a));
+  if(!order.length){
+    // No saved order — fast path: just return sorted
+    return newFilms.map(f=>f.id);
   }
-
-  // Merge unsorted films into saved order by score position
-  const result = [...savedValid];
-  for (const nf of unsorted) {
-    const ns = score(nf);
-    // Find insertion point: after all saved films with higher/equal score
-    let insertAt = result.length;
-    for (let i = 0; i < result.length; i++) {
-      const ef = FILMS.find(x => x.id === result[i]);
-      if (ef && score(ef) < ns) { insertAt = i; break; }
+  // Has saved order: insert new films at correct score position
+  newFilms.forEach(nf=>{
+    const ns=getScore(nf);
+    let insertAt=order.length;
+    for(let i=0;i<order.length;i++){
+      const ef=FILMS.find(x=>x.id===order[i]);
+      if(ef&&getScore(ef)<ns){insertAt=i;break;}
     }
-    result.splice(insertAt, 0, nf.id);
-  }
-  return result;
+    order.splice(insertAt,0,nf.id);
+  });
+  return order;
 }
 
 function initRanking(type) {
@@ -3998,7 +3988,7 @@ function switchView(view,el) {
   if(view==='home') { setTimeout(()=>initHome(false),50); }
   else if(view==='watchlist') renderWatchlist();
   else if(view==='compare') cmpReset();
-  else if(view==='ranking') initRanking('obj');
+  else if(view==='ranking') { setTimeout(()=>initRanking('obj'), 0); }
   else if(view==='rewatched') renderRewatched();
   else if(view==='collection') renderCollection();
   else if(view==='festivals') renderFestivals();
