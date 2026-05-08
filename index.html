@@ -1825,12 +1825,13 @@ function renderRankingMain() {
   const filterDecade=filterDecadeRaw==='pre1940'?'pre1940':parseInt(filterDecadeRaw)||0;
   const hasFilter=filterDir||filterCountry||filterDecadeRaw;
 
-  // Limit to top 1050 positions then apply filters
+  // Limit to top 1050 — track real position BEFORE filtering
   const limitedOrder = order.slice(0, 1050);
   const groups={};
   let totalShown=0;
-  limitedOrder.forEach(id=>{
+  limitedOrder.forEach((id, idx)=>{
     const f=FILMS.find(x=>x.id===id);if(!f)return;
+    const realPos = idx + 1; // real ranking position regardless of filters
     // Apply filters
     if(filterDir && f.director!==filterDir) return;
     if(filterCountry && f.country!==filterCountry) return;
@@ -1842,7 +1843,7 @@ function renderRankingMain() {
     const val=type==='obj'?f.rating:(f.subscores?.personal??null);
     const k=val!=null?String(val):'sin_nota';
     if(!groups[k])groups[k]=[];
-    groups[k].push(f);
+    groups[k].push({f, realPos});
     totalShown++;
   });
 
@@ -1861,19 +1862,19 @@ function renderRankingMain() {
     }
   }
   const sortedKeys=Object.keys(groups).sort((a,b)=>{if(a==='sin_nota')return 1;if(b==='sin_nota')return -1;return parseFloat(b)-parseFloat(a);});
-  let globalPos=1; container.innerHTML='';
+  container.innerHTML='';
   sortedKeys.forEach(k=>{
     const items=groups[k];
     const label=k==='sin_nota'?'Sin nota':fmtR(parseFloat(k));
-    const canDrag=items.length>1;
+    const canDrag=!hasFilter&&items.length>1; // disable drag when filtered
     const gDiv=document.createElement('div');gDiv.className='score-group';
     const badgeCls=type==='pers'?'score-group-badge pers':'score-group-badge';
     gDiv.innerHTML=`<div class="score-group-header"><div class="${badgeCls}">${label}</div><div class="score-group-line"></div><div class="score-group-count">${items.length} película${items.length!==1?'s':''}${canDrag?' · arrastrá para reordenar':''}</div></div>`;
     const listEl=document.createElement('div');
     listEl.className=mode==='list'?'rank-list':'rank-grid';
-    items.forEach(f=>{
-      const el=mode==='list'?makeRankItem(f,globalPos,canDrag,k,type):makeRankCard(f,globalPos,canDrag,k,type);
-      listEl.appendChild(el); globalPos++;
+    items.forEach(({f, realPos})=>{
+      const el=mode==='list'?makeRankItem(f,realPos,canDrag,k,type):makeRankCard(f,realPos,canDrag,k,type);
+      listEl.appendChild(el);
     });
     gDiv.appendChild(listEl); container.appendChild(gDiv);
   });
