@@ -556,6 +556,33 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .cmp-bar-wrap{height:4px;background:var(--bg3);border-radius:2px;margin-top:4px;overflow:hidden;}
 .cmp-bar{height:100%;border-radius:2px;background:var(--gold);transition:width .6s;}
 
+/* ── COLLECTION FORMAT FILTERS & CARDS ───────────────────────────────── */
+.col-fmt-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--text3);cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;}
+.col-fmt-btn:hover{border-color:var(--border2);color:var(--text);}
+.col-fmt-active{background:var(--bg4);border-color:var(--gold);color:var(--gold2);font-weight:500;}
+.col-card{border-radius:8px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);transition:.2s;position:relative;cursor:pointer;}
+.col-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.col-card img,.col-card-noimg{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;}
+.col-card-noimg{background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);text-align:center;padding:8px;}
+.col-card-info{padding:8px 10px 10px;}
+.col-card-title{font-size:11px;font-weight:500;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.col-card-meta{font-size:10px;color:var(--text3);}
+.col-fmt-pill{position:absolute;top:5px;left:5px;border-radius:3px;padding:2px 6px;font-size:9px;font-weight:600;color:#fff;}
+.col-fmt-4k{background:rgba(155,127,212,.9);}
+.col-fmt-blu{background:rgba(33,150,243,.9);}
+.col-fmt-crit{background:rgba(201,149,46,.9);color:#0b0b0e;}
+.col-fmt-dvd{background:rgba(76,175,130,.9);color:#0b0b0e;}
+.col-fmt-vhs{background:rgba(217,95,95,.9);}
+.col-fmt-other{background:rgba(100,100,100,.9);}
+.col-price-pill{position:absolute;bottom:5px;left:5px;background:rgba(76,175,130,.9);border-radius:3px;padding:2px 6px;font-size:9px;font-weight:600;color:#0b0b0e;}
+.col-del-btn{position:absolute;top:5px;right:5px;background:rgba(11,11,14,.85);border:1px solid var(--border2);border-radius:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;opacity:0;transition:.15s;color:var(--text2);}
+.col-card:hover .col-del-btn{opacity:1;}
+.col-del-btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* Barcode result */
+.barcode-found{background:rgba(76,175,130,.08);border:1px solid rgba(76,175,130,.3);border-radius:8px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;}
+.barcode-not-found{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text3);}
+
 /* ── COLLECTION WISHLIST ──────────────────────────────────────────────── */
 .col-wish-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:.2s;}
 .col-wish-card:hover{border-color:var(--border2);transform:translateY(-2px);}
@@ -989,8 +1016,14 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
     <!-- Collection tab -->
     <div id="col-panel-collection">
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-          <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">Mi colección</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <button onclick="setColFormat('')" id="col-fmt-all" class="col-fmt-btn col-fmt-active">Todos</button>
+          <button onclick="setColFormat('4K UHD')" id="col-fmt-4K UHD" class="col-fmt-btn">4K UHD</button>
+          <button onclick="setColFormat('Blu-ray')" id="col-fmt-Blu-ray" class="col-fmt-btn">Blu-ray</button>
+          <button onclick="setColFormat('Criterion')" id="col-fmt-Criterion" class="col-fmt-btn">Criterion</button>
+          <button onclick="setColFormat('DVD')" id="col-fmt-DVD" class="col-fmt-btn">DVD</button>
+          <button onclick="setColFormat('VHS')" id="col-fmt-VHS" class="col-fmt-btn">VHS</button>
+          <button onclick="setColFormat('Laserdisc')" id="col-fmt-Laserdisc" class="col-fmt-btn">Laserdisc</button>
           <select id="col-sort" onchange="renderCollection()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;padding:4px 8px;outline:none;font-family:inherit;margin-left:auto;">
             <option value="price_desc">Mayor precio</option>
             <option value="price_asc">Menor precio</option>
@@ -998,7 +1031,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
             <option value="format">Por formato</option>
           </select>
         </div>
-        <div class="films-grid" id="collection-grid"></div>
+        <div id="collection-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;"></div>
       </div>
     </div>
     <!-- Wishlist tab -->
@@ -1197,12 +1230,22 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
       <div style="font-family:'Fraunces',serif;font-size:18px;">📀 Agregar a Colección</div>
       <button onclick="closeOv('ov-col-add')" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;">✕</button>
     </div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Busca una película de tu biblioteca o TMDB:</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Busca por título, o ingresá el código de barras del disco:</div>
     <div style="display:flex;gap:8px;margin-bottom:4px;">
-      <input id="col-add-q" type="text" placeholder="Buscar película..." oninput="colAddSearch(this.value)"
+      <input id="col-add-q" type="text" placeholder="Buscar por título..." oninput="colAddSearch(this.value)"
         style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:.15s;"
         onfocus="this.style.borderColor='rgba(240,192,80,.4)'" onblur="this.style.borderColor='var(--border)'">
     </div>
+    <!-- Barcode row -->
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+      <div style="font-size:10px;color:var(--text3);white-space:nowrap;">📊 Código de barras:</div>
+      <input id="col-barcode-q" type="text" placeholder="Ej: 025192251344" maxlength="20"
+        style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;letter-spacing:.05em;transition:.15s;"
+        onfocus="this.style.borderColor='rgba(240,192,80,.4)'" onblur="this.style.borderColor='var(--border)'"
+        onkeydown="if(event.key==='Enter')lookupBarcode()">
+      <button onclick="lookupBarcode()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">🔍 Buscar</button>
+    </div>
+    <div id="col-barcode-result" style="display:none;margin-bottom:10px;"></div>
     <div id="col-add-results" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:14px;display:none;"></div>
     <!-- Selected film + fields -->
     <div id="col-add-fields" style="display:none;">
@@ -3826,16 +3869,27 @@ async function sendNewsletter() {
 }
 
 // ── COLLECTION ──
-let colActiveTab = 'collection';
+// ── COLLECTION ──
+let colActiveTab='collection', colActiveFormat='';
+
+function setColFormat(fmt){
+  colActiveFormat=fmt;
+  document.querySelectorAll('.col-fmt-btn').forEach(b=>b.classList.remove('col-fmt-active'));
+  const id='col-fmt-'+(fmt||'all');
+  const btn=document.getElementById(id);
+  if(btn) btn.classList.add('col-fmt-active');
+  renderCollection();
+}
+
 function switchColTab(tab) {
-  colActiveTab = tab;
-  document.getElementById('col-panel-collection').style.display = tab==='collection' ? 'block' : 'none';
-  document.getElementById('col-panel-wishlist').style.display  = tab==='wishlist'   ? 'block' : 'none';
-  document.getElementById('col-tab-collection').style.fontWeight = tab==='collection'?'600':'400';
-  document.getElementById('col-tab-collection').style.borderColor = tab==='collection'?'var(--border2)':'var(--border)';
-  document.getElementById('col-tab-collection').style.color = tab==='collection'?'var(--text)':'var(--text2)';
-  document.getElementById('col-tab-wishlist').style.fontWeight = tab==='wishlist'?'600':'400';
-  document.getElementById('col-tab-wishlist').style.color = tab==='wishlist'?'var(--text)':'var(--text2)';
+  colActiveTab=tab;
+  document.getElementById('col-panel-collection').style.display=tab==='collection'?'block':'none';
+  document.getElementById('col-panel-wishlist').style.display=tab==='wishlist'?'block':'none';
+  document.getElementById('col-tab-collection').style.fontWeight=tab==='collection'?'600':'400';
+  document.getElementById('col-tab-collection').style.borderColor=tab==='collection'?'var(--border2)':'var(--border)';
+  document.getElementById('col-tab-collection').style.color=tab==='collection'?'var(--text)':'var(--text2)';
+  document.getElementById('col-tab-wishlist').style.fontWeight=tab==='wishlist'?'600':'400';
+  document.getElementById('col-tab-wishlist').style.color=tab==='wishlist'?'var(--text)':'var(--text2)';
   if(tab==='wishlist') renderColWishlist();
 }
 
@@ -3843,42 +3897,126 @@ function renderCollection() {
   const physical=FILMS.filter(f=>f.physical);
   const totalValue=physical.reduce((s,f)=>s+(f.price||0),0);
   const byFormat={};
-  physical.forEach(f=>{const fmt=f.format||'Sin especificar';byFormat[fmt]=(byFormat[fmt]||0)+1;});
+  physical.forEach(f=>{const fmt=f.format||'Sin formato';byFormat[fmt]=(byFormat[fmt]||0)+1;});
+
+  // KPIs
   const kpis=document.getElementById('collection-kpis');
   kpis.innerHTML=`
     <div class="kpi"><div class="kpi-val">${physical.length}</div><div class="kpi-lbl">Títulos en físico</div></div>
     <div class="kpi"><div class="kpi-val" style="color:var(--green)">$${totalValue.toFixed(2)}</div><div class="kpi-lbl">Valor total</div></div>
-    <div class="kpi"><div class="kpi-val">${physical.length>0?(totalValue/physical.length).toFixed(2):0}</div><div class="kpi-lbl">Precio promedio</div></div>
+    <div class="kpi"><div class="kpi-val">${physical.length>0?(totalValue/physical.length).toFixed(2):'0.00'}</div><div class="kpi-lbl">Precio promedio</div></div>
     <div class="kpi"><div class="kpi-val">${getColWishlist().length}</div><div class="kpi-lbl">En wishlist</div></div>
-    ${Object.entries(byFormat).map(([fmt,n])=>`<div class="kpi"><div class="kpi-val">${n}</div><div class="kpi-lbl">${fmt}</div></div>`).join('')}`;
+    ${Object.entries(byFormat).sort((a,b)=>b[1]-a[1]).map(([fmt,n])=>`<div class="kpi"><div class="kpi-val">${n}</div><div class="kpi-lbl">${fmt}</div></div>`).join('')}`;
+
   const grid=document.getElementById('collection-grid');
   if(!physical.length){
     grid.innerHTML='<div class="empty" style="grid-column:1/-1"><p>Tu colección está vacía.<br>Usá el botón "+ Agregar película" para empezar.</p></div>';
     return;
   }
+
+  // Filter by format
+  let filtered=colActiveFormat ? physical.filter(f=>(f.format||'').toLowerCase().includes(colActiveFormat.toLowerCase())) : physical;
+
+  // Sort
   const sort=document.getElementById('col-sort')?.value||'price_desc';
-  const sorted=[...physical];
-  if(sort==='price_desc') sorted.sort((a,b)=>(b.price||0)-(a.price||0));
-  else if(sort==='price_asc') sorted.sort((a,b)=>(a.price||0)-(b.price||0));
-  else if(sort==='title') sorted.sort((a,b)=>a.title.localeCompare(b.title));
-  else if(sort==='format') sorted.sort((a,b)=>(a.format||'').localeCompare(b.format||''));
+  filtered=[...filtered];
+  if(sort==='price_desc') filtered.sort((a,b)=>(b.price||0)-(a.price||0));
+  else if(sort==='price_asc') filtered.sort((a,b)=>(a.price||0)-(b.price||0));
+  else if(sort==='title') filtered.sort((a,b)=>a.title.localeCompare(b.title));
+  else if(sort==='format') filtered.sort((a,b)=>(a.format||'').localeCompare(b.format||''));
+
   grid.innerHTML='';
-  sorted.forEach(f=>{
-    const card=makeCard(f,'films');
-    if(f.price){
-      const badge=document.createElement('div');
-      badge.style.cssText='position:absolute;bottom:6px;left:6px;background:rgba(76,175,130,.9);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:500;color:#0b0b0e;';
-      badge.textContent=`$${f.price.toFixed(2)}`;
-      card.querySelector('.poster').appendChild(badge);
+  filtered.forEach(f=>grid.appendChild(makeColCard(f)));
+}
+
+function makeColCard(f){
+  const div=document.createElement('div');
+  div.className='col-card';
+  const ps=f.poster?(f.poster.startsWith('http')?f.poster:`https://image.tmdb.org/t/p/w342${f.poster}`):null;
+  const fmtKey=(f.format||'').toLowerCase();
+  const fmtCls=fmtKey.includes('4k')?'col-fmt-4k':fmtKey.includes('blu')?'col-fmt-blu':fmtKey.includes('criterion')?'col-fmt-crit':fmtKey.includes('dvd')?'col-fmt-dvd':fmtKey.includes('vhs')?'col-fmt-vhs':'col-fmt-other';
+  const fmtLabel=f.format||'';
+  div.innerHTML=`
+    ${ps?`<img src="${ps}" loading="lazy" onerror="this.style.display='none'">`:`<div class="col-card-noimg">${esc(f.title.substring(0,30))}</div>`}
+    ${fmtLabel?`<div class="col-fmt-pill ${fmtCls}">${esc(fmtLabel)}</div>`:''}
+    ${f.price?`<div class="col-price-pill">$${f.price.toFixed(2)}</div>`:''}
+    <button class="col-del-btn" onclick="event.stopPropagation();removeFromCollection(${f.id})" title="Eliminar de colección">🗑</button>
+    <div class="col-card-info">
+      <div class="col-card-title">${esc(f.title)}</div>
+      <div class="col-card-meta">${f.year||''}${f.barcode?` · 📊 ${f.barcode}`:''}</div>
+      ${f.colNotes?`<div style="font-size:9px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(f.colNotes)}</div>`:''}
+    </div>`;
+  div.addEventListener('click',()=>openDetail(f.id));
+  return div;
+}
+
+function removeFromCollection(filmId){
+  if(!confirm('¿Quitar esta película de tu colección física?')) return;
+  const f=FILMS.find(x=>x.id===filmId);
+  if(!f) return;
+  f.physical=false;
+  f.format=null;
+  f.price=null;
+  f.barcode=null;
+  f.colNotes=null;
+  saveAll();
+  renderCollection();
+  showToast(`"${f.title}" eliminada de la colección`);
+}
+
+// ── BARCODE LOOKUP ────────────────────────────────────────────────────────
+async function lookupBarcode(){
+  const code=document.getElementById('col-barcode-q').value.trim().replace(/[^0-9]/g,'');
+  if(!code||code.length<8){showToast('Ingresá un código de barras válido (8-14 dígitos)');return;}
+  const box=document.getElementById('col-barcode-result');
+  box.style.display='block';
+  box.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0;">🔍 Consultando base de datos...</div>';
+  try {
+    // UPCitemdb — free tier, no key needed for occasional use
+    const res=await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${code}`,{headers:{'Accept':'application/json'}}).then(r=>r.json());
+    if(res.code==='OK' && res.items?.length){
+      const item=res.items[0];
+      const title=item.title||'';
+      const brand=item.brand||'';
+      const desc=(item.description||'').substring(0,120);
+      const price=item.lowest_recorded_price||item.highest_recorded_price||null;
+      const image=item.images?.[0]||null;
+      // Detect format from title/description
+      const combined=(title+' '+(item.category||'')).toLowerCase();
+      let detectedFormat='Blu-ray';
+      if(combined.includes('4k')||combined.includes('uhd')) detectedFormat='4K UHD';
+      else if(combined.includes('criterion')) detectedFormat='Criterion';
+      else if(combined.includes('dvd')) detectedFormat='DVD';
+      else if(combined.includes('vhs')) detectedFormat='VHS';
+      else if(combined.includes('laserdisc')) detectedFormat='Laserdisc';
+      // Auto-fill form
+      document.getElementById('col-add-q').value=title;
+      document.getElementById('col-add-format').value=detectedFormat;
+      if(price) document.getElementById('col-add-price').value=price.toFixed(2);
+      box.innerHTML=`<div class="barcode-found">
+        ${image?`<img src="${image}" style="width:42px;height:62px;object-fit:cover;border-radius:4px;flex-shrink:0;">`:''}
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:3px;">${esc(title)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${esc(brand)}${detectedFormat?' · '+detectedFormat:''}</div>
+          ${price?`<div style="font-size:12px;color:var(--gold2);">Precio registrado: $${price.toFixed(2)}</div>`:''}
+          ${desc?`<div style="font-size:10px;color:var(--text3);margin-top:4px;">${esc(desc)}</div>`:''}
+          <div style="font-size:10px;color:var(--green);margin-top:6px;">✓ Datos completados automáticamente</div>
+        </div>
+      </div>`;
+      // Also search TMDB to get poster
+      colAddSearch(title.replace(/(blu-ray|4k|uhd|dvd|criterion|remastered)/gi,'').trim());
+      // Save barcode for later
+      colAddFilm = colAddFilm || {};
+      colAddFilm.barcode = code;
+    } else {
+      box.innerHTML=`<div class="barcode-not-found">
+        ❌ Código <strong>${code}</strong> no encontrado en la base de datos.<br>
+        <span style="font-size:11px;">Intentá buscar el título manualmente.</span>
+      </div>`;
     }
-    if(f.format){
-      const fmt=document.createElement('div');
-      fmt.style.cssText='position:absolute;top:5px;right:5px;background:rgba(11,11,14,.85);border:1px solid var(--border2);border-radius:3px;padding:2px 5px;font-size:9px;color:var(--text2);';
-      fmt.textContent=f.format;
-      card.querySelector('.poster').appendChild(fmt);
-    }
-    grid.appendChild(card);
-  });
+  } catch(e) {
+    box.innerHTML=`<div class="barcode-not-found">Error de conexión. Intentá buscar por título.</div>`;
+  }
 }
 
 // ── COLLECTION ADD ────────────────────────────────────────────────────────
@@ -3945,14 +4083,18 @@ function saveColAdd(){
   const price=parseFloat(document.getElementById('col-add-price').value)||0;
   const notes=document.getElementById('col-add-notes').value.trim();
   if(colAddFilm.source==='local'){
-    // Update existing film
     const id=parseInt(colAddFilm.id.replace('local_',''));
     const f=FILMS.find(x=>x.id===id);
-    if(f){f.physical=true;f.format=fmt;if(price)f.price=price;if(notes)f.notes=notes;saveAll();showToast(`"${f.title}" agregada a tu colección`);}
+    if(f){
+      f.physical=true; f.format=fmt;
+      if(price) f.price=price;
+      if(notes) f.colNotes=notes;
+      if(colAddFilm.barcode) f.barcode=colAddFilm.barcode;
+      saveAll(); showToast(`"${f.title}" agregada a tu colección`);
+    }
   } else {
-    // Add new film from TMDB as physical-only entry
     const newId=Date.now();
-    const newFilm={id:newId,title:colAddFilm.title,year:parseInt(colAddFilm.year)||null,poster:colAddFilm.poster||null,physical:true,format:fmt,price:price||null,notes:notes||null,rating:null,director:'',country:''};
+    const newFilm={id:newId,title:colAddFilm.title,year:parseInt(colAddFilm.year)||null,poster:colAddFilm.poster||null,physical:true,format:fmt,price:price||null,colNotes:notes||null,barcode:colAddFilm.barcode||null,rating:null,director:'',country:''};
     FILMS.push(newFilm);
     saveAll();
     showToast(`"${colAddFilm.title}" agregada a tu colección`);
