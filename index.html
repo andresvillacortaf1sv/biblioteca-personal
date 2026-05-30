@@ -4036,19 +4036,20 @@ async function lookupBarcode(){
       document.getElementById('col-add-q').value=title;
       document.getElementById('col-add-format').value=detectedFormat;
       if(price) document.getElementById('col-add-price').value=price.toFixed(2);
+      // Set colAddFilm immediately so the button works
+      colAddFilm={id:'barcode_'+Date.now(), title, year:'', poster:image||'', source:'barcode', barcode:code};
       box.innerHTML=`<div class="barcode-found">
         ${image?`<img src="${image}" style="width:42px;height:62px;object-fit:cover;border-radius:4px;flex-shrink:0;">`:''}
-        <div>
+        <div style="flex:1;">
           <div style="font-size:13px;font-weight:500;margin-bottom:3px;">${esc(title)}</div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${esc(brand)}${detectedFormat?' · '+detectedFormat:''}</div>
-          ${price?`<div style="font-size:12px;color:var(--gold2);">Precio registrado: $${price.toFixed(2)}</div>`:''}
-          ${desc?`<div style="font-size:10px;color:var(--text3);margin-top:4px;">${esc(desc)}</div>`:''}
-          <div style="font-size:10px;color:var(--green);margin-top:6px;">✓ Datos completados automáticamente</div>
+          ${price?`<div style="font-size:12px;color:var(--gold2);margin-bottom:4px;">Precio registrado: $${price.toFixed(2)}</div>`:''}
+          ${desc?`<div style="font-size:10px;color:var(--text3);margin-top:2px;margin-bottom:8px;">${esc(desc)}</div>`:''}
+          <div style="font-size:10px;color:var(--green);margin-bottom:10px;">✓ Datos completados automáticamente</div>
+          <button onclick="saveColAdd()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">✓ Agregar a colección</button>
         </div>
       </div>`;
       colAddSearch(title.replace(/(blu-ray|4k|uhd|dvd|criterion|remastered)/gi,'').trim(), true);
-      colAddFilm=colAddFilm||{};
-      colAddFilm.barcode=code;
     } else {
       box.innerHTML=`<div class="barcode-not-found">
         ❌ Código <strong>${code}</strong> no encontrado en la base de datos.<br>
