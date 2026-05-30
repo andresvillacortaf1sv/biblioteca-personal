@@ -4046,7 +4046,7 @@ async function lookupBarcode(){
           <div style="font-size:10px;color:var(--green);margin-top:6px;">✓ Datos completados automáticamente</div>
         </div>
       </div>`;
-      colAddSearch(title.replace(/(blu-ray|4k|uhd|dvd|criterion|remastered)/gi,'').trim());
+      colAddSearch(title.replace(/(blu-ray|4k|uhd|dvd|criterion|remastered)/gi,'').trim(), true);
       colAddFilm=colAddFilm||{};
       colAddFilm.barcode=code;
     } else {
@@ -4086,7 +4086,7 @@ function openColAdd(){
   setTimeout(()=>document.getElementById('col-add-q').focus(),80);
 }
 
-async function colAddSearch(q){
+async function colAddSearch(q, autoSelect=false){
   const box=document.getElementById('col-add-results');
   const val=q.trim().toLowerCase();
   if(!val){box.style.display='none';return;}
@@ -4102,6 +4102,14 @@ async function colAddSearch(q){
     ...tmdbResults.map(m=>({id:'tmdb_'+m.id,title:m.title,year:m.release_date?.split('-')[0]||'',poster:m.poster_path?`https://image.tmdb.org/t/p/w92${m.poster_path}`:null,source:'tmdb',tmdb:m}))
   ];
   if(!items.length){box.style.display='none';return;}
+
+  // When called from barcode: auto-select the first result and show fields directly
+  if(autoSelect && items.length){
+    const first=items[0];
+    selectColAddFilm(first.id, first.title, first.year||'', first.poster||'', first.source);
+    return;
+  }
+
   box.style.display='block';
   box.innerHTML=items.map(item=>`
     <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:.15s;"
