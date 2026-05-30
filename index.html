@@ -4104,9 +4104,25 @@ async function colAddSearch(q, autoSelect=false){
   if(!items.length){box.style.display='none';return;}
 
   // When called from barcode: auto-select the first result and show fields directly
-  if(autoSelect && items.length){
-    const first=items[0];
-    selectColAddFilm(first.id, first.title, first.year||'', first.poster||'', first.source);
+  if(autoSelect){
+    if(items.length){
+      const first=items[0];
+      selectColAddFilm(first.id, first.title, first.year||'', first.poster||'', first.source);
+    } else {
+      // TMDB found nothing (e.g. box sets, collections) — use barcode title directly
+      const barcodeTitle=document.getElementById('col-add-q').value.trim();
+      if(barcodeTitle){
+        // Create a col-only entry with whatever title the barcode gave us
+        const tempId='barcode_'+Date.now();
+        colAddFilm={id:tempId, title:barcodeTitle, year:'', poster:'', source:'barcode'};
+        document.getElementById('col-add-results').style.display='none';
+        document.getElementById('col-add-fields').style.display='block';
+        const sel=document.getElementById('col-add-selected');
+        sel.innerHTML=`<div style="width:40px;height:60px;background:var(--bg3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:18px;">📀</div>
+          <div><div style="font-size:13px;font-weight:500;">${esc(barcodeTitle)}</div>
+          <div style="font-size:11px;color:var(--text3);">Sin coincidencia en TMDB · Solo colección</div></div>`;
+      }
+    }
     return;
   }
 
