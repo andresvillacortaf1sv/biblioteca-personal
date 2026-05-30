@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/barcode.js": {
+      "runtime": "edge"
+    }
+  },
   "headers": [
     {
       "source": "/api/(.*)",
