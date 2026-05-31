@@ -2514,28 +2514,56 @@ function renderTop100Content() {
       </div>`;
     }).join('')}</div>`;
   }
+  // Auto-load all photos in background after render
+  setTimeout(()=>autoLoadDirPhotos(dirs), 100);
 }
 
 // (setTop100View is defined above)
 
 // ── DIRECTOR PHOTOS ──
 const dirPhotoCache = {};
+// Track which directors we've already attempted to load
+const dirPhotoAttempted = new Set();
 
-async function loadDirPhoto(name, elId, directEl) {
+async function loadDirPhoto(name, elId) {
   if(dirPhotoCache[name]) {
-    const el = directEl || (elId ? document.getElementById(elId) : null);
-    if(el) el.innerHTML=`<img src="https://image.tmdb.org/t/p/w185${dirPhotoCache[name]}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">`;
+    const el = elId ? document.getElementById(elId) : null;
+    if(el) el.src = `https://image.tmdb.org/t/p/w185${dirPhotoCache[name]}`;
     return;
   }
+  if(dirPhotoAttempted.has(name)) return;
+  dirPhotoAttempted.add(name);
   try {
     const data=await fetch(`https://api.themoviedb.org/3/search/person?api_key=${TMDB_KEY}&query=${encodeURIComponent(name)}`).then(r=>r.json());
     const person=data.results?.[0];
     if(person?.profile_path){
       dirPhotoCache[name]=person.profile_path;
-      const el = directEl || (elId ? document.getElementById(elId) : null);
-      if(el) el.innerHTML=`<img src="https://image.tmdb.org/t/p/w185${person.profile_path}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="">`;
+      const el = elId ? document.getElementById(elId) : null;
+      if(el) el.src = `https://image.tmdb.org/t/p/w185${person.profile_path}`;
     }
   } catch(e){}
+}
+
+// Auto-load photos for all visible directors with a small delay between requests
+async function autoLoadDirPhotos(dirs) {
+  for(let i=0; i<dirs.length; i++){
+    const d = dirs[i];
+    if(dirPhotoCache[d.name] || dirPhotoAttempted.has(d.name)) continue;
+    dirPhotoAttempted.add(d.name);
+    try {
+      const data = await fetch(`https://api.themoviedb.org/3/search/person?api_key=${TMDB_KEY}&query=${encodeURIComponent(d.name)}`).then(r=>r.json());
+      const person = data.results?.[0];
+      if(person?.profile_path){
+        dirPhotoCache[d.name] = person.profile_path;
+        // Update any rendered img elements for this director
+        document.querySelectorAll(`img[data-name="${CSS.escape(d.name)}"]`).forEach(img=>{
+          img.src = `https://image.tmdb.org/t/p/w185${person.profile_path}`;
+        });
+      }
+    } catch(e){}
+    // Small delay to avoid rate limiting
+    if(i % 5 === 4) await new Promise(r=>setTimeout(r,300));
+  }
 }
 
 // Upload custom photo for director
@@ -2546,24 +2574,40 @@ function uploadDirPhoto(btn) {
   input.type='file'; input.accept='image/*';
   input.onchange=e=>{
     const file=e.target.files[0]; if(!file) return;
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      const dataUrl=ev.target.result;
-      dirPhotoCache[name]=null; // clear TMDB cache
-      // Store as data URL
-      localStorage.setItem('dirphoto_'+name, dataUrl);
+    // Resize image first to keep it small
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const maxSize=200;
+      const ratio=Math.min(maxSize/img.width, maxSize/img.height);
+      canvas.width=img.width*ratio;
+      canvas.height=img.height*ratio;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      URL.revokeObjectURL(url);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.75);
+      // Store in cache (always works)
+      dirPhotoCache[name]=null;
+      // Use a special marker in cache to indicate manual upload
+      dirPhotoCache['__manual__'+name]=dataUrl;
+      // Try localStorage but don't fail if full
+      try { localStorage.setItem('dirphoto_'+name, dataUrl); } catch(ex){}
       const el=document.getElementById(elId);
       if(el) el.src=dataUrl;
+      showToast('Foto actualizada');
     };
-    reader.readAsDataURL(file);
+    img.src=url;
   };
   input.click();
 }
 
 function getDirPhotoSrc(name, fallback) {
-  // Check localStorage for manual upload
-  const manual=localStorage.getItem('dirphoto_'+name);
-  if(manual) return manual;
+  // Check manual upload (in-memory first, then localStorage)
+  if(dirPhotoCache['__manual__'+name]) return dirPhotoCache['__manual__'+name];
+  try {
+    const manual=localStorage.getItem('dirphoto_'+name);
+    if(manual){ dirPhotoCache['__manual__'+name]=manual; return manual; }
+  } catch(e){}
   if(dirPhotoCache[name]) return `https://image.tmdb.org/t/p/w185${dirPhotoCache[name]}`;
   return fallback;
 }
