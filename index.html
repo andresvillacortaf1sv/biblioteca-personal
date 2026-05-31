@@ -2473,8 +2473,9 @@ function renderTop100Content() {
           <img id="${elId}" class="dir-rank-photo" src="${src}" loading="lazy"
             onerror="this.onerror=null;this.src='${fallback}'"
             title="Clic para cargar foto desde TMDB"
-            onclick="loadDirPhoto('${nameEsc}','${elId}')">
-          <button onclick="uploadDirPhoto('${nameEsc}','${elId}')" title="Subir foto manual"
+            data-name="${d.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"
+            onclick="loadDirPhoto(this.dataset.name,'${elId}')">
+          <button onclick="uploadDirPhoto(this)" data-name="${d.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-elid="${elId}" title="Subir foto manual"
             style="position:absolute;bottom:-2px;right:-2px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);">📁</button>
         </div>
         <div class="dir-rank-info">
@@ -2498,9 +2499,10 @@ function renderTop100Content() {
         <div style="position:relative;">
           <img id="${elId}" class="dir-grid-photo" src="${src}" loading="lazy"
             onerror="this.onerror=null;this.src='${fallback}'"
-            onclick="loadDirPhoto('${nameEsc}','${elId}')"
+            data-name="${d.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"
+            onclick="loadDirPhoto(this.dataset.name,'${elId}')"
             title="Clic para cargar foto">
-          <button onclick="uploadDirPhoto('${nameEsc}','${elId}')" title="Subir foto manual"
+          <button onclick="uploadDirPhoto(this)" data-name="${d.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-elid="${elId}" title="Subir foto manual"
             style="position:absolute;bottom:4px;right:4px;background:rgba(11,11,14,.8);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer;color:var(--text2);">📁</button>
         </div>
         <div class="dir-grid-pos">${i<3?['🥇','🥈','🥉'][i]:`#${i+1}`}</div>
@@ -2537,7 +2539,9 @@ async function loadDirPhoto(name, elId, directEl) {
 }
 
 // Upload custom photo for director
-function uploadDirPhoto(name, elId) {
+function uploadDirPhoto(btn) {
+  const name = btn.dataset.name;
+  const elId = btn.dataset.elid;
   const input=document.createElement('input');
   input.type='file'; input.accept='image/*';
   input.onchange=e=>{
@@ -2546,7 +2550,7 @@ function uploadDirPhoto(name, elId) {
     reader.onload=ev=>{
       const dataUrl=ev.target.result;
       dirPhotoCache[name]=null; // clear TMDB cache
-      // Store as data URL with special prefix
+      // Store as data URL
       localStorage.setItem('dirphoto_'+name, dataUrl);
       const el=document.getElementById(elId);
       if(el) el.src=dataUrl;
@@ -3894,8 +3898,7 @@ function switchColTab(tab) {
 }
 
 function renderCollection() {
-  // Merge films from main library (physical:true) + pure collection films
-  const physical=[...FILMS.filter(f=>f.physical), ...getColFilms()];
+  const physical=FILMS.filter(f=>f.physical);
   const totalValue=physical.reduce((s,f)=>s+(f.price||0),0);
   const byFormat={};
   physical.forEach(f=>{const fmt=f.format||'Sin formato';byFormat[fmt]=(byFormat[fmt]||0)+1;});
@@ -3947,56 +3950,12 @@ function makeColCard(f){
       <div class="col-card-meta">${f.year||''}${f.barcode?` · 📊 ${f.barcode}`:''}</div>
       ${f.colNotes?`<div style="font-size:9px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(f.colNotes)}</div>`:''}
     </div>`;
-  // col-only films don't have a detail page in the main library
-  if(!f.colOnly){
-    div.addEventListener('click',()=>openDetail(f.id));
-  }
+  div.addEventListener('click',()=>openDetail(f.id));
   return div;
 }
 
-function saveFilmToStorage(film){
-  try{
-    const sv=JSON.parse(localStorage.getItem('cl_films')||'[]');
-    const si=sv.findIndex(f=>f.id===film.id);
-    if(si>=0) sv[si]=film; else sv.unshift(film);
-    localStorage.setItem('cl_films',JSON.stringify(sv));
-  }catch(e){}
-}
-
-function saveAll(){
-  // Persist entire FILMS array (only entries that exist in localStorage or are pure-collection)
-  try{
-    const sv=JSON.parse(localStorage.getItem('cl_films')||'[]');
-    FILMS.forEach(film=>{
-      const si=sv.findIndex(f=>f.id===film.id);
-      if(si>=0) sv[si]=film;
-      // Don't auto-push base films — they live in films_data.json
-    });
-    localStorage.setItem('cl_films',JSON.stringify(sv));
-  }catch(e){}
-}
-
-// ── COLECCIÓN FÍSICA SEPARADA ─────────────────────────────────────────────
-// Films agregados SOLO a la colección física (no están en la biblioteca vista)
-function getColFilms(){ try{return JSON.parse(localStorage.getItem('cl_col_films')||'[]');}catch(e){return[];} }
-function saveColFilms(arr){ localStorage.setItem('cl_col_films',JSON.stringify(arr)); }
-
 function removeFromCollection(filmId){
   if(!confirm('¿Quitar esta película de tu colección física?')) return;
-
-  // Check if it's a pure collection film (not in main library)
-  const colFilms=getColFilms();
-  const colIdx=colFilms.findIndex(x=>x.id===filmId);
-  if(colIdx>=0){
-    // Pure collection film — just remove it from col_films, does NOT touch FILMS
-    colFilms.splice(colIdx,1);
-    saveColFilms(colFilms);
-    renderCollection();
-    showToast('Película eliminada de la colección física');
-    return;
-  }
-
-  // It's a film also in the main library — only remove physical flag
   const f=FILMS.find(x=>x.id===filmId);
   if(!f) return;
   f.physical=false;
@@ -4004,9 +3963,9 @@ function removeFromCollection(filmId){
   f.price=null;
   f.barcode=null;
   f.colNotes=null;
-  saveFilmToStorage(f);
+  saveAll();
   renderCollection();
-  showToast(`"${f.title}" quitada de la colección física (sigue en tu biblioteca)`);
+  showToast(`"${f.title}" eliminada de la colección`);
 }
 
 // ── BARCODE LOOKUP ────────────────────────────────────────────────────────
@@ -4017,8 +3976,8 @@ async function lookupBarcode(){
   box.style.display='block';
   box.innerHTML='<div style="font-size:12px;color:var(--text3);padding:6px 0;">🔍 Consultando base de datos...</div>';
   try {
-    // Calls our own Vercel proxy → avoids CORS issues with upcitemdb
-    const res=await fetch(`/api/barcode?upc=${code}`).then(r=>r.json());
+    // UPCitemdb — free tier, no key needed for occasional use
+    const res=await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${code}`,{headers:{'Accept':'application/json'}}).then(r=>r.json());
     if(res.code==='OK' && res.items?.length){
       const item=res.items[0];
       const title=item.title||'';
@@ -4026,6 +3985,7 @@ async function lookupBarcode(){
       const desc=(item.description||'').substring(0,120);
       const price=item.lowest_recorded_price||item.highest_recorded_price||null;
       const image=item.images?.[0]||null;
+      // Detect format from title/description
       const combined=(title+' '+(item.category||'')).toLowerCase();
       let detectedFormat='Blu-ray';
       if(combined.includes('4k')||combined.includes('uhd')) detectedFormat='4K UHD';
@@ -4033,53 +3993,33 @@ async function lookupBarcode(){
       else if(combined.includes('dvd')) detectedFormat='DVD';
       else if(combined.includes('vhs')) detectedFormat='VHS';
       else if(combined.includes('laserdisc')) detectedFormat='Laserdisc';
+      // Auto-fill form
       document.getElementById('col-add-q').value=title;
       document.getElementById('col-add-format').value=detectedFormat;
       if(price) document.getElementById('col-add-price').value=price.toFixed(2);
-      // Set colAddFilm immediately so the button works
-      colAddFilm={id:'barcode_'+Date.now(), title, year:'', poster:image||'', source:'barcode', barcode:code};
       box.innerHTML=`<div class="barcode-found">
         ${image?`<img src="${image}" style="width:42px;height:62px;object-fit:cover;border-radius:4px;flex-shrink:0;">`:''}
-        <div style="flex:1;">
+        <div>
           <div style="font-size:13px;font-weight:500;margin-bottom:3px;">${esc(title)}</div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${esc(brand)}${detectedFormat?' · '+detectedFormat:''}</div>
-          ${price?`<div style="font-size:12px;color:var(--gold2);margin-bottom:4px;">Precio registrado: $${price.toFixed(2)}</div>`:''}
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;margin-top:6px;">
-            <label style="font-size:11px;color:var(--text3);white-space:nowrap;">💵 Precio pagado (USD):</label>
-            <input id="barcode-price-input" type="number" step="0.01" min="0" placeholder="0.00"
-              value="${price?price.toFixed(2):''}"
-              onchange="document.getElementById('col-add-price').value=this.value"
-              oninput="document.getElementById('col-add-price').value=this.value"
-              style="width:90px;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;color:var(--gold2);font-size:14px;font-family:'Fraunces',serif;padding:5px 8px;outline:none;text-align:center;"
-              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'">
-          </div>
-          <div style="font-size:10px;color:var(--green);margin-bottom:10px;">✓ Datos completados automáticamente</div>
-          <button onclick="saveColAdd()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">✓ Agregar a colección</button>
+          ${price?`<div style="font-size:12px;color:var(--gold2);">Precio registrado: $${price.toFixed(2)}</div>`:''}
+          ${desc?`<div style="font-size:10px;color:var(--text3);margin-top:4px;">${esc(desc)}</div>`:''}
+          <div style="font-size:10px;color:var(--green);margin-top:6px;">✓ Datos completados automáticamente</div>
         </div>
       </div>`;
-      // colAddFilm already set with barcode data above — no TMDB search needed
+      // Also search TMDB to get poster
+      colAddSearch(title.replace(/(blu-ray|4k|uhd|dvd|criterion|remastered)/gi,'').trim());
+      // Save barcode for later
+      colAddFilm = colAddFilm || {};
+      colAddFilm.barcode = code;
     } else {
       box.innerHTML=`<div class="barcode-not-found">
         ❌ Código <strong>${code}</strong> no encontrado en la base de datos.<br>
-        <span style="font-size:11px;">Buscá el título manualmente. El código quedará guardado igual.</span>
-        <div style="margin-top:8px;">
-          <button onclick="colAddFilm=colAddFilm||{};colAddFilm.barcode='${code}';document.getElementById('col-barcode-result').style.display='none';showToast('✓ Código guardado')"
-            style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;">
-            📌 Guardar código de todas formas
-          </button>
-        </div>
+        <span style="font-size:11px;">Intentá buscar el título manualmente.</span>
       </div>`;
     }
   } catch(e) {
-    box.innerHTML=`<div class="barcode-not-found">
-      ⚠️ Error al consultar. Buscá el título manualmente.<br>
-      <div style="margin-top:8px;">
-        <button onclick="colAddFilm=colAddFilm||{};colAddFilm.barcode='${code}';document.getElementById('col-barcode-result').style.display='none';showToast('✓ Código guardado')"
-          style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;">
-          📌 Guardar código igual
-        </button>
-      </div>
-    </div>`;
+    box.innerHTML=`<div class="barcode-not-found">Error de conexión. Intentá buscar por título.</div>`;
   }
 }
 
@@ -4095,7 +4035,7 @@ function openColAdd(){
   setTimeout(()=>document.getElementById('col-add-q').focus(),80);
 }
 
-async function colAddSearch(q, autoSelect=false){
+async function colAddSearch(q){
   const box=document.getElementById('col-add-results');
   const val=q.trim().toLowerCase();
   if(!val){box.style.display='none';return;}
@@ -4111,30 +4051,6 @@ async function colAddSearch(q, autoSelect=false){
     ...tmdbResults.map(m=>({id:'tmdb_'+m.id,title:m.title,year:m.release_date?.split('-')[0]||'',poster:m.poster_path?`https://image.tmdb.org/t/p/w92${m.poster_path}`:null,source:'tmdb',tmdb:m}))
   ];
   if(!items.length){box.style.display='none';return;}
-
-  // When called from barcode: auto-select the first result and show fields directly
-  if(autoSelect){
-    if(items.length){
-      const first=items[0];
-      selectColAddFilm(first.id, first.title, first.year||'', first.poster||'', first.source);
-    } else {
-      // TMDB found nothing (e.g. box sets, collections) — use barcode title directly
-      const barcodeTitle=document.getElementById('col-add-q').value.trim();
-      if(barcodeTitle){
-        // Create a col-only entry with whatever title the barcode gave us
-        const tempId='barcode_'+Date.now();
-        colAddFilm={id:tempId, title:barcodeTitle, year:'', poster:'', source:'barcode'};
-        document.getElementById('col-add-results').style.display='none';
-        document.getElementById('col-add-fields').style.display='block';
-        const sel=document.getElementById('col-add-selected');
-        sel.innerHTML=`<div style="width:40px;height:60px;background:var(--bg3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:18px;">📀</div>
-          <div><div style="font-size:13px;font-weight:500;">${esc(barcodeTitle)}</div>
-          <div style="font-size:11px;color:var(--text3);">Sin coincidencia en TMDB · Solo colección</div></div>`;
-      }
-    }
-    return;
-  }
-
   box.style.display='block';
   box.innerHTML=items.map(item=>`
     <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:.15s;"
@@ -4171,7 +4087,6 @@ function saveColAdd(){
   const price=parseFloat(document.getElementById('col-add-price').value)||0;
   const notes=document.getElementById('col-add-notes').value.trim();
   if(colAddFilm.source==='local'){
-    // Film already in main library — just add physical flag
     const id=parseInt(colAddFilm.id.replace('local_',''));
     const f=FILMS.find(x=>x.id===id);
     if(f){
@@ -4179,30 +4094,13 @@ function saveColAdd(){
       if(price) f.price=price;
       if(notes) f.colNotes=notes;
       if(colAddFilm.barcode) f.barcode=colAddFilm.barcode;
-      saveFilmToStorage(f);
-      showToast(`"${f.title}" agregada a tu colección`);
+      saveAll(); showToast(`"${f.title}" agregada a tu colección`);
     }
   } else {
-    // TMDB film — save to SEPARATE collection storage, NOT to FILMS
-    const colFilms=getColFilms();
     const newId=Date.now();
-    // Use poster from colAddFilm (already a full URL from TMDB search)
-    const poster=colAddFilm.poster||null;
-    const newFilm={
-      id:newId,
-      title:colAddFilm.title,
-      year:parseInt(colAddFilm.year)||null,
-      poster:poster,
-      physical:true,
-      format:fmt,
-      price:price||null,
-      colNotes:notes||null,
-      barcode:colAddFilm.barcode||null,
-      // Mark as col-only so we know it's not a watched film
-      colOnly:true
-    };
-    colFilms.unshift(newFilm);
-    saveColFilms(colFilms);
+    const newFilm={id:newId,title:colAddFilm.title,year:parseInt(colAddFilm.year)||null,poster:colAddFilm.poster||null,physical:true,format:fmt,price:price||null,colNotes:notes||null,barcode:colAddFilm.barcode||null,rating:null,director:'',country:''};
+    FILMS.push(newFilm);
+    saveAll();
     showToast(`"${colAddFilm.title}" agregada a tu colección`);
   }
   closeOv('ov-col-add');
