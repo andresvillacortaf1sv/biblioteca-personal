@@ -758,8 +758,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
   gap: 8px !important;
 }
 .home-recent-grid {
-  grid-template-columns: repeat(10, 1fr) !important;
-  gap: 4px !important;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+  gap: 5px !important;
 }
 
 /* 2. Animaciones de entrada — spring curve */
@@ -1426,7 +1426,7 @@ select {
 /* ── Poster strip (recent films) ── */
 .lb-poster-strip {
   display: grid !important;
-  grid-template-columns: repeat(16, minmax(0, 58px)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
   gap: 5px !important;
   margin-bottom: 0 !important;
   padding-bottom: 18px;
@@ -3690,7 +3690,7 @@ function renderHomeKPIs(){
 }
 
 function renderHomeRecent(){
-  const sorted=[...FILMS].sort((a,b)=>b.id-a.id).slice(0,16);
+  const sorted=[...FILMS].sort((a,b)=>b.id-a.id).slice(0,24);
   const badge = document.getElementById('home-recent-badge');
   if(badge) badge.textContent = `— ${sorted.length} más recientes`;
   const grid = document.getElementById('home-recent-films');
