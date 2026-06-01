@@ -1535,13 +1535,14 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 
 // ══════════════════════════════════════════════════════════════════
 // IndexedDB storage layer — replaces localStorage for all app data
-// (cl_theme stays in localStorage — it's a single tiny string)
+// Strategy: in-memory cache (_idbCache) keeps reads synchronous.
+// IDB writes are async fire-and-forget. Boot loads cache from IDB.
 // ══════════════════════════════════════════════════════════════════
 const DB_NAME = 'biblioteca_db';
 const DB_VER  = 1;
-const STORE   = 'kv'; // single key-value store
-
+const STORE   = 'kv';
 let _db = null;
+const _idbCache = {};
 
 function openDB() {
   if (_db) return Promise.resolve(_db);
@@ -1549,56 +1550,62 @@ function openDB() {
     const req = indexedDB.open(DB_NAME, DB_VER);
     req.onupgradeneeded = e => {
       const db = e.target.result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE);
-      }
+      if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
     };
     req.onsuccess = e => { _db = e.target.result; resolve(_db); };
     req.onerror   = e => reject(e.target.error);
   });
 }
 
-async function idbGet(key) {
+function _idbWrite(key, value) {
+  openDB().then(db => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(value, key);
+  }).catch(e => console.error('IDB write error', key, e));
+}
+
+async function _idbRead(key) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx  = db.transaction(STORE, 'readonly');
-    const req = tx.objectStore(STORE).get(key);
+    const req = db.transaction(STORE, 'readonly').objectStore(STORE).get(key);
     req.onsuccess = () => resolve(req.result ?? null);
     req.onerror   = e => reject(e.target.error);
   });
 }
 
-async function idbSet(key, value) {
+async function _idbAllKeys() {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx  = db.transaction(STORE, 'readwrite');
-    const req = tx.objectStore(STORE).put(value, key);
-    req.onsuccess = () => resolve();
-    req.onerror   = e => reject(e.target.error);
-  });
-}
-
-async function idbDel(key) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx  = db.transaction(STORE, 'readwrite');
-    const req = tx.objectStore(STORE).delete(key);
-    req.onsuccess = () => resolve();
-    req.onerror   = e => reject(e.target.error);
-  });
-}
-
-async function idbKeys() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx  = db.transaction(STORE, 'readonly');
-    const req = tx.objectStore(STORE).getAllKeys();
+    const req = db.transaction(STORE, 'readonly').objectStore(STORE).getAllKeys();
     req.onsuccess = () => resolve(req.result);
     req.onerror   = e => reject(e.target.error);
   });
 }
 
-// Migrate any existing localStorage data to IDB (runs once)
+// Synchronous get/set that use the in-memory cache + async IDB write
+function idbGetSync(key, def) {
+  return (key in _idbCache) ? _idbCache[key] : def;
+}
+function idbSetSync(key, value) {
+  _idbCache[key] = value;
+  _idbWrite(key, value);
+}
+
+// Load all keys we care about into _idbCache before boot
+const IDB_KEYS = [
+  'cl_films','cl_dels','cl_rankorder','cl_rankorder_pers',
+  'cl_blog','cl_col_wish','cl_watchlist','cl_lists'
+];
+
+async function idbPreload() {
+  const allKeys = await _idbAllKeys().catch(() => []);
+  const keysToLoad = [...IDB_KEYS, ...allKeys.filter(k => k.startsWith('dirphoto_') || k.startsWith('cl_home_') || k.startsWith('cl_news_v2_'))];
+  await Promise.all(keysToLoad.map(async k => {
+    try { _idbCache[k] = await _idbRead(k); } catch(e) {}
+  }));
+}
+
+// Migrate existing localStorage data to IDB (runs once on first load)
 async function migrateFromLocalStorage() {
   const KEYS = ['cl_films','cl_dels','cl_rankorder','cl_rankorder_pers',
                 'cl_blog','cl_col_wish','cl_watchlist','cl_lists'];
@@ -1606,37 +1613,34 @@ async function migrateFromLocalStorage() {
     const raw = localStorage.getItem(k);
     if (raw !== null) {
       try {
-        const existing = await idbGet(k);
-        if (existing === null) {
-          await idbSet(k, JSON.parse(raw));
-        }
+        const parsed = JSON.parse(raw);
+        _idbCache[k] = parsed;
+        _idbWrite(k, parsed);
         localStorage.removeItem(k);
-      } catch(e) { console.warn('Migration error for', k, e); }
+      } catch(e) {}
     }
   }
-  // Migrate dir photos
   const toRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
     if (k && k.startsWith('dirphoto_')) {
-      try {
-        const existing = await idbGet(k);
-        if (existing === null) await idbSet(k, localStorage.getItem(k));
-        toRemove.push(k);
-      } catch(e) {}
+      const val = localStorage.getItem(k);
+      _idbCache[k] = val;
+      _idbWrite(k, val);
+      toRemove.push(k);
     }
   }
   toRemove.forEach(k => localStorage.removeItem(k));
-  // Migrate date-keyed caches (cl_home_*, cl_news_v2_*)
-  const cacheKeys = [];
+  const cacheToMigrate = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && (k.startsWith('cl_home_') || k.startsWith('cl_news_v2_'))) cacheKeys.push(k);
+    if (k && (k.startsWith('cl_home_') || k.startsWith('cl_news_v2_'))) cacheToMigrate.push(k);
   }
-  for (const k of cacheKeys) {
+  for (const k of cacheToMigrate) {
     try {
-      const existing = await idbGet(k);
-      if (existing === null) await idbSet(k, JSON.parse(localStorage.getItem(k)));
+      const parsed = JSON.parse(localStorage.getItem(k));
+      _idbCache[k] = parsed;
+      _idbWrite(k, parsed);
       localStorage.removeItem(k);
     } catch(e) {}
   }
@@ -1660,11 +1664,12 @@ let top100ViewMode = 'list';
 async function boot() {
   initTheme();
   await migrateFromLocalStorage();
+  await idbPreload();
   try { const r = await fetch('films_data.json'); FILMS = await r.json(); } catch(e) { FILMS = window.__FILMS_DATA__ || []; }
   try {
-    const saved = (await idbGet('cl_films')) || [];
+    const saved = idbGetSync('cl_films', []);
     saved.forEach(s => { const i = FILMS.findIndex(f => f.id === s.id); if (i >= 0) FILMS[i] = s; else FILMS.unshift(s); });
-    const dels = (await idbGet('cl_dels')) || [];
+    const dels = idbGetSync('cl_dels', []);
     FILMS = FILMS.filter(f => !dels.includes(f.id));
   } catch(e) {}
   populateOpts(); applyFilters(); applyPersonal(); renderStats();
@@ -2052,14 +2057,14 @@ function saveFilm() {
   };
   if(isEdit){const i=FILMS.findIndex(f=>f.id===film.id);if(i>=0)FILMS[i]=film;else FILMS.unshift(film);}
   else FILMS.unshift(film);
-  try {
-    const sv = (await idbGet('cl_films')) || [];
-    const si = sv.findIndex(f => f.id === film.id);
-    if(si >= 0) sv[si] = film; else sv.unshift(film);
-    await idbSet('cl_films', sv);
+  try{
+    const sv = idbGetSync('cl_films', []);
+    const si = sv.findIndex(f=>f.id===film.id);
+    if(si>=0) sv[si]=film; else sv.unshift(film);
+    idbSetSync('cl_films', sv);
     showToast(isEdit?`"${title}" actualizada`:`"${title}" agregada`);
-  } catch(e) {
-    console.error('Error al guardar en IDB:', e);
+  }catch(e){
+    console.error('Error al guardar:', e);
     showToast('⚠️ Error al guardar. Revisá la consola.');
   }
   closeOv('ov-form');applyFilters();applyPersonal();renderStats();
@@ -2070,15 +2075,13 @@ function confirmDel(id) {
   document.getElementById('ov-confirm').classList.add('on');
   document.getElementById('confirm-del-btn').onclick=()=>{
     FILMS=FILMS.filter(f=>f.id!==id);
-    (async()=>{
-      try{
-        const sv=(await idbGet('cl_films'))||[];
-        await idbSet('cl_films',sv.filter(f=>f.id!==id));
-        const dels=(await idbGet('cl_dels'))||[];
-        dels.push(id);
-        await idbSet('cl_dels',dels);
-      }catch(e){console.error('IDB delete error',e);}
-    })();
+    try{
+      const sv=idbGetSync('cl_films',[]);
+      idbSetSync('cl_films',sv.filter(f=>f.id!==id));
+      const dels=idbGetSync('cl_dels',[]);
+      dels.push(id);
+      idbSetSync('cl_dels',dels);
+    }catch(e){}
     closeOv('ov-confirm');applyFilters();applyPersonal();renderStats();showToast('Película eliminada');
   };
 }
@@ -2095,7 +2098,7 @@ function buildOrder(type) {
 
   // Load saved order — ONLY used to reorder within same-score groups (drag-drop)
   let savedOrder = [];
-  try { savedOrder = (await idbGet(storageKey)) || []; } catch(e) {}
+  try { savedOrder = idbGetSync(storageKey, []); } catch(e) {}
   const savedPos = {};
   savedOrder.forEach((id, i) => { savedPos[id] = i; });
 
@@ -2123,7 +2126,7 @@ function buildOrder(type) {
 }
 
 function initRanking(type) {
-  // IDB has no size limit; stale-data cleanup no longer needed
+  // IDB has no 5MB limit; old stale-data cleanup removed
   if(type==='obj'||type===undefined) { rankObjOrder=buildOrder('obj'); rankCurrentMode='obj'; }
   else { rankPersOrder=buildOrder('pers'); rankCurrentMode='pers'; }
   populateRankFilters();
@@ -2247,10 +2250,10 @@ function setRankView(type,mode,btn) { /* legacy */ }
 
 function saveRankingCurrent() { saveRanking(rankCurrentMode); }
 
-async function saveRanking(type) {
+function saveRanking(type) {
   const key=type==='obj'?'cl_rankorder':'cl_rankorder_pers';
   const order=(type==='obj'?rankObjOrder:rankPersOrder).slice(0,1050);
-  try{await idbSet(key,order);showToast('✓ Orden guardado (Top 1050)');}catch(e){showToast('Error al guardar');}
+  try{idbSetSync(key,order);showToast('✓ Orden guardado (Top 1050)');}catch(e){showToast('Error al guardar');}
 }
 
 function makeRankItem(f,pos,canDrag,k,type) {
@@ -2711,11 +2714,10 @@ function uploadDirPhoto(btn) {
       dirPhotoCache[name]=null;
       // Use a special marker in cache to indicate manual upload
       dirPhotoCache['__manual__'+name]=dataUrl;
+      idbSetSync('dirphoto_'+name, dataUrl);
       const el=document.getElementById(elId);
       if(el) el.src=dataUrl;
-      idbSet('dirphoto_'+name, dataUrl)
-        .then(()=>showToast('Foto actualizada'))
-        .catch(e=>{ console.error('IDB photo save error',e); showToast('⚠️ Error al guardar foto'); });
+      showToast('Foto actualizada');
     };
     img.src=url;
   };
@@ -2723,13 +2725,10 @@ function uploadDirPhoto(btn) {
 }
 
 function getDirPhotoSrc(name, fallback) {
-  // Check in-memory cache first (sync, fast)
   if(dirPhotoCache['__manual__'+name]) return dirPhotoCache['__manual__'+name];
+  const stored = idbGetSync('dirphoto_'+name, null);
+  if(stored){ dirPhotoCache['__manual__'+name]=stored; return stored; }
   if(dirPhotoCache[name]) return `https://image.tmdb.org/t/p/w185${dirPhotoCache[name]}`;
-  // Async load from IDB — update element once loaded
-  idbGet('dirphoto_'+name).then(val => {
-    if(val){ dirPhotoCache['__manual__'+name]=val; }
-  }).catch(()=>{});
   return fallback;
 }
 
@@ -2754,7 +2753,7 @@ function initHome(forceRefresh) {
   const today=new Date().toISOString().split('T')[0];
   const cacheKey='cl_home_'+today;
   let cached=null;
-  try{const _cv=await idbGet(cacheKey);if(_cv!==null)cached=_cv;}catch(e){}
+  try{cached=idbGetSync(cacheKey,null);}catch(e){}
   if(cached&&!forceRefresh){
     renderHomeRecs(cached.recs, cached.aiGenerated);
     renderHomeCycle(cached.cycle);
@@ -2970,7 +2969,7 @@ REGLAS CRÍTICAS:
     const parsed = JSON.parse(cleaned);
     if(!parsed.recs||!parsed.cycle) throw new Error('Estructura inválida');
     console.log('[BibliotecaPersonal] Recomendaciones IA generadas:', parsed.recs.map(r=>r.title));
-    idbSet(cacheKey, {recs:parsed.recs, cycle:parsed.cycle, aiGenerated:true}).catch(()=>{});
+    idbSetSync(cacheKey, {recs:parsed.recs, cycle:parsed.cycle, aiGenerated:true});
     renderHomeRecs(parsed.recs, true);
     renderHomeCycle(parsed.cycle);
   } catch(e) {
@@ -2979,7 +2978,7 @@ REGLAS CRÍTICAS:
     await new Promise(r=>setTimeout(r,1500));
     const recs = generateLocalRecs();
     const cycle = generateLocalCycle();
-    idbSet(cacheKey, {recs, cycle, aiGenerated:false}).catch(()=>{});
+    idbSetSync(cacheKey, {recs, cycle, aiGenerated:false});
     renderHomeRecs(recs, false);
     renderHomeCycle(cycle);
   }
@@ -3546,14 +3545,11 @@ function initTheme() {
 
 // ── BACKUP: EXPORT / IMPORT ──────────────────────────────────────────────────
 
-async function openBackupModal() {
-  // Show stats — read from IDB
-  const films   = (await idbGet('cl_films'))          || [];
-  const dels    = (await idbGet('cl_dels'))            || [];
-  const rankObj = (await idbGet('cl_rankorder'))       || [];
-  const allKeys = await idbKeys();
-  const photoCount = allKeys.filter(k => k.startsWith('dirphoto_')).length;
-  // Estimate IDB usage (rough: stringify sizes)
+function openBackupModal() {
+  const films   = idbGetSync('cl_films', []);
+  const dels    = idbGetSync('cl_dels', []);
+  const rankObj = idbGetSync('cl_rankorder', []);
+  const photoCount = Object.keys(_idbCache).filter(k=>k.startsWith('dirphoto_')).length;
   const storageHtml = `<div style="margin-top:8px;">
     <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
       <span>💾 Almacenamiento</span>
@@ -3573,24 +3569,22 @@ function closeBackupModal() {
   document.getElementById('backup-overlay').classList.remove('on');
 }
 
-async function exportData() {
-  const allKeys = await idbKeys();
+function exportData() {
   const data = {
     version: 1,
     exportDate: new Date().toISOString(),
-    cl_films:          (await idbGet('cl_films'))          || [],
-    cl_dels:           (await idbGet('cl_dels'))           || [],
-    cl_rankorder:      (await idbGet('cl_rankorder'))      || [],
-    cl_rankorder_pers: (await idbGet('cl_rankorder_pers')) || [],
-    cl_blog:           (await idbGet('cl_blog'))           || [],
-    cl_col_wish:       (await idbGet('cl_col_wish'))       || [],
-    cl_watchlist:      (await idbGet('cl_watchlist'))      || [],
-    cl_lists:          (await idbGet('cl_lists'))          || [],
-    dirPhotos: {},
+    cl_films:          idbGetSync('cl_films', []),
+    cl_dels:           idbGetSync('cl_dels', []),
+    cl_rankorder:      idbGetSync('cl_rankorder', []),
+    cl_rankorder_pers: idbGetSync('cl_rankorder_pers', []),
+    cl_blog:           idbGetSync('cl_blog', []),
+    cl_col_wish:       idbGetSync('cl_col_wish', []),
+    cl_watchlist:      idbGetSync('cl_watchlist', []),
+    cl_lists:          idbGetSync('cl_lists', []),
+    dirPhotos: Object.fromEntries(
+      Object.entries(_idbCache).filter(([k])=>k.startsWith('dirphoto_'))
+    ),
   };
-  for (const k of allKeys) {
-    if (k.startsWith('dirphoto_')) data.dirPhotos[k] = await idbGet(k);
-  }
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3624,23 +3618,23 @@ function processImportFile(file) {
   statusEl.style.color='var(--text3)';
   statusEl.textContent='Leyendo archivo...';
   const reader = new FileReader();
-  reader.onload = async e => {
+  reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
       if(!data.version || !Array.isArray(data.cl_films)) throw new Error('Formato inválido');
 
-      // Apply to IDB
-      await idbSet('cl_films',          data.cl_films          || []);
-      await idbSet('cl_dels',           data.cl_dels           || []);
-      await idbSet('cl_rankorder',      data.cl_rankorder      || []);
-      await idbSet('cl_rankorder_pers', data.cl_rankorder_pers || []);
-      if(data.cl_blog)      await idbSet('cl_blog',      data.cl_blog);
-      if(data.cl_col_wish)  await idbSet('cl_col_wish',  data.cl_col_wish);
-      if(data.cl_watchlist) await idbSet('cl_watchlist', data.cl_watchlist);
-      if(data.cl_lists)     await idbSet('cl_lists',     data.cl_lists);
+      // Apply to IDB cache + write
+      idbSetSync('cl_films',          data.cl_films          || []);
+      idbSetSync('cl_dels',           data.cl_dels           || []);
+      idbSetSync('cl_rankorder',      data.cl_rankorder      || []);
+      idbSetSync('cl_rankorder_pers', data.cl_rankorder_pers || []);
+      if(data.cl_blog)      idbSetSync('cl_blog',      data.cl_blog);
+      if(data.cl_col_wish)  idbSetSync('cl_col_wish',  data.cl_col_wish);
+      if(data.cl_watchlist) idbSetSync('cl_watchlist', data.cl_watchlist);
+      if(data.cl_lists)     idbSetSync('cl_lists',     data.cl_lists);
       // Restore dir photos
       const photos = data.dirPhotos || {};
-      for(const [k,v] of Object.entries(photos)) await idbSet(k,v);
+      Object.entries(photos).forEach(([k,v])=>idbSetSync(k,v));
 
       const filmCount = (data.cl_films||[]).length;
       const photoCount = Object.keys(photos).length;
@@ -3700,7 +3694,7 @@ async function loadNews(forceRefresh) {
   // Cache 2 hours
   const cacheKey = 'cl_news_v2_' + Math.floor(Date.now()/(2*60*60*1000));
   let cached = null;
-  try { const _cv=await idbGet(cacheKey); if(_cv!==null) cached=_cv; } catch(e) {}
+  try { cached = idbGetSync(cacheKey, null); } catch(e) {}
 
   if(cached && !forceRefresh) { renderNews(cached); return; }
 
@@ -3716,7 +3710,7 @@ async function loadNews(forceRefresh) {
     if(!res.ok) throw new Error(`${res.status}`);
     const data = await res.json();
     if(!data.articles?.length) throw new Error('Sin artículos');
-    idbSet(cacheKey, data).catch(()=>{});
+    idbSetSync(cacheKey, data);
     renderNews(data);
   } catch(e) {
     el.innerHTML = `<div class="news-error">No se pudieron cargar las noticias (${e.message}).<br>
@@ -3812,12 +3806,12 @@ const BLOG_PASSWORD = 'cineblog2026'; // Cambiar por tu contraseña
 let blogAdminMode = false;
 let blogEditingId = null;
 
-async function getBlogPosts() {
-  try { return (await idbGet('cl_blog')) || []; } catch(e) { return []; }
+function getBlogPosts() {
+  return idbGetSync('cl_blog', []);
 }
 
-async function saveBlogPosts(posts) {
-  await idbSet('cl_blog', posts);
+function saveBlogPosts(posts) {
+  idbSetSync('cl_blog', posts);
 }
 
 function renderBlog() {
@@ -4285,8 +4279,8 @@ function saveColAdd(){
 }
 
 // ── COLLECTION WISHLIST ───────────────────────────────────────────────────
-async function getColWishlist(){ try{return (await idbGet('cl_col_wish'))||[];}catch(e){return[];} }
-async function saveColWishlist(w){ await idbSet('cl_col_wish',w); }
+function getColWishlist(){ return idbGetSync('cl_col_wish', []); }
+function saveColWishlist(w){ idbSetSync('cl_col_wish', w); }
 
 let colWishFilm=null;
 function openColWishAdd(){
@@ -4784,8 +4778,8 @@ window.__FILMS_DATA__ = [{"id":1,"title":"8½","year":1963,"director":"Federico 
 // ══════════════════════════════════════════════════════════════════════════
 // ── WATCHLIST ─────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
-async function getWatchlist(){ try{return (await idbGet("cl_watchlist"))||[];}catch(e){return[];} }
-async function saveWatchlist(wl){ await idbSet("cl_watchlist",wl); }
+function getWatchlist(){ return idbGetSync("cl_watchlist", []); }
+function saveWatchlist(wl){ idbSetSync("cl_watchlist", wl); }
 
 function wlSearch(q){
   const res=document.getElementById("wl-search-results");
@@ -4883,8 +4877,8 @@ function renderWatchlist(){
 // ══════════════════════════════════════════════════════════════════════════
 // ── LISTAS TEMÁTICAS ──────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
-async function getLists(){ try{return (await idbGet("cl_lists"))||[];}catch(e){return[];} }
-async function saveLists(l){ await idbSet("cl_lists",l); }
+function getLists(){ return idbGetSync("cl_lists", []); }
+function saveLists(l){ idbSetSync("cl_lists", l); }
 
 function openCreateList(){
   const emoji=prompt("Emoji para la lista (ej: 🎬 🌍 ❤️):","🎬");
