@@ -1293,7 +1293,7 @@ select {
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
 
-/* ═══ LETTERBOXD-STYLE HOME ════════════════════════════════════════════════ */
+
 
 .lb-home { display: flex; flex-direction: column; }
 
@@ -1525,6 +1525,133 @@ select {
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
+
+/* ═══ HOME POLISH ══════════════════════════════════════════════════════════ */
+
+/* Hero: gradiente más dramático y cinematográfico */
+.home-hero-overlay {
+  background: linear-gradient(
+    105deg,
+    rgba(13,13,16,.98) 0%,
+    rgba(13,13,16,.88) 35%,
+    rgba(13,13,16,.5) 65%,
+    rgba(13,13,16,.08) 100%
+  ) !important;
+}
+
+/* Hero title: más impactante */
+.home-hero-title {
+  font-size: 62px !important;
+  letter-spacing: -2.5px !important;
+  line-height: .92 !important;
+  margin-bottom: 10px !important;
+}
+
+/* Eyebrow: línea dorada más elegante */
+.home-hero-eyebrow {
+  color: var(--gold2) !important;
+  letter-spacing: .22em !important;
+  margin-bottom: 20px !important;
+}
+.home-hero-eyebrow::before {
+  width: 32px !important;
+  background: var(--gold2) !important;
+}
+
+/* Stats del hero: valores más grandes */
+.home-hero-stat-val {
+  font-size: 40px !important;
+  letter-spacing: -1.5px !important;
+}
+.home-hero-stat-lbl {
+  letter-spacing: .14em !important;
+}
+
+/* Section headers: más refinados */
+.home-section-hd-title::after {
+  width: 28px !important;
+  height: 2px !important;
+}
+
+/* Recent tiles: hover más cinematográfico */
+.home-recent-tile:hover {
+  transform: scale(1.06) translateY(-3px) !important;
+  z-index: 3 !important;
+}
+.home-recent-tile img,
+.home-recent-tile-noimg {
+  border-radius: 5px !important;
+  transition: box-shadow .2s !important;
+}
+.home-recent-tile:hover img {
+  box-shadow: 0 8px 24px rgba(0,0,0,.6) !important;
+}
+
+/* Rating badge en tiles */
+.home-recent-tile-rating {
+  font-family: 'Fraunces', serif !important;
+  font-size: 11px !important;
+  letter-spacing: -.3px !important;
+  padding: 2px 6px !important;
+}
+
+/* Rec items: separador más suave */
+.home-rec-item {
+  border-bottom-color: rgba(255,255,255,.04) !important;
+}
+
+/* Rec número: más grande y sutil */
+.home-rec-num {
+  color: rgba(255,255,255,.05) !important;
+  font-size: 36px !important;
+}
+
+/* Rec title: más legible */
+.home-rec-title {
+  font-size: 16px !important;
+  letter-spacing: -.2px !important;
+}
+
+/* Body: separador más sutil entre main y sidebar */
+.home-main { border-right-color: rgba(255,255,255,.05) !important; }
+
+/* Sidebar section headers */
+.home-sidebar .home-section-hd { margin-bottom: 16px !important; }
+
+/* Upcoming items: spacing */
+.home-upcoming-item { padding: 11px 0 !important; }
+
+/* Ephemeris: más elegante */
+.home-ephemeris {
+  border-top-color: rgba(255,255,255,.06) !important;
+}
+.home-ephemeris-label {
+  color: var(--gold) !important;
+  letter-spacing: .2em !important;
+}
+.home-ephemeris-text {
+  font-size: 12px !important;
+  line-height: 1.75 !important;
+}
+
+/* Ciclo semanal: films más compactos */
+.home-cycle-film { padding: 10px 0 !important; }
+.home-cycle-title { font-size: 12.5px !important; }
+
+/* Mosaic: opacidad ligeramente mayor para más textura */
+.home-hero-mosaic { opacity: .26 !important; }
+
+/* Animaciones de entrada del home */
+@keyframes homeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.home-hero         { animation: homeIn .5s cubic-bezier(.16,1,.3,1) both .00s; }
+.home-main         { animation: homeIn .5s cubic-bezier(.16,1,.3,1) both .08s; }
+.home-sidebar      { animation: homeIn .5s cubic-bezier(.16,1,.3,1) both .14s; }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
 </style>
 </head>
 <body>
@@ -1558,75 +1685,73 @@ select {
 </header>
 
 <div id="view-home" class="view">
-  <div class="lb-home">
+  <div class="home-wrap">
 
-    <!-- ══ PROFILE HEADER ══ -->
-    <div class="lb-profile-header">
+    <!-- ── Hero: mosaic backdrop + big stats ── -->
+    <div class="home-hero">
       <div class="home-hero-mosaic" id="home-mosaic"></div>
-      <div class="lb-profile-overlay"></div>
-      <div class="lb-profile-content">
-        <div class="lb-profile-identity">
-          <div class="lb-profile-name">Espacio <em>Cinéfilo</em></div>
-          <div class="lb-profile-date" id="home-sub-date"></div>
-        </div>
-        <div class="lb-stats-bar home-hero-stats" id="home-kpis"></div>
+      <div class="home-hero-overlay"></div>
+      <div class="home-hero-content">
+        <div class="home-hero-eyebrow">Cine · Academia Otto Salamanca</div>
+        <div class="home-hero-title">Espacio<br><em>Cinéfilo</em></div>
+        <div class="home-hero-date" id="home-sub-date"></div>
+        <div class="home-hero-stats" id="home-kpis"></div>
+        <div class="home-ephemeris" id="home-ephemeris"></div>
       </div>
     </div>
 
-    <!-- ══ RECENT FILMS STRIP ══ -->
-    <div class="lb-section">
-      <div class="lb-section-hd">
-        <div class="lb-section-title">Recientes <span class="lb-section-badge" id="home-recent-badge"></span></div>
-        <div class="lb-section-hd-rule"></div>
-        <div class="lb-search-wrap" style="margin:0 8px 0 0;max-width:220px;">
-          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input id="home-search" type="text" placeholder="Buscar…" oninput="filterHomeGrid(this.value)"
+    <!-- ── Body: main + sidebar ── -->
+    <div class="home-body">
+
+      <!-- Main column -->
+      <div class="home-main">
+
+        <!-- Últimas añadidas -->
+        <div class="home-section-hd">
+          <div class="home-section-hd-title">Últimas añadidas <span class="home-section-hd-badge" id="home-recent-badge"></span></div>
+          <button class="home-section-hd-action" onclick="switchView('films',document.querySelector('.nav-btn:nth-child(2)'))">Ver todas →</button>
+        </div>
+        <!-- Búsqueda rápida en inicio -->
+        <div style="margin-bottom:16px;position:relative;">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="home-search" type="text" placeholder="Buscar en tu biblioteca..." oninput="filterHomeGrid(this.value)"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px 8px 32px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:.15s;"
             onfocus="this.style.borderColor='rgba(240,192,80,.4)'" onblur="this.style.borderColor='var(--border)'">
-          <div id="home-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;margin-top:4px;z-index:50;max-height:300px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
+          <div id="home-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;margin-top:4px;z-index:50;max-height:320px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
         </div>
-        <button class="lb-section-action" onclick="switchView('films',document.querySelector('.nav-btn:nth-child(2)'))">Ver todas →</button>
-      </div>
-      <div class="home-recent-grid lb-poster-strip" id="home-recent-films"></div>
-    </div>
+        <div class="home-recent-grid" id="home-recent-films"></div>
 
-    <!-- ══ BODY: 2 columnas ══ -->
-    <div class="lb-body">
-
-      <!-- Main: Recomendaciones -->
-      <div class="lb-main">
-        <div class="lb-section-hd" style="margin-bottom:18px;">
-          <div class="lb-section-title">Recomendaciones del día</div>
-          <div class="lb-section-hd-rule"></div>
-          <button class="lb-section-action" onclick="initHome(true)">↺ nuevo</button>
+        <!-- Recomendaciones -->
+        <div class="home-section-hd">
+          <div class="home-section-hd-title">Recomendaciones del día</div>
+          <button class="home-section-hd-action" onclick="initHome(true)">↺ Regenerar</button>
         </div>
         <div id="home-recs-body" class="home-rec-list">
           <div class="home-loading">Analizando tu biblioteca…</div>
         </div>
+
       </div>
 
       <!-- Sidebar -->
-      <div class="lb-aside">
+      <div class="home-sidebar">
 
-        <!-- Ephemeris / cita -->
-        <div class="home-ephemeris" id="home-ephemeris"></div>
-
-        <!-- Ciclo semanal -->
-        <div class="lb-aside-section">
-          <div class="lb-section-hd" style="margin-bottom:12px;">
-            <div class="lb-section-title">Ciclo semanal</div>
-          </div>
-          <div id="home-cycle-body">
-            <div class="home-loading">Preparando ciclo…</div>
-          </div>
-        </div>
-
-        <!-- En cartelera -->
-        <div class="lb-aside-section">
-          <div class="lb-section-hd" style="margin-bottom:12px;">
-            <div class="lb-section-title">En cartelera</div>
+        <!-- Próximos estrenos -->
+        <div>
+          <div class="home-section-hd">
+            <div class="home-section-hd-title">En cartelera pronto</div>
           </div>
           <div id="home-upcoming-list" class="home-upcoming-list">
             <div class="home-loading">Cargando…</div>
+          </div>
+        </div>
+
+        <!-- Ciclo semanal -->
+        <div>
+          <div class="home-section-hd">
+            <div class="home-section-hd-title">Ciclo semanal</div>
+          </div>
+          <div id="home-cycle-body">
+            <div class="home-loading">Preparando ciclo…</div>
           </div>
         </div>
 
