@@ -1941,9 +1941,17 @@ function saveFilm() {
   };
   if(isEdit){const i=FILMS.findIndex(f=>f.id===film.id);if(i>=0)FILMS[i]=film;else FILMS.unshift(film);}
   else FILMS.unshift(film);
-  try{const sv=JSON.parse(localStorage.getItem('cl_films')||'[]');const si=sv.findIndex(f=>f.id===film.id);if(si>=0)sv[si]=film;else sv.unshift(film);localStorage.setItem('cl_films',JSON.stringify(sv));}catch(e){}
+  let savedOk = false;
+  try{const sv=JSON.parse(localStorage.getItem('cl_films')||'[]');const si=sv.findIndex(f=>f.id===film.id);if(si>=0)sv[si]=film;else sv.unshift(film);localStorage.setItem('cl_films',JSON.stringify(sv));savedOk=true;}catch(e){
+    console.error('Error al guardar en localStorage:', e);
+  }
   closeOv('ov-form');applyFilters();applyPersonal();renderStats();
-  showToast(isEdit?`"${title}" actualizada`:`"${title}" agregada`);
+  if(savedOk){
+    showToast(isEdit?`"${title}" actualizada`:`"${title}" agregada`);
+  } else {
+    showToast('⚠️ Error: no se pudo guardar. El almacenamiento local está lleno. Hacé un backup y recargá.');
+    console.warn('localStorage lleno o inaccesible al guardar película.');
+  }
 }
 
 // ── DELETE ──
@@ -2590,11 +2598,18 @@ function uploadDirPhoto(btn) {
       dirPhotoCache[name]=null;
       // Use a special marker in cache to indicate manual upload
       dirPhotoCache['__manual__'+name]=dataUrl;
-      // Try localStorage but don't fail if full
-      try { localStorage.setItem('dirphoto_'+name, dataUrl); } catch(ex){}
+      // Try localStorage but warn if full
+      let photoSaved = false;
+      try { localStorage.setItem('dirphoto_'+name, dataUrl); photoSaved = true; } catch(ex){
+        console.warn('localStorage lleno: foto del director no se pudo guardar de forma permanente.', ex);
+      }
       const el=document.getElementById(elId);
       if(el) el.src=dataUrl;
-      showToast('Foto actualizada');
+      if(photoSaved){
+        showToast('Foto actualizada');
+      } else {
+        showToast('⚠️ Foto visible pero no guardada: almacenamiento lleno. Hacé un backup.');
+      }
     };
     img.src=url;
   };
@@ -3436,8 +3451,29 @@ function openBackupModal() {
   for(let i=0;i<localStorage.length;i++){
     if(localStorage.key(i).startsWith('dirphoto_')) photoCount++;
   }
+  // Calculate localStorage usage
+  let totalBytes = 0;
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    totalBytes += (k.length + (localStorage.getItem(k)||'').length) * 2; // UTF-16
+  }
+  const usedKB = Math.round(totalBytes / 1024);
+  const usedMB = (totalBytes / 1024 / 1024).toFixed(2);
+  const limitMB = 5;
+  const pct = Math.min(100, Math.round(totalBytes / (limitMB * 1024 * 1024) * 100));
+  const barColor = pct > 85 ? '#e05' : pct > 60 ? '#f90' : '#4a9';
+  const storageHtml = `<div style="margin-top:8px;">
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
+      <span>💾 Almacenamiento local</span>
+      <span style="color:${barColor};font-weight:600;">${usedKB < 1024 ? usedKB+'KB' : usedMB+'MB'} / ~${limitMB}MB (${pct}%)</span>
+    </div>
+    <div style="background:var(--bg4);border-radius:4px;height:6px;overflow:hidden;">
+      <div style="width:${pct}%;background:${barColor};height:100%;border-radius:4px;transition:.3s;"></div>
+    </div>
+    ${pct > 85 ? '<div style="color:#e05;font-size:11px;margin-top:4px;font-weight:600;">⚠️ Almacenamiento casi lleno — los cambios pueden no guardarse. Hacé backup y eliminá fotos de directores si es necesario.</div>' : ''}
+  </div>`;
   document.getElementById('backup-stats').innerHTML =
-    `📊 Datos actuales: <strong>${films.length}</strong> películas editadas/agregadas · <strong>${dels.length}</strong> eliminaciones · <strong>${rankObj.length}</strong> posiciones en ranking · <strong>${photoCount}</strong> fotos de directores`;
+    `📊 Datos actuales: <strong>${films.length}</strong> películas editadas/agregadas · <strong>${dels.length}</strong> eliminaciones · <strong>${rankObj.length}</strong> posiciones en ranking · <strong>${photoCount}</strong> fotos de directores` + storageHtml;
   document.getElementById('import-status').textContent = '';
   document.getElementById('backup-overlay').classList.add('on');
 }
