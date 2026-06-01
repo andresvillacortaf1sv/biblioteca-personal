@@ -1532,6 +1532,116 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 <div id="toast"></div>
 
 <script>
+
+// ══════════════════════════════════════════════════════════════════
+// IndexedDB storage layer — replaces localStorage for all app data
+// (cl_theme stays in localStorage — it's a single tiny string)
+// ══════════════════════════════════════════════════════════════════
+const DB_NAME = 'biblioteca_db';
+const DB_VER  = 1;
+const STORE   = 'kv'; // single key-value store
+
+let _db = null;
+
+function openDB() {
+  if (_db) return Promise.resolve(_db);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        db.createObjectStore(STORE);
+      }
+    };
+    req.onsuccess = e => { _db = e.target.result; resolve(_db); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).get(key);
+    req.onsuccess = () => resolve(req.result ?? null);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function idbSet(key, value) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).put(value, key);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function idbDel(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).delete(key);
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function idbKeys() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAllKeys();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+// Migrate any existing localStorage data to IDB (runs once)
+async function migrateFromLocalStorage() {
+  const KEYS = ['cl_films','cl_dels','cl_rankorder','cl_rankorder_pers',
+                'cl_blog','cl_col_wish','cl_watchlist','cl_lists'];
+  for (const k of KEYS) {
+    const raw = localStorage.getItem(k);
+    if (raw !== null) {
+      try {
+        const existing = await idbGet(k);
+        if (existing === null) {
+          await idbSet(k, JSON.parse(raw));
+        }
+        localStorage.removeItem(k);
+      } catch(e) { console.warn('Migration error for', k, e); }
+    }
+  }
+  // Migrate dir photos
+  const toRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('dirphoto_')) {
+      try {
+        const existing = await idbGet(k);
+        if (existing === null) await idbSet(k, localStorage.getItem(k));
+        toRemove.push(k);
+      } catch(e) {}
+    }
+  }
+  toRemove.forEach(k => localStorage.removeItem(k));
+  // Migrate date-keyed caches (cl_home_*, cl_news_v2_*)
+  const cacheKeys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && (k.startsWith('cl_home_') || k.startsWith('cl_news_v2_'))) cacheKeys.push(k);
+  }
+  for (const k of cacheKeys) {
+    try {
+      const existing = await idbGet(k);
+      if (existing === null) await idbSet(k, JSON.parse(localStorage.getItem(k)));
+      localStorage.removeItem(k);
+    } catch(e) {}
+  }
+}
+// ══════════════════════════════════════════════════════════════════
 const TMDB_KEY = '9ead44dc2fd5da01ee3499ece3cd72fb';
 
 let FILMS = [];
@@ -1549,11 +1659,12 @@ let top100ViewMode = 'list';
 // ── BOOT ──
 async function boot() {
   initTheme();
+  await migrateFromLocalStorage();
   try { const r = await fetch('films_data.json'); FILMS = await r.json(); } catch(e) { FILMS = window.__FILMS_DATA__ || []; }
   try {
-    const saved = JSON.parse(localStorage.getItem('cl_films') || '[]');
+    const saved = (await idbGet('cl_films')) || [];
     saved.forEach(s => { const i = FILMS.findIndex(f => f.id === s.id); if (i >= 0) FILMS[i] = s; else FILMS.unshift(s); });
-    const dels = JSON.parse(localStorage.getItem('cl_dels') || '[]');
+    const dels = (await idbGet('cl_dels')) || [];
     FILMS = FILMS.filter(f => !dels.includes(f.id));
   } catch(e) {}
   populateOpts(); applyFilters(); applyPersonal(); renderStats();
@@ -1941,17 +2052,17 @@ function saveFilm() {
   };
   if(isEdit){const i=FILMS.findIndex(f=>f.id===film.id);if(i>=0)FILMS[i]=film;else FILMS.unshift(film);}
   else FILMS.unshift(film);
-  let savedOk = false;
-  try{const sv=JSON.parse(localStorage.getItem('cl_films')||'[]');const si=sv.findIndex(f=>f.id===film.id);if(si>=0)sv[si]=film;else sv.unshift(film);localStorage.setItem('cl_films',JSON.stringify(sv));savedOk=true;}catch(e){
-    console.error('Error al guardar en localStorage:', e);
+  try {
+    const sv = (await idbGet('cl_films')) || [];
+    const si = sv.findIndex(f => f.id === film.id);
+    if(si >= 0) sv[si] = film; else sv.unshift(film);
+    await idbSet('cl_films', sv);
+    showToast(isEdit?`"${title}" actualizada`:`"${title}" agregada`);
+  } catch(e) {
+    console.error('Error al guardar en IDB:', e);
+    showToast('⚠️ Error al guardar. Revisá la consola.');
   }
   closeOv('ov-form');applyFilters();applyPersonal();renderStats();
-  if(savedOk){
-    showToast(isEdit?`"${title}" actualizada`:`"${title}" agregada`);
-  } else {
-    showToast('⚠️ Error: no se pudo guardar. El almacenamiento local está lleno. Hacé un backup y recargá.');
-    console.warn('localStorage lleno o inaccesible al guardar película.');
-  }
 }
 
 // ── DELETE ──
@@ -1959,7 +2070,15 @@ function confirmDel(id) {
   document.getElementById('ov-confirm').classList.add('on');
   document.getElementById('confirm-del-btn').onclick=()=>{
     FILMS=FILMS.filter(f=>f.id!==id);
-    try{const sv=JSON.parse(localStorage.getItem('cl_films')||'[]');localStorage.setItem('cl_films',JSON.stringify(sv.filter(f=>f.id!==id)));const dels=JSON.parse(localStorage.getItem('cl_dels')||'[]');dels.push(id);localStorage.setItem('cl_dels',JSON.stringify(dels));}catch(e){}
+    (async()=>{
+      try{
+        const sv=(await idbGet('cl_films'))||[];
+        await idbSet('cl_films',sv.filter(f=>f.id!==id));
+        const dels=(await idbGet('cl_dels'))||[];
+        dels.push(id);
+        await idbSet('cl_dels',dels);
+      }catch(e){console.error('IDB delete error',e);}
+    })();
     closeOv('ov-confirm');applyFilters();applyPersonal();renderStats();showToast('Película eliminada');
   };
 }
@@ -1976,7 +2095,7 @@ function buildOrder(type) {
 
   // Load saved order — ONLY used to reorder within same-score groups (drag-drop)
   let savedOrder = [];
-  try { savedOrder = JSON.parse(localStorage.getItem(storageKey)||'[]'); } catch(e) {}
+  try { savedOrder = (await idbGet(storageKey)) || []; } catch(e) {}
   const savedPos = {};
   savedOrder.forEach((id, i) => { savedPos[id] = i; });
 
@@ -2004,13 +2123,7 @@ function buildOrder(type) {
 }
 
 function initRanking(type) {
-  // Clear any stale localStorage from old versions (had 2912 entries)
-  ['cl_rankorder','cl_rankorder_pers'].forEach(k => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(k)||'[]');
-      if(saved.length > 1050) localStorage.removeItem(k);
-    } catch(e) { localStorage.removeItem(k); }
-  });
+  // IDB has no size limit; stale-data cleanup no longer needed
   if(type==='obj'||type===undefined) { rankObjOrder=buildOrder('obj'); rankCurrentMode='obj'; }
   else { rankPersOrder=buildOrder('pers'); rankCurrentMode='pers'; }
   populateRankFilters();
@@ -2134,10 +2247,10 @@ function setRankView(type,mode,btn) { /* legacy */ }
 
 function saveRankingCurrent() { saveRanking(rankCurrentMode); }
 
-function saveRanking(type) {
+async function saveRanking(type) {
   const key=type==='obj'?'cl_rankorder':'cl_rankorder_pers';
   const order=(type==='obj'?rankObjOrder:rankPersOrder).slice(0,1050);
-  try{localStorage.setItem(key,JSON.stringify(order));showToast('✓ Orden guardado (Top 1050)');}catch(e){showToast('Error al guardar');}
+  try{await idbSet(key,order);showToast('✓ Orden guardado (Top 1050)');}catch(e){showToast('Error al guardar');}
 }
 
 function makeRankItem(f,pos,canDrag,k,type) {
@@ -2598,18 +2711,11 @@ function uploadDirPhoto(btn) {
       dirPhotoCache[name]=null;
       // Use a special marker in cache to indicate manual upload
       dirPhotoCache['__manual__'+name]=dataUrl;
-      // Try localStorage but warn if full
-      let photoSaved = false;
-      try { localStorage.setItem('dirphoto_'+name, dataUrl); photoSaved = true; } catch(ex){
-        console.warn('localStorage lleno: foto del director no se pudo guardar de forma permanente.', ex);
-      }
       const el=document.getElementById(elId);
       if(el) el.src=dataUrl;
-      if(photoSaved){
-        showToast('Foto actualizada');
-      } else {
-        showToast('⚠️ Foto visible pero no guardada: almacenamiento lleno. Hacé un backup.');
-      }
+      idbSet('dirphoto_'+name, dataUrl)
+        .then(()=>showToast('Foto actualizada'))
+        .catch(e=>{ console.error('IDB photo save error',e); showToast('⚠️ Error al guardar foto'); });
     };
     img.src=url;
   };
@@ -2617,13 +2723,13 @@ function uploadDirPhoto(btn) {
 }
 
 function getDirPhotoSrc(name, fallback) {
-  // Check manual upload (in-memory first, then localStorage)
+  // Check in-memory cache first (sync, fast)
   if(dirPhotoCache['__manual__'+name]) return dirPhotoCache['__manual__'+name];
-  try {
-    const manual=localStorage.getItem('dirphoto_'+name);
-    if(manual){ dirPhotoCache['__manual__'+name]=manual; return manual; }
-  } catch(e){}
   if(dirPhotoCache[name]) return `https://image.tmdb.org/t/p/w185${dirPhotoCache[name]}`;
+  // Async load from IDB — update element once loaded
+  idbGet('dirphoto_'+name).then(val => {
+    if(val){ dirPhotoCache['__manual__'+name]=val; }
+  }).catch(()=>{});
   return fallback;
 }
 
@@ -2648,7 +2754,7 @@ function initHome(forceRefresh) {
   const today=new Date().toISOString().split('T')[0];
   const cacheKey='cl_home_'+today;
   let cached=null;
-  try{cached=JSON.parse(localStorage.getItem(cacheKey));}catch(e){}
+  try{const _cv=await idbGet(cacheKey);if(_cv!==null)cached=_cv;}catch(e){}
   if(cached&&!forceRefresh){
     renderHomeRecs(cached.recs, cached.aiGenerated);
     renderHomeCycle(cached.cycle);
@@ -2864,7 +2970,7 @@ REGLAS CRÍTICAS:
     const parsed = JSON.parse(cleaned);
     if(!parsed.recs||!parsed.cycle) throw new Error('Estructura inválida');
     console.log('[BibliotecaPersonal] Recomendaciones IA generadas:', parsed.recs.map(r=>r.title));
-    localStorage.setItem(cacheKey, JSON.stringify({recs:parsed.recs, cycle:parsed.cycle, aiGenerated:true}));
+    idbSet(cacheKey, {recs:parsed.recs, cycle:parsed.cycle, aiGenerated:true}).catch(()=>{});
     renderHomeRecs(parsed.recs, true);
     renderHomeCycle(parsed.cycle);
   } catch(e) {
@@ -2873,7 +2979,7 @@ REGLAS CRÍTICAS:
     await new Promise(r=>setTimeout(r,1500));
     const recs = generateLocalRecs();
     const cycle = generateLocalCycle();
-    localStorage.setItem(cacheKey, JSON.stringify({recs, cycle, aiGenerated:false}));
+    idbSet(cacheKey, {recs, cycle, aiGenerated:false}).catch(()=>{});
     renderHomeRecs(recs, false);
     renderHomeCycle(cycle);
   }
@@ -3440,37 +3546,22 @@ function initTheme() {
 
 // ── BACKUP: EXPORT / IMPORT ──────────────────────────────────────────────────
 
-function openBackupModal() {
-  // Show stats
-  const films = JSON.parse(localStorage.getItem('cl_films')||'[]');
-  const dels = JSON.parse(localStorage.getItem('cl_dels')||'[]');
-  const rankObj = JSON.parse(localStorage.getItem('cl_rankorder')||'[]');
-  const rankPers = JSON.parse(localStorage.getItem('cl_rankorder_pers')||'[]');
-  // Count dir photos
-  let photoCount = 0;
-  for(let i=0;i<localStorage.length;i++){
-    if(localStorage.key(i).startsWith('dirphoto_')) photoCount++;
-  }
-  // Calculate localStorage usage
-  let totalBytes = 0;
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    totalBytes += (k.length + (localStorage.getItem(k)||'').length) * 2; // UTF-16
-  }
-  const usedKB = Math.round(totalBytes / 1024);
-  const usedMB = (totalBytes / 1024 / 1024).toFixed(2);
-  const limitMB = 5;
-  const pct = Math.min(100, Math.round(totalBytes / (limitMB * 1024 * 1024) * 100));
-  const barColor = pct > 85 ? '#e05' : pct > 60 ? '#f90' : '#4a9';
+async function openBackupModal() {
+  // Show stats — read from IDB
+  const films   = (await idbGet('cl_films'))          || [];
+  const dels    = (await idbGet('cl_dels'))            || [];
+  const rankObj = (await idbGet('cl_rankorder'))       || [];
+  const allKeys = await idbKeys();
+  const photoCount = allKeys.filter(k => k.startsWith('dirphoto_')).length;
+  // Estimate IDB usage (rough: stringify sizes)
   const storageHtml = `<div style="margin-top:8px;">
     <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
-      <span>💾 Almacenamiento local</span>
-      <span style="color:${barColor};font-weight:600;">${usedKB < 1024 ? usedKB+'KB' : usedMB+'MB'} / ~${limitMB}MB (${pct}%)</span>
+      <span>💾 Almacenamiento</span>
+      <span style="color:var(--green);font-weight:600;">IndexedDB — sin límite de 5MB ✓</span>
     </div>
     <div style="background:var(--bg4);border-radius:4px;height:6px;overflow:hidden;">
-      <div style="width:${pct}%;background:${barColor};height:100%;border-radius:4px;transition:.3s;"></div>
+      <div style="width:15%;background:#4a9;height:100%;border-radius:4px;"></div>
     </div>
-    ${pct > 85 ? '<div style="color:#e05;font-size:11px;margin-top:4px;font-weight:600;">⚠️ Almacenamiento casi lleno — los cambios pueden no guardarse. Hacé backup y eliminá fotos de directores si es necesario.</div>' : ''}
   </div>`;
   document.getElementById('backup-stats').innerHTML =
     `📊 Datos actuales: <strong>${films.length}</strong> películas editadas/agregadas · <strong>${dels.length}</strong> eliminaciones · <strong>${rankObj.length}</strong> posiciones en ranking · <strong>${photoCount}</strong> fotos de directores` + storageHtml;
@@ -3482,22 +3573,24 @@ function closeBackupModal() {
   document.getElementById('backup-overlay').classList.remove('on');
 }
 
-function exportData() {
+async function exportData() {
+  const allKeys = await idbKeys();
   const data = {
     version: 1,
     exportDate: new Date().toISOString(),
-    cl_films: JSON.parse(localStorage.getItem('cl_films')||'[]'),
-    cl_dels: JSON.parse(localStorage.getItem('cl_dels')||'[]'),
-    cl_rankorder: JSON.parse(localStorage.getItem('cl_rankorder')||'[]'),
-    cl_rankorder_pers: JSON.parse(localStorage.getItem('cl_rankorder_pers')||'[]'),
+    cl_films:          (await idbGet('cl_films'))          || [],
+    cl_dels:           (await idbGet('cl_dels'))           || [],
+    cl_rankorder:      (await idbGet('cl_rankorder'))      || [],
+    cl_rankorder_pers: (await idbGet('cl_rankorder_pers')) || [],
+    cl_blog:           (await idbGet('cl_blog'))           || [],
+    cl_col_wish:       (await idbGet('cl_col_wish'))       || [],
+    cl_watchlist:      (await idbGet('cl_watchlist'))      || [],
+    cl_lists:          (await idbGet('cl_lists'))          || [],
     dirPhotos: {},
   };
-  // Collect all dir photos
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k.startsWith('dirphoto_')) data.dirPhotos[k]=localStorage.getItem(k);
+  for (const k of allKeys) {
+    if (k.startsWith('dirphoto_')) data.dirPhotos[k] = await idbGet(k);
   }
-
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3531,19 +3624,23 @@ function processImportFile(file) {
   statusEl.style.color='var(--text3)';
   statusEl.textContent='Leyendo archivo...';
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const data = JSON.parse(e.target.result);
       if(!data.version || !Array.isArray(data.cl_films)) throw new Error('Formato inválido');
 
-      // Apply to localStorage
-      localStorage.setItem('cl_films', JSON.stringify(data.cl_films||[]));
-      localStorage.setItem('cl_dels', JSON.stringify(data.cl_dels||[]));
-      localStorage.setItem('cl_rankorder', JSON.stringify(data.cl_rankorder||[]));
-      localStorage.setItem('cl_rankorder_pers', JSON.stringify(data.cl_rankorder_pers||[]));
+      // Apply to IDB
+      await idbSet('cl_films',          data.cl_films          || []);
+      await idbSet('cl_dels',           data.cl_dels           || []);
+      await idbSet('cl_rankorder',      data.cl_rankorder      || []);
+      await idbSet('cl_rankorder_pers', data.cl_rankorder_pers || []);
+      if(data.cl_blog)      await idbSet('cl_blog',      data.cl_blog);
+      if(data.cl_col_wish)  await idbSet('cl_col_wish',  data.cl_col_wish);
+      if(data.cl_watchlist) await idbSet('cl_watchlist', data.cl_watchlist);
+      if(data.cl_lists)     await idbSet('cl_lists',     data.cl_lists);
       // Restore dir photos
       const photos = data.dirPhotos || {};
-      Object.entries(photos).forEach(([k,v])=>localStorage.setItem(k,v));
+      for(const [k,v] of Object.entries(photos)) await idbSet(k,v);
 
       const filmCount = (data.cl_films||[]).length;
       const photoCount = Object.keys(photos).length;
@@ -3603,7 +3700,7 @@ async function loadNews(forceRefresh) {
   // Cache 2 hours
   const cacheKey = 'cl_news_v2_' + Math.floor(Date.now()/(2*60*60*1000));
   let cached = null;
-  try { cached = JSON.parse(localStorage.getItem(cacheKey)); } catch(e) {}
+  try { const _cv=await idbGet(cacheKey); if(_cv!==null) cached=_cv; } catch(e) {}
 
   if(cached && !forceRefresh) { renderNews(cached); return; }
 
@@ -3619,7 +3716,7 @@ async function loadNews(forceRefresh) {
     if(!res.ok) throw new Error(`${res.status}`);
     const data = await res.json();
     if(!data.articles?.length) throw new Error('Sin artículos');
-    localStorage.setItem(cacheKey, JSON.stringify(data));
+    idbSet(cacheKey, data).catch(()=>{});
     renderNews(data);
   } catch(e) {
     el.innerHTML = `<div class="news-error">No se pudieron cargar las noticias (${e.message}).<br>
@@ -3715,12 +3812,12 @@ const BLOG_PASSWORD = 'cineblog2026'; // Cambiar por tu contraseña
 let blogAdminMode = false;
 let blogEditingId = null;
 
-function getBlogPosts() {
-  try { return JSON.parse(localStorage.getItem('cl_blog')||'[]'); } catch(e) { return []; }
+async function getBlogPosts() {
+  try { return (await idbGet('cl_blog')) || []; } catch(e) { return []; }
 }
 
-function saveBlogPosts(posts) {
-  localStorage.setItem('cl_blog', JSON.stringify(posts));
+async function saveBlogPosts(posts) {
+  await idbSet('cl_blog', posts);
 }
 
 function renderBlog() {
@@ -4188,8 +4285,8 @@ function saveColAdd(){
 }
 
 // ── COLLECTION WISHLIST ───────────────────────────────────────────────────
-function getColWishlist(){ try{return JSON.parse(localStorage.getItem('cl_col_wish')||'[]');}catch(e){return[];} }
-function saveColWishlist(w){ localStorage.setItem('cl_col_wish',JSON.stringify(w)); }
+async function getColWishlist(){ try{return (await idbGet('cl_col_wish'))||[];}catch(e){return[];} }
+async function saveColWishlist(w){ await idbSet('cl_col_wish',w); }
 
 let colWishFilm=null;
 function openColWishAdd(){
@@ -4687,8 +4784,8 @@ window.__FILMS_DATA__ = [{"id":1,"title":"8½","year":1963,"director":"Federico 
 // ══════════════════════════════════════════════════════════════════════════
 // ── WATCHLIST ─────────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
-function getWatchlist(){ try{return JSON.parse(localStorage.getItem("cl_watchlist")||"[]");}catch(e){return[];} }
-function saveWatchlist(wl){ localStorage.setItem("cl_watchlist",JSON.stringify(wl)); }
+async function getWatchlist(){ try{return (await idbGet("cl_watchlist"))||[];}catch(e){return[];} }
+async function saveWatchlist(wl){ await idbSet("cl_watchlist",wl); }
 
 function wlSearch(q){
   const res=document.getElementById("wl-search-results");
@@ -4786,8 +4883,8 @@ function renderWatchlist(){
 // ══════════════════════════════════════════════════════════════════════════
 // ── LISTAS TEMÁTICAS ──────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
-function getLists(){ try{return JSON.parse(localStorage.getItem("cl_lists")||"[]");}catch(e){return[];} }
-function saveLists(l){ localStorage.setItem("cl_lists",JSON.stringify(l)); }
+async function getLists(){ try{return (await idbGet("cl_lists"))||[];}catch(e){return[];} }
+async function saveLists(l){ await idbSet("cl_lists",l); }
 
 function openCreateList(){
   const emoji=prompt("Emoji para la lista (ej: 🎬 🌍 ❤️):","🎬");
