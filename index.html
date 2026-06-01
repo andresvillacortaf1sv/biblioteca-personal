@@ -953,6 +953,578 @@ select {
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
+
+/* ═══ STATS ANIMATIONS ════════════════════════════════════════════════════ */
+
+/* Counter number animate-in */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stats-hero-val {
+  animation: countUp .6s cubic-bezier(.16,1,.3,1) both;
+}
+.stats-hero-kpi:nth-child(1) .stats-hero-val { animation-delay: .05s; }
+.stats-hero-kpi:nth-child(2) .stats-hero-val { animation-delay: .12s; }
+.stats-hero-kpi:nth-child(3) .stats-hero-val { animation-delay: .19s; }
+.stats-hero-kpi:nth-child(4) .stats-hero-val { animation-delay: .26s; }
+
+/* Stats sections — staggered slide-in */
+@keyframes statsSectionIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stats-section {
+  animation: statsSectionIn .55s cubic-bezier(.16,1,.3,1) both;
+}
+.stats-section:nth-child(1) { animation-delay: .08s; }
+.stats-section:nth-child(2) { animation-delay: .16s; }
+.stats-section:nth-child(3) { animation-delay: .24s; }
+.stats-section:nth-child(4) { animation-delay: .32s; }
+.stats-section:nth-child(5) { animation-delay: .40s; }
+.stats-section:nth-child(n+6) { animation-delay: .48s; }
+
+/* Year bars — stagger grow from bottom */
+@keyframes barGrow {
+  from { transform: scaleY(0); transform-origin: bottom; }
+  to   { transform: scaleY(1); transform-origin: bottom; }
+}
+.stats-year-bar {
+  animation: barGrow .6s cubic-bezier(.16,1,.3,1) both;
+}
+
+/* Dist bars */
+.stats-dist-bar {
+  animation: barGrow .5s cubic-bezier(.16,1,.3,1) both;
+}
+.stats-dist-col:nth-child(1) .stats-dist-bar  { animation-delay: .04s; }
+.stats-dist-col:nth-child(2) .stats-dist-bar  { animation-delay: .07s; }
+.stats-dist-col:nth-child(3) .stats-dist-bar  { animation-delay: .10s; }
+.stats-dist-col:nth-child(4) .stats-dist-bar  { animation-delay: .13s; }
+.stats-dist-col:nth-child(5) .stats-dist-bar  { animation-delay: .16s; }
+.stats-dist-col:nth-child(6) .stats-dist-bar  { animation-delay: .19s; }
+.stats-dist-col:nth-child(7) .stats-dist-bar  { animation-delay: .22s; }
+.stats-dist-col:nth-child(8) .stats-dist-bar  { animation-delay: .25s; }
+.stats-dist-col:nth-child(9) .stats-dist-bar  { animation-delay: .28s; }
+.stats-dist-col:nth-child(10) .stats-dist-bar { animation-delay: .31s; }
+
+/* Bar chart rows — slide in from left */
+@keyframes barRowIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.brow {
+  animation: barRowIn .45s cubic-bezier(.16,1,.3,1) both;
+}
+.brow:nth-child(1)  { animation-delay: .06s; }
+.brow:nth-child(2)  { animation-delay: .10s; }
+.brow:nth-child(3)  { animation-delay: .14s; }
+.brow:nth-child(4)  { animation-delay: .18s; }
+.brow:nth-child(5)  { animation-delay: .22s; }
+.brow:nth-child(6)  { animation-delay: .26s; }
+.brow:nth-child(7)  { animation-delay: .30s; }
+.brow:nth-child(8)  { animation-delay: .34s; }
+.brow:nth-child(n+9) { animation-delay: .38s; }
+
+/* Country bars — slide from left */
+.stats-country-row {
+  animation: barRowIn .45s cubic-bezier(.16,1,.3,1) both;
+}
+.stats-country-row:nth-child(1) { animation-delay: .05s; }
+.stats-country-row:nth-child(2) { animation-delay: .09s; }
+.stats-country-row:nth-child(3) { animation-delay: .13s; }
+.stats-country-row:nth-child(4) { animation-delay: .17s; }
+.stats-country-row:nth-child(5) { animation-delay: .21s; }
+.stats-country-row:nth-child(n+6) { animation-delay: .25s; }
+
+/* Director cards — stagger pop-in */
+@keyframes dirCardIn {
+  from { opacity: 0; transform: scale(.88) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.stats-dir-card {
+  animation: dirCardIn .5s cubic-bezier(.16,1,.3,1) both;
+}
+.stats-dir-card:nth-child(1) { animation-delay: .04s; }
+.stats-dir-card:nth-child(2) { animation-delay: .09s; }
+.stats-dir-card:nth-child(3) { animation-delay: .14s; }
+.stats-dir-card:nth-child(4) { animation-delay: .19s; }
+.stats-dir-card:nth-child(5) { animation-delay: .24s; }
+
+/* KPI cards — fade up */
+.kpi {
+  animation: statsSectionIn .5s cubic-bezier(.16,1,.3,1) both;
+}
+.stats-g2 .kpi:nth-child(1) { animation-delay: .05s; }
+.stats-g2 .kpi:nth-child(2) { animation-delay: .10s; }
+
+/* Decade rows — slide in */
+.stats-decade-row {
+  animation: barRowIn .5s cubic-bezier(.16,1,.3,1) both;
+}
+.stats-decade-row:nth-child(1) { animation-delay: .05s; }
+.stats-decade-row:nth-child(2) { animation-delay: .12s; }
+.stats-decade-row:nth-child(3) { animation-delay: .19s; }
+.stats-decade-row:nth-child(4) { animation-delay: .26s; }
+.stats-decade-row:nth-child(n+5) { animation-delay: .33s; }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+
+
+
+/* Override: home-wrap sin grid fijo */
+.home-wrap { display: block !important; }
+
+/* ── Masthead: portada de revista ── */
+.mag-masthead {
+  background: var(--bg);
+  border-bottom: 3px double rgba(255,255,255,.07);
+}
+.mag-rule {
+  height: 1px;
+  background: var(--border2);
+  margin: 0 28px;
+}
+.mag-masthead-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 22px 36px 18px;
+}
+.mag-edition {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  color: var(--text3);
+  line-height: 1.6;
+}
+.mag-edition strong { color: var(--gold); font-weight: 500; }
+.mag-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 54px;
+  font-weight: 400;
+  line-height: .92;
+  letter-spacing: -2px;
+  text-align: center;
+  color: var(--text);
+  padding: 0 32px;
+}
+.mag-logo em { color: var(--gold2); font-style: italic; }
+.mag-tagline {
+  font-size: 10px;
+  color: var(--text3);
+  font-style: italic;
+  text-align: right;
+  letter-spacing: .01em;
+  line-height: 1.65;
+  padding-left: 8px;
+  border-left: 1px solid var(--border2);
+}
+.mag-stats-bar {
+  display: flex;
+  gap: 0;
+  padding: 10px 36px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+/* JS inyecta .home-hero-stat dentro de #home-kpis */
+.mag-stats-bar .home-hero-stat {
+  padding: 4px 28px 4px 0;
+  margin-right: 28px;
+  border-right: 1px solid var(--border) !important;
+}
+.mag-stats-bar .home-hero-stat:last-child {
+  border-right: none !important;
+}
+.mag-stats-bar .home-hero-stat-val {
+  font-size: 24px !important;
+  color: var(--text) !important;
+  transition: color .25s;
+}
+.mag-stats-bar:hover .home-hero-stat-val { color: var(--gold2) !important; }
+.mag-stats-bar .home-hero-stat-lbl {
+  font-size: 9px !important;
+  letter-spacing: .14em !important;
+}
+
+/* ── Hero strip: mosaico reducido con cita ── */
+.mag-hero-strip {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.mag-hero-strip .home-hero-mosaic {
+  opacity: .14 !important;
+  height: 150px !important;
+}
+.mag-hero-strip .home-hero-mosaic-img {
+  height: 150px !important;
+}
+.mag-hero-strip .home-hero-overlay {
+  background: linear-gradient(105deg, rgba(13,13,16,.98) 0%, rgba(13,13,16,.82) 45%, rgba(13,13,16,.35) 100%) !important;
+}
+.mag-hero-strip .home-ephemeris {
+  position: relative;
+  z-index: 2;
+  margin: 0 !important;
+  padding: 0 40px !important;
+  border: none !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 700px;
+}
+
+/* ── Body: 3 columnas ── */
+.mag-body {
+  display: grid;
+  grid-template-columns: 210px 1fr 255px;
+  min-height: 0;
+}
+.mag-col-left {
+  padding: 24px 18px 32px 24px;
+  border-right: 1px solid var(--border);
+}
+.mag-col-center {
+  padding: 24px 32px 32px;
+  border-right: 1px solid var(--border);
+}
+.mag-col-right {
+  padding: 24px 24px 32px 18px;
+}
+
+/* ── Diario header ── */
+.mag-diary-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border2);
+}
+.mag-diary-rule { flex: 1; height: 1px; background: var(--border); }
+
+/* ── Search dentro del diario ── */
+.mag-search-wrap { position: relative; margin-bottom: 14px; }
+.mag-search-wrap svg {
+  position: absolute; left: 9px; top: 50%;
+  transform: translateY(-50%); color: var(--text3); pointer-events: none;
+}
+#home-search {
+  width: 100% !important;
+  background: var(--bg2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 7px !important;
+  padding: 7px 10px 7px 30px !important;
+  font-size: 12px !important;
+}
+
+/* ── Film log: grid tipo diario — 5 columnas medianas ── */
+#home-recent-films.home-recent-grid {
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 9px !important;
+  margin-bottom: 0 !important;
+}
+/* tiles más grandes y con info abajo visible */
+#home-recent-films .home-recent-tile img,
+#home-recent-films .home-recent-tile-noimg {
+  border-radius: 5px !important;
+}
+
+/* ── Recomendaciones: más compactas ── */
+.mag-col-right .home-rec-item {
+  grid-template-columns: 40px 52px 1fr !important;
+  gap: 10px !important;
+  padding: 12px 0 !important;
+}
+.mag-col-right .home-rec-num {
+  font-size: 24px !important;
+}
+.mag-col-right .home-rec-poster {
+  width: 52px !important;
+  height: 78px !important;
+}
+.mag-col-right .home-rec-poster-placeholder {
+  width: 52px !important;
+  height: 78px !important;
+}
+.mag-col-right .home-rec-title { font-size: 13px !important; }
+.mag-col-right .home-rec-reason { font-size: 11px !important; }
+
+/* ── Sección headers en columnas laterales: más compactos ── */
+.mag-col-left .home-section-hd,
+.mag-col-right .home-section-hd {
+  margin-bottom: 14px !important;
+}
+.mag-col-left .home-section-hd-title,
+.mag-col-right .home-section-hd-title {
+  font-size: 9px !important;
+  letter-spacing: .22em !important;
+}
+
+/* ── Entrada del ciclo semanal: más compacta ── */
+.mag-col-left .home-cycle-film { padding: 8px 0 !important; }
+.mag-col-left .home-cycle-poster { width: 32px !important; height: 48px !important; }
+.mag-col-left .home-cycle-title { font-size: 11px !important; }
+.mag-col-left .home-cycle-why { font-size: 10px !important; }
+
+/* ── Upcoming más compacto ── */
+.mag-col-left .home-upcoming-item { padding: 8px 0 !important; }
+.mag-col-left .home-upcoming-poster { width: 36px !important; height: 54px !important; }
+.mag-col-left .home-upcoming-title { font-size: 11px !important; }
+.mag-col-left .home-upcoming-meta { font-size: 10px !important; }
+
+/* ── Animaciones de entrada del magazine ── */
+@keyframes magIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mag-masthead   { animation: magIn .45s cubic-bezier(.16,1,.3,1) both .00s; }
+.mag-hero-strip { animation: magIn .45s cubic-bezier(.16,1,.3,1) both .05s; }
+.mag-col-left   { animation: magIn .45s cubic-bezier(.16,1,.3,1) both .10s; }
+.mag-col-center { animation: magIn .45s cubic-bezier(.16,1,.3,1) both .07s; }
+.mag-col-right  { animation: magIn .45s cubic-bezier(.16,1,.3,1) both .13s; }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══ LETTERBOXD-STYLE HOME ════════════════════════════════════════════════ */
+
+.lb-home { display: flex; flex-direction: column; }
+
+/* ── Profile header ── */
+.lb-profile-header {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.lb-profile-header .home-hero-mosaic {
+  position: absolute; inset: 0;
+  opacity: .18;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 2px;
+}
+.lb-profile-header .home-hero-mosaic-img { height: 220px; }
+.lb-profile-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(13,13,16,.55) 0%,
+    rgba(13,13,16,.82) 60%,
+    rgba(13,13,16,.97) 100%);
+}
+.lb-profile-content {
+  position: relative; z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 36px 22px;
+}
+.lb-profile-identity {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.lb-profile-name {
+  font-family: 'Fraunces', serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: var(--text);
+}
+.lb-profile-name em { color: var(--gold2); font-style: italic; }
+.lb-profile-date {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: .04em;
+}
+
+/* Stats bar (JS renders .home-hero-stat children into #home-kpis) */
+.lb-stats-bar {
+  display: flex;
+  gap: 0;
+}
+.lb-stats-bar .home-hero-stat {
+  padding: 0 24px 0 0;
+  margin-right: 24px;
+  border-right: 1px solid var(--border2) !important;
+}
+.lb-stats-bar .home-hero-stat:last-child {
+  border-right: none !important;
+  margin-right: 0;
+}
+.lb-stats-bar .home-hero-stat-val {
+  font-size: 26px !important;
+  color: var(--text) !important;
+  transition: color .2s;
+}
+.lb-stats-bar .home-hero-stat:hover .home-hero-stat-val {
+  color: var(--gold2) !important;
+}
+.lb-stats-bar .home-hero-stat-lbl {
+  font-size: 9px !important;
+  letter-spacing: .18em !important;
+  margin-top: 2px !important;
+}
+
+/* ── Section shell ── */
+.lb-section {
+  padding: 20px 36px 0;
+  border-bottom: 1px solid var(--border);
+}
+.lb-section-hd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.lb-section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  color: var(--text3);
+  font-weight: 500;
+  position: relative;
+  padding-bottom: 8px;
+}
+.lb-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 20px; height: 2px;
+  background: var(--gold2);
+}
+.lb-section-badge {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.lb-section-hd-rule { flex: 1; height: 1px; background: var(--border); }
+.lb-section-action {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--text3);
+  background: none; border: none;
+  font-family: inherit; cursor: pointer;
+  transition: .15s; padding: 0; white-space: nowrap;
+}
+.lb-section-action:hover { color: var(--gold2); }
+
+/* ── Poster strip (recent films) ── */
+.lb-poster-strip {
+  display: grid !important;
+  grid-template-columns: repeat(16, minmax(0, 58px)) !important;
+  gap: 5px !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 18px;
+}
+.lb-poster-strip .home-recent-tile img,
+.lb-poster-strip .home-recent-tile-noimg {
+  border-radius: 4px !important;
+}
+.lb-poster-strip .home-recent-tile:hover {
+  transform: translateY(-5px) scale(1.04) !important;
+  z-index: 3 !important;
+}
+.lb-poster-strip .home-recent-tile-rating {
+  font-family: 'Fraunces', serif;
+  font-size: 11px;
+  letter-spacing: -.3px;
+}
+
+/* Search inline */
+.lb-search-wrap {
+  position: relative;
+  margin-bottom: 14px;
+  max-width: 320px;
+}
+.lb-search-wrap svg {
+  position: absolute; left: 9px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3); pointer-events: none;
+}
+#home-search {
+  width: 100% !important;
+  background: var(--bg2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 7px !important;
+  padding: 7px 10px 7px 30px !important;
+  font-size: 12px !important;
+  color: var(--text) !important;
+  font-family: inherit !important;
+  outline: none !important;
+  transition: .15s !important;
+}
+#home-search:focus { border-color: rgba(240,192,80,.4) !important; }
+
+/* ── Body: 2 columns ── */
+.lb-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  min-height: 0;
+}
+.lb-main {
+  padding: 28px 36px 36px;
+  border-right: 1px solid var(--border);
+}
+.lb-aside {
+  padding: 28px 24px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Recs: make them slightly more compact in 2-col */
+.lb-main .home-rec-item {
+  grid-template-columns: 44px 60px 1fr !important;
+  gap: 12px !important;
+  padding: 14px 0 !important;
+}
+.lb-main .home-rec-num { font-size: 28px !important; }
+.lb-main .home-rec-poster { width: 60px !important; height: 90px !important; }
+.lb-main .home-rec-poster-placeholder { width: 60px !important; height: 90px !important; }
+
+/* Ephemeris en sidebar */
+.lb-aside .home-ephemeris {
+  margin: 0 !important;
+  padding: 14px !important;
+  border-top: none !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: var(--bg2) !important;
+  max-width: none !important;
+}
+
+/* Aside section headers */
+.lb-aside-section { display: flex; flex-direction: column; gap: 0; }
+.lb-aside-section .home-cycle-film { padding: 9px 0 !important; }
+.lb-aside-section .home-upcoming-item { padding: 9px 0 !important; }
+
+/* ── Animaciones entrada ── */
+@keyframes lbIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lb-profile-header { animation: lbIn .4s cubic-bezier(.16,1,.3,1) both .00s; }
+.lb-section         { animation: lbIn .4s cubic-bezier(.16,1,.3,1) both .05s; }
+.lb-main            { animation: lbIn .4s cubic-bezier(.16,1,.3,1) both .10s; }
+.lb-aside           { animation: lbIn .4s cubic-bezier(.16,1,.3,1) both .13s; }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
 </style>
 </head>
 <body>
@@ -974,89 +1546,87 @@ select {
     <nav class="nav">
       <button class="nav-btn" onclick="switchView('home',this)">Inicio</button>
       <button class="nav-btn on" onclick="switchView('films',this)">Películas</button>
-      <button class="nav-btn" onclick="switchView('watchlist',this)">⏳ Watchlist</button>
-      <button class="nav-btn" onclick="switchView('compare',this)">⚖️ Comparar</button>
+      <button class="nav-btn" onclick="switchView('watchlist',this)">Watchlist</button>
       <button class="nav-btn" onclick="switchView('ranking',this)">Mi Ranking</button>
       <button class="nav-btn" onclick="switchView('rewatched',this)">Re-vistas</button>
       <button class="nav-btn" onclick="switchView('filmog',this)">Filmografías</button>
       <button class="nav-btn" onclick="switchView('top100',this)">Top 100 Directores</button>
       <button class="nav-btn" onclick="switchView('collection',this)">Colección Física</button>
-      <button class="nav-btn" onclick="switchView('festivals',this)">Festivales</button>
-      <button class="nav-btn" onclick="switchView('news',this)">Noticias</button>
-      <button class="nav-btn" onclick="switchView('newsletter',this)">Newsletter</button>
       <button class="nav-btn" onclick="switchView('stats',this)">Estadísticas</button>
     </nav>
   </div>
 </header>
 
 <div id="view-home" class="view">
-  <div class="home-wrap">
+  <div class="lb-home">
 
-    <!-- ── Hero: mosaic backdrop + big stats ── -->
-    <div class="home-hero">
+    <!-- ══ PROFILE HEADER ══ -->
+    <div class="lb-profile-header">
       <div class="home-hero-mosaic" id="home-mosaic"></div>
-      <div class="home-hero-overlay"></div>
-      <div class="home-hero-content">
-        <div class="home-hero-eyebrow">Cine · Academia Otto Salamanca</div>
-        <div class="home-hero-title">Espacio<br><em>Cinéfilo</em></div>
-        <div class="home-hero-date" id="home-sub-date"></div>
-        <div class="home-hero-stats" id="home-kpis"></div>
-        <div class="home-ephemeris" id="home-ephemeris"></div>
+      <div class="lb-profile-overlay"></div>
+      <div class="lb-profile-content">
+        <div class="lb-profile-identity">
+          <div class="lb-profile-name">Espacio <em>Cinéfilo</em></div>
+          <div class="lb-profile-date" id="home-sub-date"></div>
+        </div>
+        <div class="lb-stats-bar home-hero-stats" id="home-kpis"></div>
       </div>
     </div>
 
-    <!-- ── Body: main + sidebar ── -->
-    <div class="home-body">
-
-      <!-- Main column -->
-      <div class="home-main">
-
-        <!-- Últimas añadidas -->
-        <div class="home-section-hd">
-          <div class="home-section-hd-title">Últimas añadidas <span class="home-section-hd-badge" id="home-recent-badge"></span></div>
-          <button class="home-section-hd-action" onclick="switchView('films',document.querySelector('.nav-btn:nth-child(2)'))">Ver todas →</button>
-        </div>
-        <!-- Búsqueda rápida en inicio -->
-        <div style="margin-bottom:16px;position:relative;">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input id="home-search" type="text" placeholder="Buscar en tu biblioteca..." oninput="filterHomeGrid(this.value)"
-            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px 8px 32px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:.15s;"
+    <!-- ══ RECENT FILMS STRIP ══ -->
+    <div class="lb-section">
+      <div class="lb-section-hd">
+        <div class="lb-section-title">Recientes <span class="lb-section-badge" id="home-recent-badge"></span></div>
+        <div class="lb-section-hd-rule"></div>
+        <div class="lb-search-wrap" style="margin:0 8px 0 0;max-width:220px;">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="home-search" type="text" placeholder="Buscar…" oninput="filterHomeGrid(this.value)"
             onfocus="this.style.borderColor='rgba(240,192,80,.4)'" onblur="this.style.borderColor='var(--border)'">
-          <div id="home-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;margin-top:4px;z-index:50;max-height:320px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
+          <div id="home-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;margin-top:4px;z-index:50;max-height:300px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
         </div>
-        <div class="home-recent-grid" id="home-recent-films"></div>
+        <button class="lb-section-action" onclick="switchView('films',document.querySelector('.nav-btn:nth-child(2)'))">Ver todas →</button>
+      </div>
+      <div class="home-recent-grid lb-poster-strip" id="home-recent-films"></div>
+    </div>
 
-        <!-- Recomendaciones -->
-        <div class="home-section-hd">
-          <div class="home-section-hd-title">Recomendaciones del día</div>
-          <button class="home-section-hd-action" onclick="initHome(true)">↺ Regenerar</button>
+    <!-- ══ BODY: 2 columnas ══ -->
+    <div class="lb-body">
+
+      <!-- Main: Recomendaciones -->
+      <div class="lb-main">
+        <div class="lb-section-hd" style="margin-bottom:18px;">
+          <div class="lb-section-title">Recomendaciones del día</div>
+          <div class="lb-section-hd-rule"></div>
+          <button class="lb-section-action" onclick="initHome(true)">↺ nuevo</button>
         </div>
         <div id="home-recs-body" class="home-rec-list">
           <div class="home-loading">Analizando tu biblioteca…</div>
         </div>
-
       </div>
 
       <!-- Sidebar -->
-      <div class="home-sidebar">
+      <div class="lb-aside">
 
-        <!-- Próximos estrenos -->
-        <div>
-          <div class="home-section-hd">
-            <div class="home-section-hd-title">En cartelera pronto</div>
-          </div>
-          <div id="home-upcoming-list" class="home-upcoming-list">
-            <div class="home-loading">Cargando…</div>
-          </div>
-        </div>
+        <!-- Ephemeris / cita -->
+        <div class="home-ephemeris" id="home-ephemeris"></div>
 
         <!-- Ciclo semanal -->
-        <div>
-          <div class="home-section-hd">
-            <div class="home-section-hd-title">Ciclo semanal</div>
+        <div class="lb-aside-section">
+          <div class="lb-section-hd" style="margin-bottom:12px;">
+            <div class="lb-section-title">Ciclo semanal</div>
           </div>
           <div id="home-cycle-body">
             <div class="home-loading">Preparando ciclo…</div>
+          </div>
+        </div>
+
+        <!-- En cartelera -->
+        <div class="lb-aside-section">
+          <div class="lb-section-hd" style="margin-bottom:12px;">
+            <div class="lb-section-title">En cartelera</div>
+          </div>
+          <div id="home-upcoming-list" class="home-upcoming-list">
+            <div class="home-loading">Cargando…</div>
           </div>
         </div>
 
@@ -1137,14 +1707,14 @@ select {
       <div style="font-size:12px;color:var(--text2);" id="rank-mode-label"><strong style="color:var(--text)">Ranking Objetivo</strong></div>
     </div>
     <div class="rank-view-btns">
-      <button class="rvbtn on" id="rank-toggle-obj" onclick="setRankMode('obj')">⭐ Objetivo</button>
+      <button class="rvbtn on" id="rank-toggle-obj" onclick="setRankMode('obj')">Objetivo</button>
       <button class="rvbtn" id="rank-toggle-pers" onclick="setRankMode('pers')">❤️ Subjetivo</button>
     </div>
     <div class="rank-view-btns">
       <button class="rvbtn on" id="rank-view-list" onclick="setRankViewUnified('list',this)">☰ Lista</button>
       <button class="rvbtn" id="rank-view-grid" onclick="setRankViewUnified('grid',this)">⊞ Grilla</button>
     </div>
-    <button class="rank-save-btn" onclick="saveRankingCurrent()">💾 Guardar</button>
+    <button class="rank-save-btn" onclick="saveRankingCurrent()">Guardar</button>
   </div>
 
   <!-- Barra de filtros del ranking -->
@@ -1180,14 +1750,14 @@ select {
   <div class="filmog-wrap">
     <!-- Tabs -->
     <div style="display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid var(--border);">
-      <button id="filmog-tab-dir" onclick="switchFilmogTab('dir')" style="background:none;border:none;border-bottom:2px solid var(--gold2);padding:9px 18px;font-size:12px;font-weight:500;color:var(--text);font-family:inherit;cursor:pointer;">🎬 Buscar por Director</button>
+      <button id="filmog-tab-dir" onclick="switchFilmogTab('dir')" style="background:none;border:none;border-bottom:2px solid var(--gold2);padding:9px 18px;font-size:12px;font-weight:500;color:var(--text);font-family:inherit;cursor:pointer;">Buscar por Director</button>
       <button id="filmog-tab-movie" onclick="switchFilmogTab('movie')" style="background:none;border:none;border-bottom:2px solid transparent;padding:9px 18px;font-size:12px;font-weight:400;color:var(--text3);font-family:inherit;cursor:pointer;transition:.15s;">🔎 Buscar Película en TMDB</button>
     </div>
     <!-- Director search -->
     <div id="filmog-dir-panel">
       <div class="filmog-search-row">
         <input type="text" id="filmog-input" placeholder="Nombre del director..." onkeydown="if(event.key==='Enter')searchFilmog()">
-        <button onclick="searchFilmog()">🔍 Buscar filmografía</button>
+        <button onclick="searchFilmog()">Buscar filmografía</button>
       </div>
       <div id="filmog-results"></div>
     </div>
@@ -1195,7 +1765,7 @@ select {
     <div id="filmog-movie-panel" style="display:none;">
       <div class="filmog-search-row">
         <input type="text" id="filmog-movie-input" placeholder="Título de la película..." onkeydown="if(event.key==='Enter')searchFilmogMovie()">
-        <button onclick="searchFilmogMovie()">🔍 Buscar en TMDB</button>
+        <button onclick="searchFilmogMovie()">Buscar en TMDB</button>
       </div>
       <div id="filmog-movie-results"></div>
     </div>
@@ -1334,7 +1904,7 @@ select {
 <div id="view-watchlist" class="view">
   <div style="padding:20px;">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap;">
-      <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:400;">⏳ Watchlist</div>
+      <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:400;">Watchlist</div>
       <div style="position:relative;flex:1;max-width:300px;">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input id="wl-search" type="text" placeholder="Buscar película para agregar..." oninput="wlSearch(this.value)"
@@ -1343,7 +1913,7 @@ select {
         <div id="wl-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;margin-top:4px;z-index:50;max-height:280px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.4);"></div>
       </div>
       <button onclick="pickRandomWl()" style="background:linear-gradient(135deg,rgba(155,127,212,.2),rgba(201,149,46,.15));border:1px solid rgba(155,127,212,.35);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text);cursor:pointer;font-family:inherit;transition:.15s;font-weight:500;">🎲 Elegir aleatoria</button>
-      <button onclick="openWlTMDB()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;">🔍 Buscar en TMDB</button>
+      <button onclick="openWlTMDB()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;">Buscar en TMDB</button>
       <span id="wl-count" style="margin-left:auto;font-size:12px;color:var(--text3);"></span>
     </div>
     <!-- Filters -->
@@ -1363,7 +1933,7 @@ select {
     </div>
     <div id="wl-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;"></div>
     <div id="wl-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--text3);">
-      <div style="font-size:36px;margin-bottom:12px;">🎬</div>
+      
       <div style="font-size:14px;margin-bottom:6px;">Tu watchlist está vacía</div>
       <div style="font-size:12px;">Busca películas arriba o añádelas desde la biblioteca</div>
     </div>
@@ -1389,7 +1959,7 @@ select {
 <!-- ══ COMPARADOR ════════════════════════════════════════════════════════ -->
 <div id="view-compare" class="view">
   <div style="padding:20px;max-width:1100px;">
-    <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:400;margin-bottom:6px;">⚖️ Comparar Películas</div>
+    <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:400;margin-bottom:6px;">Comparar Películas</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:22px;">Seleccioná dos películas de tu biblioteca para comparar sus puntuaciones en detalle</div>
     <!-- Selectors -->
     <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start;margin-bottom:24px;">
@@ -1447,7 +2017,7 @@ select {
         style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;letter-spacing:.05em;transition:.15s;"
         onfocus="this.style.borderColor='rgba(240,192,80,.4)'" onblur="this.style.borderColor='var(--border)'"
         onkeydown="if(event.key==='Enter')lookupBarcode()">
-      <button onclick="lookupBarcode()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">🔍 Buscar</button>
+      <button onclick="lookupBarcode()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">Buscar</button>
     </div>
     <div id="col-barcode-result" style="display:none;margin-bottom:10px;"></div>
     <div id="col-add-results" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:14px;display:none;"></div>
@@ -1478,7 +2048,7 @@ select {
           style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:7px 10px;outline:none;font-family:inherit;">
       </div>
       <div style="display:flex;gap:10px;">
-        <button onclick="searchColPrices()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;flex:1;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">🔍 Buscar precios</button>
+        <button onclick="searchColPrices()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;flex:1;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">Buscar precios</button>
         <button onclick="saveColAdd()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;flex:1;">✓ Agregar a colección</button>
       </div>
       <div id="col-price-results" style="margin-top:14px;display:none;"></div>
@@ -1519,7 +2089,7 @@ select {
         </div>
       </div>
       <div style="display:flex;gap:10px;">
-        <button onclick="searchWishPrices()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;flex:1;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">🔍 Ver precios estimados</button>
+        <button onclick="searchWishPrices()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s;flex:1;" onmouseover="this.style.borderColor='var(--gold2)'" onmouseout="this.style.borderColor='var(--border)'">Ver precios estimados</button>
         <button onclick="saveColWish()" style="background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;flex:1;">+ Agregar a wishlist</button>
       </div>
       <div id="col-wish-price-results" style="margin-top:14px;display:none;"></div>
@@ -1530,7 +2100,7 @@ select {
 <div class="overlay" id="ov-wl-tmdb" onclick="if(event.target===this)closeOv('ov-wl-tmdb')">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;padding:24px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div style="font-family:'Fraunces',serif;font-size:18px;">🔍 Buscar en TMDB</div>
+      <div style="font-family:'Fraunces',serif;font-size:18px;">Buscar en TMDB</div>
       <button onclick="closeOv('ov-wl-tmdb')" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;">✕</button>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
@@ -1570,7 +2140,7 @@ select {
         <label>Título</label>
         <div class="tsrow">
           <input type="text" id="f-title" placeholder="Título de la película...">
-          <button class="tsbtn" onclick="searchTMDB()">🎬 Buscar portada</button>
+          <button class="tsbtn" onclick="searchTMDB()">Buscar portada</button>
         </div>
       </div>
       <div id="tmdb-wrap"></div>
@@ -1604,7 +2174,7 @@ select {
       <!-- AI REVIEW SECTION -->
       <div class="ai-review-box">
         <div class="ai-review-title">🎭 Síntesis de crítica cinematográfica</div>
-        <button class="ai-review-btn" onclick="fetchAIReview()">✨ Generar síntesis de críticos</button>
+        <button class="ai-review-btn" onclick="fetchAIReview()">Generar síntesis de críticos</button>
         <div id="ai-review-content"></div>
       </div>
 
@@ -1638,22 +2208,22 @@ select {
       <div class="divider"></div>
       <div class="subscores-grid">
         <div class="score-inp-grp">
-          <label>📝 Guión</label>
+          <label>Guión</label>
           <input type="number" id="ss-script" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-hint">0 – 10, decimales libres</span>
         </div>
         <div class="score-inp-grp">
-          <label>🎬 Dirección</label>
+          <label>Dirección</label>
           <input type="number" id="ss-direction" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-hint">0 – 10, decimales libres</span>
         </div>
         <div class="score-inp-grp">
-          <label>📷 Fotografía</label>
+          <label>Fotografía</label>
           <input type="number" id="ss-photo" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-hint">0 – 10, decimales libres</span>
         </div>
         <div class="score-inp-grp">
-          <label>🎭 Producción</label>
+          <label>Producción</label>
           <input type="number" id="ss-prod" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-hint">0 – 10, decimales libres</span>
         </div>
@@ -1665,7 +2235,7 @@ select {
       <div class="divider"></div>
       <div class="sec-lbl">❤️ Evaluación subjetiva</div>
       <div class="score-inp-grp" style="background:rgba(155,127,212,.07);border-color:rgba(155,127,212,.25);">
-        <label>❤️ Gusto Personal</label>
+        <label>Gusto Personal</label>
         <input type="number" id="ss-personal" class="pers-inp" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
         <span class="score-hint">Tu nota subjetiva independiente</span>
       </div>
@@ -2009,7 +2579,7 @@ function makeCard(film, mode) {
       ${rwCount>1?`<div class="rewatch-badge">🔁×${rwCount}</div>`:''}
       <div class="card-hover">
         <button class="chbtn" onclick="event.stopPropagation();openDetail(${film.id})">Ver</button>
-        <button class="chbtn" onclick="event.stopPropagation();openForm(${film.id})">✏️</button>
+        <button class="chbtn" onclick="event.stopPropagation();openForm(${film.id})"></button>
         <button class="chbtn" onclick="event.stopPropagation();addToWatchlist(${film.id})" title="Agregar a Watchlist">⏳</button>
         <button class="chbtn del" onclick="event.stopPropagation();confirmDel(${film.id})">🗑</button>
       </div>
@@ -2031,7 +2601,7 @@ function openDetail(id) {
   const hasSub=ss.script!=null||ss.direction!=null||ss.photo!=null||ss.production!=null;
   const hasPers=ss.personal!=null;
   const rwCount=f.rewatchCount||1;
-  const subHTML=hasSub?`<div class="sub-scores">${[['📝 Guión',ss.script],['🎬 Dirección',ss.direction],['📷 Fotografía',ss.photo],['🎭 Producción',ss.production]].map(([l,v])=>v!=null?`<div class="sub-sc"><div class="sub-sc-val">${fmtR(v)}</div><div class="sub-sc-lbl">${l}</div></div>`:'').join('')}${hasPers?`<div class="sub-sc" style="border-color:rgba(155,127,212,.3);background:rgba(155,127,212,.07)"><div class="sub-sc-val" style="color:var(--purple)">${fmtR(ss.personal)}</div><div class="sub-sc-lbl">❤️ Gusto</div></div>`:''}</div>`:'';
+  const subHTML=hasSub?`<div class="sub-scores">${[['Guión',ss.script],['Dirección',ss.direction],['Fotografía',ss.photo],['Producción',ss.production]].map(([l,v])=>v!=null?`<div class="sub-sc"><div class="sub-sc-val">${fmtR(v)}</div><div class="sub-sc-lbl">${l}</div></div>`:'').join('')}${hasPers?`<div class="sub-sc" style="border-color:rgba(155,127,212,.3);background:rgba(155,127,212,.07)"><div class="sub-sc-val" style="color:var(--purple)">${fmtR(ss.personal)}</div><div class="sub-sc-lbl">Gusto</div></div>`:''}</div>`:'';
   document.getElementById('det-content').innerHTML=`
     <div class="det-top">
       <div class="det-poster">${f.poster?`<img src="${esc(f.poster)}" alt="${esc(f.title)}">`:noImgHTML(f.title)}</div>
@@ -2047,7 +2617,7 @@ function openDetail(id) {
           ${f.year?`<span class="tag">${f.year}</span>`:''}
           ${f.country?`<span class="tag">${esc(f.country)}</span>`:''}
           ${rwCount>1?`<span class="tag green">🔁 Vista ${rwCount} veces</span>`:''}
-          ${f.watchedDate?`<span class="tag">📅 ${f.watchedDate}</span>`:''}
+          ${f.watchedDate?`<span class="tag">${f.watchedDate}</span>`:''}
         </div>
       </div>
     </div>
@@ -2056,8 +2626,8 @@ function openDetail(id) {
       ${f.streaming?`<div class="det-meta-row"><span>📺 Dónde ver:</span>${esc(f.streaming)}</div>`:''}
       ${f.comment?`<div class="det-comment">${esc(f.comment)}</div>`:''}
       <div class="det-actions">
-        <button class="det-btn edit" onclick="closeOv('ov-detail');openForm(${f.id})">✏️ Editar</button>
-        ${f.letterboxd?`<a class="det-btn" href="${esc(f.letterboxd)}" target="_blank">📽 Letterboxd</a>`:''}
+        <button class="det-btn edit" onclick="closeOv('ov-detail');openForm(${f.id})">Editar</button>
+        ${f.letterboxd?`<a class="det-btn" href="${esc(f.letterboxd)}" target="_blank">Letterboxd</a>`:''}
         <button class="det-btn del" onclick="closeOv('ov-detail');confirmDel(${f.id})">🗑 Eliminar</button>
       </div>
     </div>`;
@@ -2166,10 +2736,10 @@ async function fetchAIReview() {
         </div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">🔗 Ver críticas completas en:</div>
         <div class="ai-review-links">
-          <a class="ai-review-link" href="${imdbUrl}" target="_blank">🎬 IMDb</a>
+          <a class="ai-review-link" href="${imdbUrl}" target="_blank">IMDb</a>
           <a class="ai-review-link" href="${rtUrl}" target="_blank">🍅 Rotten Tomatoes</a>
           <a class="ai-review-link" href="${mcUrl}" target="_blank">🟡 Metacritic</a>
-          <a class="ai-review-link" href="${lbUrl}" target="_blank">📽 Letterboxd</a>
+          <a class="ai-review-link" href="${lbUrl}" target="_blank">Letterboxd</a>
         </div>
       </div>`;
   } catch(e) {
@@ -2269,7 +2839,7 @@ function saveFilm() {
     showToast(isEdit?`"${title}" actualizada`:`"${title}" agregada`);
   }catch(e){
     console.error('Error al guardar:', e);
-    showToast('⚠️ Error al guardar. Revisá la consola.');
+    showToast('Error al guardar. Revisá la consola.');
   }
   closeOv('ov-form');applyFilters();applyPersonal();renderStats();
 }
@@ -2464,7 +3034,7 @@ function makeRankItem(f,pos,canDrag,k,type) {
   const el=document.createElement('div');el.className='rank-item';el.dataset.id=f.id;
   if(canDrag)setupDrag(el,f.id,k,type);
   const img=f.poster?`<img class="rank-poster-sm" src="${esc(f.poster)}" loading="lazy" onerror="this.className='rank-noimg-sm';this.textContent='?'">`:`<div class="rank-noimg-sm">${esc(f.title[0]||'?')}</div>`;
-  el.innerHTML=`<span class="rank-pos">#${pos}</span>${img}<div class="rank-info"><div class="rank-title">${esc(f.title)}</div><div class="rank-meta">${f.director?esc(f.director.split(',')[0]):'—'} · ${f.year||'?'}</div></div><button class="rank-edit-btn" onclick="event.stopPropagation();openForm(${f.id})" title="Editar" style="background:none;border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:11px;color:var(--text3);cursor:pointer;flex-shrink:0;transition:.15s;opacity:0;margin-left:auto;">✏️</button>${canDrag?'<span class="rank-handle">⠿</span>':''}`;
+  el.innerHTML=`<span class="rank-pos">#${pos}</span>${img}<div class="rank-info"><div class="rank-title">${esc(f.title)}</div><div class="rank-meta">${f.director?esc(f.director.split(',')[0]):'—'} · ${f.year||'?'}</div></div><button class="rank-edit-btn" onclick="event.stopPropagation();openForm(${f.id})" title="Editar" style="background:none;border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:11px;color:var(--text3);cursor:pointer;flex-shrink:0;transition:.15s;opacity:0;margin-left:auto;"></button>${canDrag?'<span class="rank-handle">⠿</span>':''}`;
   el.addEventListener('mouseenter',()=>{const b=el.querySelector('.rank-edit-btn');if(b)b.style.opacity='1';});
   el.addEventListener('mouseleave',()=>{const b=el.querySelector('.rank-edit-btn');if(b)b.style.opacity='0';});
   return el;
@@ -2474,7 +3044,7 @@ function makeRankCard(f,pos,canDrag,k,type) {
   const el=document.createElement('div');el.className='rank-card';el.dataset.id=f.id;
   if(canDrag)setupDrag(el,f.id,k,type);
   el.style.position='relative';
-  el.innerHTML=`<div class="rank-card-pos">#${pos}</div>${f.poster?`<img src="${esc(f.poster)}" loading="lazy" onerror="this.outerHTML='<div class=rank-card-noimg>${esc(f.title.substring(0,20))}</div>'">`:`<div class="rank-card-noimg">${esc(f.title.substring(0,24))}</div>`}<div class="rank-card-info"><div class="rank-card-title">${esc(f.title)}</div></div><button class="rank-card-edit-btn" onclick="event.stopPropagation();openForm(${f.id})" style="position:absolute;bottom:6px;right:6px;background:rgba(11,11,14,.8);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-size:11px;color:var(--text2);cursor:pointer;opacity:0;transition:.15s;">✏️</button>`;
+  el.innerHTML=`<div class="rank-card-pos">#${pos}</div>${f.poster?`<img src="${esc(f.poster)}" loading="lazy" onerror="this.outerHTML='<div class=rank-card-noimg>${esc(f.title.substring(0,20))}</div>'">`:`<div class="rank-card-noimg">${esc(f.title.substring(0,24))}</div>`}<div class="rank-card-info"><div class="rank-card-title">${esc(f.title)}</div></div><button class="rank-card-edit-btn" onclick="event.stopPropagation();openForm(${f.id})" style="position:absolute;bottom:6px;right:6px;background:rgba(11,11,14,.8);border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-size:11px;color:var(--text2);cursor:pointer;opacity:0;transition:.15s;"></button>`;
   el.addEventListener('mouseenter',()=>{const b=el.querySelector('.rank-card-edit-btn');if(b)b.style.opacity='1';});
   el.addEventListener('mouseleave',()=>{const b=el.querySelector('.rank-card-edit-btn');if(b)b.style.opacity='0';});
   return el;
@@ -2566,11 +3136,11 @@ async function searchFilmogMovie() {
             <div style="position:relative;">
               ${posterUrl
                 ? `<img src="${posterUrl}" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;display:block;background:var(--bg3);" loading="lazy">`
-                : `<div style="width:100%;aspect-ratio:2/3;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:28px;opacity:.2;">🎬</div>`}
+                : `<div style="width:100%;aspect-ratio:2/3;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:28px;opacity:.2;">▶</div>`}
               ${inLib ? `<div style="position:absolute;top:4px;right:4px;background:rgba(76,175,130,.9);border-radius:3px;padding:1px 5px;font-size:9px;color:#0b0b0e;font-weight:500;">✓ Vista</div>` : ''}
               <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(11,11,14,.9));border-radius:0 0 6px 6px;padding:20px 6px 6px;">
                 <div style="font-size:10px;font-weight:500;line-height:1.3;color:var(--text);">${esc(m.title||'')}</div>
-                <div style="font-size:9.5px;color:var(--text3);">${year}${m.vote_average>0?' · ⭐'+m.vote_average.toFixed(1):''}</div>
+                <div style="font-size:9.5px;color:var(--text3);">${year}${m.vote_average>0?' · ★'+m.vote_average.toFixed(1):''}</div>
               </div>
               ${!inLib ? `<div style="position:absolute;inset:0;background:rgba(201,149,46,.08);border:1px dashed rgba(201,149,46,.3);border-radius:6px;display:flex;align-items:center;justify-content:center;opacity:0;transition:.15s;" class="add-overlay"><span style="font-size:10px;color:var(--gold);font-weight:500;">+ Agregar</span></div>` : ''}
             </div>
@@ -2678,14 +3248,14 @@ async function searchFilmog() {
           <div class="filmog-dir-stats">${directed.length} películas · ${seen.length} vistas · ${unseen.length} pendientes</div>
         </div>
       </div>
-      ${seen.length?`<div class="filmog-section-title">✅ Vistas (${seen.length})</div>
+      ${seen.length?`<div class="filmog-section-title">Vistas (${seen.length})</div>
       <div class="filmog-grid">${seen.map(m=>{
         const myFilm=getMyFilm(m);
         const displayTitle=esTitleMap[m.id]||m.title;
         const poster=m.poster_path?`https://image.tmdb.org/t/p/w185${m.poster_path}`:'';
         return`<div class="filmog-card seen">${poster?`<img src="${poster}" loading="lazy">`:`<div class="filmog-card-noimg">${esc(m.title.substring(0,20))}</div>`}${myFilm?.rating!=null?`<div class="filmog-rating-badge">${fmtR(myFilm.rating)}</div>`:''}<div class="filmog-seen-badge">Vista</div><div class="filmog-card-info"><div class="filmog-card-title">${esc(displayTitle)}</div><div class="filmog-card-year">${m.release_date?.split('-')[0]||'?'}</div></div></div>`;
       }).join('')}</div>`:''}
-      ${unseen.length?`<div class="filmog-section-title">🎬 Pendientes (${unseen.length})</div>
+      ${unseen.length?`<div class="filmog-section-title">Pendientes (${unseen.length})</div>
       <div class="filmog-grid">${unseen.map(m=>{
         const displayTitle=esTitleMap[m.id]||m.title;
         const poster=m.poster_path?`https://image.tmdb.org/t/p/w185${m.poster_path}`:'';
@@ -2732,7 +3302,7 @@ function renderTop100() {
     <div class="top100-note">Ranking ponderado de tus <strong>100 mejores directores</strong>. Directores con menos de 4 películas reciben una <strong>penalización</strong>. Clic en el nombre para filtrar sus películas.</div>
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
       <div class="rank-view-btns">
-        <button class="rvbtn on" id="t100-obj" onclick="setTop100Score('obj')">⭐ Objetivo</button>
+        <button class="rvbtn on" id="t100-obj" onclick="setTop100Score('obj')">Objetivo</button>
         <button class="rvbtn" id="t100-pers" onclick="setTop100Score('pers')">❤️ Subjetivo</button>
       </div>
       <div class="rank-view-btns">
@@ -3044,10 +3614,10 @@ async function loadHomeUpcoming(){
     const formatDate = d => d ? new Date(d).toLocaleDateString('es',{day:'numeric',month:'short'}) : '';
 
     const makeItem = (m, isNow) => {
-      const score = m.vote_average&&m.vote_average>0 ? `⭐ ${m.vote_average.toFixed(1)}` : '';
+      const score = m.vote_average&&m.vote_average>0 ? `★ ${m.vote_average.toFixed(1)}` : '';
       const dateLabel = isNow
         ? `<span style="color:var(--green);font-size:10px;font-weight:500;">● En cines</span>`
-        : `<span style="color:var(--gold2);">📅 ${formatDate(m.release_date)}</span>`;
+        : `<span style="color:var(--gold2);">${formatDate(m.release_date)}</span>`;
       return `<div class="home-upcoming-item" style="cursor:pointer;" onclick="window.open('https://www.themoviedb.org/movie/${m.id}','_blank')" title="Ver en TMDB">
         <img class="home-upcoming-poster" src="https://image.tmdb.org/t/p/w92${m.poster_path}" loading="lazy" onerror="this.style.display='none'">
         <div class="home-upcoming-info">
@@ -4767,7 +5337,7 @@ function renderStats() {
     <div class="stats-section">
       <div class="stats-section-hd"><span>Décadas mejor valoradas</span></div>
       <div class="stats-decades">
-        ${decades.map((d,di)=>`<div class="stats-decade-row"><div><div class="stats-decade-label">${d.decade}s</div><div style="font-size:9.5px;color:var(--text3);margin-top:3px;">⭐ ${d.avg.toFixed(2)}</div></div><div class="stats-decade-films" id="dec-films-${di}">${d.films.map((f,fi)=>{const pid='dp-'+di+'-'+fi;const src=f.poster?'https://image.tmdb.org/t/p/w185'+f.poster:'';return `<img id="${pid}" class="stats-decade-poster" src="${src}" loading="lazy" title="${esc(f.title)}" onclick="openModal(${f.id})" data-title="${esc(f.title).replace(/"/g,'&quot;')}" data-year="${f.year||''}" onerror="fetchDecadePoster(this)">`;}).join('')}</div></div>`).join('')}
+        ${decades.map((d,di)=>`<div class="stats-decade-row"><div><div class="stats-decade-label">${d.decade}s</div><div style="font-size:9.5px;color:var(--text3);margin-top:3px;">★ ${d.avg.toFixed(2)}</div></div><div class="stats-decade-films" id="dec-films-${di}">${d.films.map((f,fi)=>{const pid='dp-'+di+'-'+fi;const src=f.poster?'https://image.tmdb.org/t/p/w185'+f.poster:'';return `<img id="${pid}" class="stats-decade-poster" src="${src}" loading="lazy" title="${esc(f.title)}" onclick="openModal(${f.id})" data-title="${esc(f.title).replace(/"/g,'&quot;')}" data-year="${f.year||''}" onerror="fetchDecadePoster(this)">`;}).join('')}</div></div>`).join('')}
       </div>
     </div>
     <div class="stats-section">
@@ -5273,7 +5843,7 @@ async function wlTMDBSearch(){
         ${ps?`<img src="${ps}" style="width:36px;height:54px;object-fit:cover;border-radius:4px;flex-shrink:0;">`:`<div style="width:36px;height:54px;background:var(--bg3);border-radius:4px;flex-shrink:0;"></div>`}
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.title)}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${yr}${m.vote_average?` · ⭐ ${m.vote_average.toFixed(1)}/10`:''}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${yr}${m.vote_average?` · ★ ${m.vote_average.toFixed(1)}/10`:''}</div>
         </div>
         <div style="font-size:11px;color:${inWl?'var(--text3)':'var(--gold2)'};flex-shrink:0;">${inWl?'✓ En lista':'+ Agregar'}</div>
       </div>`;
@@ -5344,7 +5914,7 @@ async function loadCmpExternal(){
     {key:'mubi',    label:'MUBI',            icon:'🎞'},
     {key:'rt',      label:'Rotten Tomatoes', icon:'🍅'},
     {key:'mc',      label:'Metacritic',      icon:'🟡'},
-    {key:'imdb',    label:'IMDb',            icon:'⭐'},
+    {key:'imdb',    label:'IMDb',            icon:'★'},
   ];
 
   extCont.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
