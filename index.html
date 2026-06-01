@@ -5223,7 +5223,8 @@ async function loadCmpExternal(){
 boot();
 </script>
 
-// ── Taste-Skill: Spotlight border tracking ──────────────────────────────
+<script>
+// Taste-Skill: Spotlight border tracking
 (function(){
   function attachSpotlight(selector){
     document.querySelectorAll(selector).forEach(card => {
@@ -5234,7 +5235,6 @@ boot();
       });
     });
   }
-  // Attach on load and after grid renders
   const observer = new MutationObserver(() => {
     attachSpotlight('.card');
     attachSpotlight('.wl-card');
@@ -5247,7 +5247,7 @@ boot();
     attachSpotlight('.col-card');
   });
 })();
-// ────────────────────────────────────────────────────────────────────────
+</script>
 
 </body>
 </html>
