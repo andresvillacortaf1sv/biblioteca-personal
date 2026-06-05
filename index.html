@@ -2948,7 +2948,7 @@ function saveFilm() {
   const isEdit=!!eid;
   const getN=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:Math.round(v*100)/100;};
   const sc={direction:getN('ss-direction'),script:getN('ss-script'),acting:getN('ss-acting'),visual:getN('ss-visual'),editing:getN('ss-editing'),sound:getN('ss-sound'),impact:getN('ss-impact'),personal:getN('ss-personal')};
-  const filled=[sc.script,sc.direction,sc.photo,sc.production].filter(v=>v!==null);
+  const filled=[sc.direction,sc.script,sc.acting,sc.visual,sc.editing,sc.sound,sc.impact].filter(v=>v!==null);
   const obj=filled.length?Math.round(filled.reduce((a,b)=>a+b,0)/filled.length*100)/100:null;
   const rwCount=parseInt(document.getElementById('f-rewatch-count').value)||1;
   const film={
