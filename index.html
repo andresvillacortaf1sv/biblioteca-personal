@@ -3006,7 +3006,9 @@ function saveFilm() {
     console.error('Error al guardar:', e);
     showToast('Error al guardar. Revisá la consola.');
   }
+  const _sy=window.scrollY;
   closeOv('ov-form');applyFilters();applyPersonal();renderStats();
+  requestAnimationFrame(()=>window.scrollTo({top:_sy,behavior:'instant'}));
 }
 
 // ── DELETE ──
