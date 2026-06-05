@@ -87,7 +87,7 @@ select:hover{border-color:var(--border2);}
 .tag{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--text2);}
 .tag.green{background:rgba(76,175,130,.15);border-color:rgba(76,175,130,.3);color:var(--green);}
 .det-body{padding:15px 24px 22px;}
-.sub-scores{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:13px;}
+.sub-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:13px;}
 .sub-sc{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 4px;text-align:center;}
 .sub-sc-val{font-size:15px;font-weight:500;color:var(--gold2);font-family:'Fraunces',serif;}
 .sub-sc-lbl{font-size:9px;color:var(--text3);margin-top:2px;}
@@ -120,7 +120,7 @@ select:hover{border-color:var(--border2);}
 .tmr-lbl{font-size:9px;color:var(--gold2);padding:2px 4px;text-align:center;font-weight:500;}
 .divider{height:1px;background:var(--border);margin:1px 0;}
 .sec-lbl{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
-.subscores-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.subscores-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
 .score-inp-grp{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;}
 .score-inp-grp label{font-size:12px;font-weight:500;color:var(--text2);}
 .score-inp-grp input[type=number]{background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--gold2);font-size:19px;font-family:'Fraunces',serif;font-weight:500;padding:5px 8px;width:100%;outline:none;text-align:center;transition:.15s;}
@@ -2333,28 +2333,43 @@ select {
       <div class="divider"></div>
       <div class="subscores-grid">
         <div class="score-inp-grp">
-          <label>Guión</label>
-          <input type="number" id="ss-script" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10, decimales libres</span>
-        </div>
-        <div class="score-inp-grp">
           <label>Dirección</label>
           <input type="number" id="ss-direction" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10, decimales libres</span>
+          <span class="score-hint">0 – 10</span>
         </div>
         <div class="score-inp-grp">
-          <label>Fotografía</label>
-          <input type="number" id="ss-photo" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10, decimales libres</span>
+          <label>Guión</label>
+          <input type="number" id="ss-script" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
+          <span class="score-hint">0 – 10</span>
         </div>
         <div class="score-inp-grp">
-          <label>Producción</label>
-          <input type="number" id="ss-prod" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10, decimales libres</span>
+          <label>Actuaciones</label>
+          <input type="number" id="ss-acting" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
+          <span class="score-hint">0 – 10</span>
+        </div>
+        <div class="score-inp-grp">
+          <label>Lenguaje Visual</label>
+          <input type="number" id="ss-visual" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
+          <span class="score-hint">0 – 10</span>
+        </div>
+        <div class="score-inp-grp">
+          <label>Montaje</label>
+          <input type="number" id="ss-editing" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
+          <span class="score-hint">0 – 10</span>
+        </div>
+        <div class="score-inp-grp">
+          <label>Sonido</label>
+          <input type="number" id="ss-sound" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
+          <span class="score-hint">0 – 10</span>
+        </div>
+        <div class="score-inp-grp" style="grid-column:span 3;">
+          <label>Impacto y Propuesta Autoral</label>
+          <input type="number" id="ss-impact" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
+          <span class="score-hint">0 – 10</span>
         </div>
       </div>
       <div class="avg-preview">
-        <span>Nota objetiva (promedio de los 4 indicadores)</span>
+        <span>Nota objetiva (promedio de los 7 indicadores)</span>
         <strong id="avg-val">—</strong>
       </div>
       <div class="divider"></div>
@@ -2723,10 +2738,10 @@ function emptyEl(){return`<div class="empty"><svg width="38" height="38" fill="n
 function openDetail(id) {
   const f=FILMS.find(x=>x.id===id); if(!f) return;
   const ss=f.subscores||{};
-  const hasSub=ss.script!=null||ss.direction!=null||ss.photo!=null||ss.production!=null;
+  const hasSub=ss.direction!=null||ss.script!=null||ss.acting!=null||ss.visual!=null||ss.editing!=null||ss.sound!=null||ss.impact!=null||ss.photo!=null||ss.production!=null;
   const hasPers=ss.personal!=null;
   const rwCount=f.rewatchCount||1;
-  const subHTML=hasSub?`<div class="sub-scores">${[['Guión',ss.script],['Dirección',ss.direction],['Fotografía',ss.photo],['Producción',ss.production]].map(([l,v])=>v!=null?`<div class="sub-sc"><div class="sub-sc-val">${fmtR(v)}</div><div class="sub-sc-lbl">${l}</div></div>`:'').join('')}${hasPers?`<div class="sub-sc" style="border-color:rgba(155,127,212,.3);background:rgba(155,127,212,.07)"><div class="sub-sc-val" style="color:var(--purple)">${fmtR(ss.personal)}</div><div class="sub-sc-lbl">Gusto</div></div>`:''}</div>`:'';
+  const subHTML=hasSub?`<div class="sub-scores">${[['Dirección',ss.direction],['Guión',ss.script],['Actuaciones',ss.acting],['Lenguaje Visual',ss.visual],['Montaje',ss.editing],['Sonido',ss.sound],['Impacto Autoral',ss.impact],['Fotografía',ss.photo],['Producción',ss.production]].map(([l,v])=>v!=null?`<div class="sub-sc"><div class="sub-sc-val">${fmtR(v)}</div><div class="sub-sc-lbl">${l}</div></div>`:'').join('')}${hasPers?`<div class="sub-sc" style="border-color:rgba(155,127,212,.3);background:rgba(155,127,212,.07)"><div class="sub-sc-val" style="color:var(--purple)">${fmtR(ss.personal)}</div><div class="sub-sc-lbl">Gusto</div></div>`:''}</div>`:'';
   document.getElementById('det-content').innerHTML=`
     <div class="det-top">
       <div class="det-poster">${f.poster?`<img src="${esc(f.poster)}" alt="${esc(f.title)}">`:noImgHTML(f.title)}</div>
@@ -2786,9 +2801,9 @@ function openForm(id) {
   document.getElementById('f-edition').value=f?.edition||'';
   document.getElementById('physical-fields').style.display=(f?.physical)?'flex':'none';
   const ss=f?.subscores||{};
-  ['script','direction','photo','prod','personal'].forEach(n=>{
-    const key=n==='prod'?'production':n;
-    document.getElementById('ss-'+n).value=ss[key]!=null?ss[key]:'';
+  ['direction','script','acting','visual','editing','sound','impact','personal'].forEach(n=>{
+    const el=document.getElementById('ss-'+n);
+    if(el) el.value=ss[n]!=null?ss[n]:'';
   });
   updatePreviews();
   document.getElementById('ov-form').classList.add('on');
@@ -2796,7 +2811,7 @@ function openForm(id) {
 }
 
 function updatePreviews() {
-  const vals=['script','direction','photo','prod'].map(n=>{const v=parseFloat(document.getElementById('ss-'+n).value);return isNaN(v)?null:v;});
+  const vals=['direction','script','acting','visual','editing','sound','impact'].map(n=>{const v=parseFloat(document.getElementById('ss-'+n).value);return isNaN(v)?null:v;});
   const filled=vals.filter(v=>v!==null);
   document.getElementById('avg-val').textContent=filled.length?fmtR(filled.reduce((a,b)=>a+b,0)/filled.length):'—';
   const pv=parseFloat(document.getElementById('ss-personal').value);
@@ -2932,7 +2947,7 @@ function saveFilm() {
   const eid=document.getElementById('f-eid').value;
   const isEdit=!!eid;
   const getN=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:Math.round(v*100)/100;};
-  const sc={script:getN('ss-script'),direction:getN('ss-direction'),photo:getN('ss-photo'),production:getN('ss-prod'),personal:getN('ss-personal')};
+  const sc={direction:getN('ss-direction'),script:getN('ss-script'),acting:getN('ss-acting'),visual:getN('ss-visual'),editing:getN('ss-editing'),sound:getN('ss-sound'),impact:getN('ss-impact'),personal:getN('ss-personal')};
   const filled=[sc.script,sc.direction,sc.photo,sc.production].filter(v=>v!==null);
   const obj=filled.length?Math.round(filled.reduce((a,b)=>a+b,0)/filled.length*100)/100:null;
   const rwCount=parseInt(document.getElementById('f-rewatch-count').value)||1;
