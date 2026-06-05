@@ -1766,13 +1766,27 @@ select {
     <select id="fc-country" onchange="applyFilters()"><option value="">Todos los países</option></select>
     <select id="fc-director" onchange="applyFilters()"><option value="">Todos los directores</option></select>
     <select id="fc-sort" onchange="applyFilters()">
-      <option value="rating_desc">Nota: Mayor → Menor</option>
-      <option value="rating_asc">Nota: Menor → Mayor</option>
-      <option value="year_desc">Año: Más reciente</option>
-      <option value="year_asc">Año: Más antiguo</option>
-      <option value="title_asc">Título: A → Z</option>
-      <option value="watched_desc">Fecha vista: Más reciente</option>
-      <option value="added_desc">Agregadas recientemente</option>
+      <optgroup label="General">
+        <option value="rating_desc">Nota objetiva: Mayor → Menor</option>
+        <option value="rating_asc">Nota objetiva: Menor → Mayor</option>
+        <option value="personal_desc">Gusto personal: Mayor → Menor</option>
+        <option value="personal_asc">Gusto personal: Menor → Mayor</option>
+        <option value="director_asc">Director: A → Z</option>
+        <option value="year_desc">Año: Más reciente</option>
+        <option value="year_asc">Año: Más antiguo</option>
+        <option value="title_asc">Título: A → Z</option>
+        <option value="watched_desc">Fecha vista: Más reciente</option>
+        <option value="added_desc">Agregadas recientemente</option>
+      </optgroup>
+      <optgroup label="Por indicador">
+        <option value="ss_direction_desc">Dirección: Mayor → Menor</option>
+        <option value="ss_script_desc">Guión: Mayor → Menor</option>
+        <option value="ss_acting_desc">Actuaciones: Mayor → Menor</option>
+        <option value="ss_visual_desc">Lenguaje Visual: Mayor → Menor</option>
+        <option value="ss_editing_desc">Montaje: Mayor → Menor</option>
+        <option value="ss_sound_desc">Sonido: Mayor → Menor</option>
+        <option value="ss_impact_desc">Impacto Autoral: Mayor → Menor</option>
+      </optgroup>
     </select>
     <select id="fc-rating" onchange="applyFilters()">
       <option value="">Todas las notas</option>
@@ -2680,14 +2694,25 @@ function applyPersonal() {
 }
 
 function sortArr(arr, s) {
+  const ss = f => f.subscores||{};
   arr.sort((a,b)=>{
-    if(s==='rating_desc')  return (b.rating??-1)-(a.rating??-1);
-    if(s==='rating_asc')   return (a.rating??999)-(b.rating??999);
-    if(s==='year_desc')    return (b.year??0)-(a.year??0);
-    if(s==='year_asc')     return (a.year??9999)-(b.year??9999);
-    if(s==='title_asc')    return a.title.localeCompare(b.title);
-    if(s==='added_desc')   return b.id-a.id;
-    if(s==='watched_desc') return (b.watchedDate||'')>(a.watchedDate||'')?1:-1;
+    if(s==='rating_desc')      return (b.rating??-1)-(a.rating??-1);
+    if(s==='rating_asc')       return (a.rating??999)-(b.rating??999);
+    if(s==='personal_desc')    return (ss(b).personal??-1)-(ss(a).personal??-1);
+    if(s==='personal_asc')     return (ss(a).personal??999)-(ss(b).personal??999);
+    if(s==='director_asc')     return (a.director||'').localeCompare(b.director||'');
+    if(s==='year_desc')        return (b.year??0)-(a.year??0);
+    if(s==='year_asc')         return (a.year??9999)-(b.year??9999);
+    if(s==='title_asc')        return a.title.localeCompare(b.title);
+    if(s==='added_desc')       return b.id-a.id;
+    if(s==='watched_desc')     return (b.watchedDate||'')>(a.watchedDate||'')?1:-1;
+    if(s==='ss_direction_desc')return (ss(b).direction??-1)-(ss(a).direction??-1);
+    if(s==='ss_script_desc')   return (ss(b).script??-1)-(ss(a).script??-1);
+    if(s==='ss_acting_desc')   return (ss(b).acting??-1)-(ss(a).acting??-1);
+    if(s==='ss_visual_desc')   return (ss(b).visual??-1)-(ss(a).visual??-1);
+    if(s==='ss_editing_desc')  return (ss(b).editing??-1)-(ss(a).editing??-1);
+    if(s==='ss_sound_desc')    return (ss(b).sound??-1)-(ss(a).sound??-1);
+    if(s==='ss_impact_desc')   return (ss(b).impact??-1)-(ss(a).impact??-1);
     return 0;
   });
 }
