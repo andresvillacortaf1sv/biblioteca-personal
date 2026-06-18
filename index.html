@@ -2721,7 +2721,8 @@ function sortArr(arr, s) {
 function loadMore(type) {
   if (type==='films') {
     const g=document.getElementById('films-grid');
-    filtered.slice(dispF,dispF+PAGE).forEach(f=>g.appendChild(makeCard(f,'films')));
+    const curSort=document.getElementById('fc-sort')?.value;
+    filtered.slice(dispF,dispF+PAGE).forEach(f=>g.appendChild(makeCard(f,'films',curSort)));
     dispF+=PAGE; document.getElementById('lmwrap').style.display=dispF<filtered.length?'block':'none';
     if(!filtered.length) g.innerHTML=emptyEl();
   } else {
@@ -2732,15 +2733,16 @@ function loadMore(type) {
   }
 }
 
-function makeCard(film, mode) {
+function makeCard(film, mode, sort) {
   const div=document.createElement('div'); div.className='card';
-  const showR=mode==='personal'?(film.subscores?.personal??null):film.rating;
+  const isPersonal = mode==='personal' || (typeof sort==='string' && sort.indexOf('personal')===0);
+  const showR=isPersonal?(film.subscores?.personal??null):film.rating;
   const rwCount=film.rewatchCount||1;
   const poster=film.poster?`<img src="${esc(film.poster)}" alt="${esc(film.title)}" loading="lazy" onerror="this.parentElement.innerHTML=noImgHTML('${esc(film.title).replace(/'/g,"\\'")}')">`:noImgHTML(film.title);
   div.innerHTML=`
     <div class="poster">
       ${poster}
-      ${showR!=null?`<div class="rbadge${mode==='personal'?' pers':''}">${fmtR(showR)}</div>`:''}
+      ${showR!=null?`<div class="rbadge${isPersonal?' pers':''}">${fmtR(showR)}</div>`:''}
       ${rwCount>1?`<div class="rewatch-badge">🔁×${rwCount}</div>`:''}
       <div class="card-hover">
         <button class="chbtn" onclick="event.stopPropagation();openDetail(${film.id})">Ver</button>
