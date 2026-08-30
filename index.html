@@ -2362,6 +2362,10 @@ select {
         </div>
       </div>
       <div class="divider"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:2px;">
+        <div class="sec-lbl" style="margin:0;">🎯 Notas y evaluación</div>
+        <button type="button" onclick="clearFilmScores()" title="Borra las 7 notas objetivas y el Gusto Personal para volver a evaluar la película desde cero. La reseña y el resto de los datos no se tocan." style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text3);cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">🗑 Borrar todas las notas</button>
+      </div>
       <div class="subscores-grid">
         <div class="score-inp-grp">
           <label>Dirección</label>
@@ -2862,6 +2866,19 @@ function updatePreviews() {
   document.getElementById('avg-val').textContent=filled.length?fmtR(filled.reduce((a,b)=>a+b,0)/filled.length):'—';
   const pv=parseFloat(document.getElementById('ss-personal').value);
   document.getElementById('pers-val').textContent=isNaN(pv)?'—':fmtR(pv);
+}
+
+// Clear all 8 score fields (7 objective indicators + Gusto Personal) in one go,
+// so the user can re-evaluate a film from scratch without clearing each field by hand.
+// Only affects the open form; nothing is saved until the user clicks "Guardar".
+function clearFilmScores() {
+  if(!confirm('¿Borrar las 7 notas objetivas y el Gusto Personal de esta película?\n\nLa reseña, el póster y el resto de los datos no se tocan. El cambio recién se guarda si le das a "Guardar".')) return;
+  ['direction','script','acting','visual','editing','sound','impact','personal'].forEach(n=>{
+    const el=document.getElementById('ss-'+n);
+    if(el) el.value='';
+  });
+  updatePreviews();
+  showToast('Notas borradas — recordá guardar para confirmar el cambio');
 }
 
 // ── AI REVIEW ──
