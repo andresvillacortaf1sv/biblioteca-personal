@@ -1840,8 +1840,11 @@ select {
 <div id="view-ranking" class="view">
   <!-- Toolbar principal -->
   <div class="rank-toolbar">
-    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
-      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;flex-shrink:0;">Top 1000</div>
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;flex-wrap:wrap;">
+      <div class="rank-view-btns" title="Elegí si el ranking (y sus filtros/búsquedas) trabajan sobre el Top 1000 o el Top 1200 ampliado">
+        <button class="rvbtn on" id="rank-scope-1000" onclick="setRankScope(false)">Top 1000</button>
+        <button class="rvbtn" id="rank-scope-1200" onclick="setRankScope(true)">Ampliado · 1200</button>
+      </div>
       <div style="width:1px;height:14px;background:var(--border2);flex-shrink:0;"></div>
       <div style="font-size:12px;color:var(--text2);" id="rank-mode-label"><strong style="color:var(--text)">Ranking Objetivo</strong></div>
     </div>
@@ -2599,6 +2602,7 @@ let rankObjOrder = [], rankPersOrder = [];
 let rankObjView = 'list', rankPersView = 'list';
 let rankCurrentMode = 'obj'; // 'obj' or 'pers'
 let rankCurrentView = 'list';
+let rankExtended = false; // false = Top 1000, true = Top 1200 ampliado
 let dragSrcId = null, dragSrcKey = null;
 let statsAllDirs = [];
 let top100ViewMode = 'list';
@@ -2628,7 +2632,7 @@ function populateOpts() {
 // Populate ranking filters with ONLY values present in the ranked list
 function populateRankFilters() {
   const type = rankCurrentMode;
-  const order = (type==='obj' ? rankObjOrder : rankPersOrder).slice(0, 1050);
+  const order = (type==='obj' ? rankObjOrder : rankPersOrder).slice(0, rankExtended?1200:1000);
   const ranked = order.map(id=>FILMS.find(f=>f.id===id)).filter(Boolean);
 
   const dirs   = [...new Set(ranked.map(f=>f.director).filter(d=>d&&!d.includes(',')))].sort();
@@ -3046,7 +3050,7 @@ function confirmDel(id) {
 
 // ── RANKING ──
 function buildOrder(type) {
-  const LIMIT = 1050;
+  const LIMIT = 1200; // max extended scope; the UI slices this down to 1000 or 1200
   const getScore = f => type==='obj' ? (f.rating??-1) : (f.subscores?.personal??-1);
   const storageKey = type==='obj' ? 'cl_rankorder' : 'cl_rankorder_pers';
 
@@ -3105,8 +3109,9 @@ function renderRankingMain() {
   const filterDecade=parseInt(filterDecadeRaw)||0;
   const hasFilter=filterDir||filterCountry||filterDecadeRaw;
 
-  // Limit to top 1050 — track real position BEFORE filtering
-  const limitedOrder = order.slice(0, 1050);
+  // Limit to current scope (Top 1000 or extended Top 1200) — track real position BEFORE filtering.
+  // Filters/search only ever look inside this slice, so switching scope changes what's searchable.
+  const limitedOrder = order.slice(0, rankExtended?1200:1000);
   const groups={};
   let totalShown=0;
   let seqPos=0; // sequential counter for unfiltered view
@@ -3210,8 +3215,18 @@ function saveRankingCurrent() { saveRanking(rankCurrentMode); }
 
 function saveRanking(type) {
   const key=type==='obj'?'cl_rankorder':'cl_rankorder_pers';
-  const order=(type==='obj'?rankObjOrder:rankPersOrder).slice(0,1050);
-  try{idbSetSync(key,order);showToast('✓ Orden guardado (Top 1050)');}catch(e){showToast('Error al guardar');}
+  const order=(type==='obj'?rankObjOrder:rankPersOrder).slice(0,1200);
+  try{idbSetSync(key,order);showToast('✓ Orden guardado');}catch(e){showToast('Error al guardar');}
+}
+
+// Toggle ranking scope between Top 1000 and the extended Top 1200.
+// Filters/dropdowns and search results are re-scoped to whichever is active.
+function setRankScope(extended) {
+  rankExtended = !!extended;
+  document.getElementById('rank-scope-1000').classList.toggle('on', !rankExtended);
+  document.getElementById('rank-scope-1200').classList.toggle('on', rankExtended);
+  populateRankFilters();
+  renderRankingMain();
 }
 
 function makeRankItem(f,pos,canDrag,k,type) {
