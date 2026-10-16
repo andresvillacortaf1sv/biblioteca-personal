@@ -1703,6 +1703,19 @@ select{text-transform:uppercase;letter-spacing:.08em;font-size:11px;}
 .ec-reel-track:hover{animation-play-state:paused;}
 .ec-reel-track .home-recent-tile{width:150px;flex-shrink:0;}
 @keyframes ec-reel{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+/* ── Hero más grande (sin eyebrow) ── */
+.home-hero-content{max-width:860px !important;}
+.home-hero-title{font-size:clamp(72px,9vw,116px) !important;line-height:.88 !important;letter-spacing:-.03em !important;margin-bottom:18px !important;}
+/* ── Recomendación destacada + lista ── */
+.home-rec-featured{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:0 0 26px;margin-bottom:22px;border-bottom:2px solid var(--text);}
+.home-rec-featured .home-rec-poster,.home-rec-featured .home-rec-poster-placeholder{width:150px !important;height:225px !important;border-radius:0 !important;}
+.home-rec-featured-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);margin-bottom:12px;}
+.home-rec-featured-title{font-family:'Fraunces',serif;font-size:30px;font-weight:400;line-height:1.05;margin-bottom:8px;color:var(--text);}
+.home-rec-featured-title .home-rec-title-year{font-size:16px;color:var(--text3);}
+.home-rec-featured-dir{font-size:11px;color:var(--gold);letter-spacing:.14em;margin-bottom:14px;text-transform:uppercase;}
+.home-rec-featured-why{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+.home-rec-featured-desc{font-size:13px;color:var(--text3);line-height:1.7;font-style:italic;}
+.home-rec-featured .home-rec-tags{margin-top:14px;}
 </style>
 </head>
 <body>
@@ -1743,7 +1756,6 @@ select{text-transform:uppercase;letter-spacing:.08em;font-size:11px;}
       <div class="home-hero-mosaic" id="home-mosaic"></div>
       <div class="home-hero-overlay"></div>
       <div class="home-hero-content">
-        <div class="home-hero-eyebrow">Cine · Academia Otto Salamanca</div>
         <div class="home-hero-title">Espacio<br><em>Cinéfilo</em></div>
         <div class="home-hero-date" id="home-sub-date"></div>
         <div class="home-hero-stats" id="home-kpis"></div>
@@ -3067,6 +3079,7 @@ function saveFilm() {
   const rwCount=parseInt(document.getElementById('f-rewatch-count').value)||1;
   const film={
     id:isEdit?parseInt(eid):Date.now(),title,
+    addedAt:isEdit?((FILMS.find(f=>f.id===parseInt(eid))||{}).addedAt||null):Date.now(),
     year:parseInt(document.getElementById('f-year').value)||null,
     director:document.getElementById('f-director').value.trim(),
     country:document.getElementById('f-country').value.trim(),
@@ -3874,17 +3887,25 @@ function ecRunCounts(root){
   });
 }
 function renderHomeKPIs(){
-  const total=FILMS.length;
   const ratings=FILMS.filter(f=>f.rating!=null).map(f=>f.rating);
   const avg=ratings.length?(ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(2):0;
   const perfect=FILMS.filter(f=>f.rating===10).length;
   const countries=new Set(FILMS.map(f=>f.country).filter(Boolean)).size;
+  // Añadidas este mes (requiere addedAt; sólo cuenta altas nuevas desde ahora)
+  const now=new Date(), ym=now.getFullYear()+'-'+now.getMonth();
+  const addedThisMonth=FILMS.filter(f=>{ if(!f.addedAt) return false; const d=new Date(f.addedAt); return (d.getFullYear()+'-'+d.getMonth())===ym; }).length;
+  // País mejor valorado (mínimo 10 películas para ser significativo)
+  const byC={};
+  FILMS.forEach(f=>{ if(!f.country||f.rating==null) return; (byC[f.country]=byC[f.country]||{s:0,n:0}); byC[f.country].s+=f.rating; byC[f.country].n++; });
+  let bestC='—', bestAvg=-1;
+  Object.keys(byC).forEach(c=>{ const v=byC[c]; if(v.n>=10){ const a=v.s/v.n; if(a>bestAvg){ bestAvg=a; bestC=c; } } });
   const el = document.getElementById('home-kpis');
   if(!el) return;
   el.innerHTML = `
-    <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${total}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Películas</div></div>
-    <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${avg}" data-ec-dec="2">0</div><div class="home-hero-stat-lbl">Nota media</div></div>
-    <div class="home-hero-stat"><div class="home-hero-stat-val" style="color:var(--gold2)" data-ec-count="${perfect}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Perfectas</div></div>
+    <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${addedThisMonth}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Añadidas este mes</div></div>
+    <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${avg}" data-ec-dec="2">0</div><div class="home-hero-stat-lbl">Nota media general</div></div>
+    <div class="home-hero-stat"><div class="home-hero-stat-val" style="font-size:.72em;line-height:1.15;" title="Media ${bestAvg>0?bestAvg.toFixed(2):'—'}">${esc(bestC)}</div><div class="home-hero-stat-lbl">País mejor valorado</div></div>
+    <div class="home-hero-stat"><div class="home-hero-stat-val" style="color:var(--gold2)" data-ec-count="${perfect}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Notas perfectas</div></div>
     <div class="home-hero-stat" style="border-right:none;"><div class="home-hero-stat-val" data-ec-count="${countries}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Países</div></div>`;
   ecRunCounts(el);
 }
@@ -4380,13 +4401,12 @@ function renderHomeRecs(recs, aiGenerated){
     if(!hd.querySelector('span')) hd.innerHTML += badge;
   }
   // Enrich with description from REC_DB if AI didn't provide one
-  el.innerHTML=recs.map((r,i)=>{
+  const mkItem=(r,i)=>{
     const dbEntry = !r.desc ? REC_DB.find(d=>d.title===r.title) : null;
     const desc = r.desc || dbEntry?.desc || '';
-    const posterId = `rec-poster-${i}`;
     return `<div class="home-rec-item">
       <div class="home-rec-num">${String(i+1).padStart(2,'0')}</div>
-      <div class="home-rec-poster-placeholder" id="${posterId}">🎬</div>
+      <div class="home-rec-poster-placeholder" id="rec-poster-${i}">🎬</div>
       <div class="home-rec-body">
         <div class="home-rec-title">${esc(r.title||'')} <span class="home-rec-title-year">(${r.year||''})</span></div>
         <div class="home-rec-dir">${esc(r.director||'')}${r.country?` · ${esc(r.country)}`:''}</div>
@@ -4395,7 +4415,21 @@ function renderHomeRecs(recs, aiGenerated){
         <div class="home-rec-tags">${(r.tags||[]).map(t=>`<span class="home-rec-tag">${esc(t)}</span>`).join('')}</div>
       </div>
     </div>`;
-  }).join('');
+  };
+  const f0=recs[0];
+  const d0 = f0.desc || (REC_DB.find(d=>d.title===f0.title)||{}).desc || '';
+  const featured = `<div class="home-rec-featured">
+      <div class="home-rec-poster-placeholder" id="rec-poster-0">🎬</div>
+      <div class="home-rec-featured-body">
+        <div class="home-rec-featured-eyebrow">Recomendación del día</div>
+        <div class="home-rec-featured-title">${esc(f0.title||'')} <span class="home-rec-title-year">(${f0.year||''})</span></div>
+        <div class="home-rec-featured-dir">${esc(f0.director||'')}${f0.country?` · ${esc(f0.country)}`:''}</div>
+        <div class="home-rec-featured-why">${esc(f0.why||'')}</div>
+        ${d0?`<div class="home-rec-featured-desc">${esc(d0)}</div>`:''}
+        <div class="home-rec-tags">${(f0.tags||[]).map(t=>`<span class="home-rec-tag">${esc(t)}</span>`).join('')}</div>
+      </div>
+    </div>`;
+  el.innerHTML = featured + recs.slice(1).map((r,k)=>mkItem(r,k+1)).join('');
   // Load posters from TMDB
   recs.forEach((r,i) => loadRecPoster(r.title, r.year, `rec-poster-${i}`));
 }
