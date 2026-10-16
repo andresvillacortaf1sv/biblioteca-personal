@@ -1709,6 +1709,14 @@ select{text-transform:uppercase;letter-spacing:.08em;font-size:11px;}
 .home-hero-content{max-width:880px !important;height:auto !important;justify-content:flex-start !important;padding-top:52px !important;padding-bottom:42px !important;}
 .home-hero-title{font-size:clamp(72px,9vw,116px) !important;line-height:.88 !important;letter-spacing:-.03em !important;margin-bottom:18px !important;}
 .home-hero-stats{flex-wrap:wrap;row-gap:16px;}
+/* Fondo del hero: cubre el hero más alto + imagen sustituible */
+.home-hero-mosaic-img{height:100% !important;}
+.home-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0;}
+.hero-bg-ctl{position:absolute;top:14px;right:18px;z-index:5;display:flex;gap:6px;}
+.hero-bg-ctl button{background:rgba(11,11,14,.55);border:1px solid rgba(255,255,255,.22);color:#f0ebe3;font-family:'Inter',sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:7px 11px;cursor:pointer;backdrop-filter:blur(4px);transition:.15s;}
+.hero-bg-ctl button:hover{border-color:#f0c050;color:#f0c050;}
+/* Modo claro: el banner sigue oscuro con texto legible */
+body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b24a;--gold2:#f0c050;--border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.18);}
 /* ── Recomendación destacada + lista ── */
 .home-rec-featured{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:0 0 24px;margin-bottom:22px;border-bottom:1px solid var(--border2);}
 .home-rec-featured .home-rec-poster,.home-rec-featured .home-rec-poster-placeholder{width:150px !important;height:225px !important;border-radius:0 !important;}
@@ -1756,6 +1764,7 @@ select{text-transform:uppercase;letter-spacing:.08em;font-size:11px;}
 
     <!-- ── Hero: mosaic backdrop + big stats ── -->
     <div class="home-hero">
+      <div class="home-hero-bg" id="home-hero-bg"></div>
       <div class="home-hero-mosaic" id="home-mosaic"></div>
       <div class="home-hero-overlay"></div>
       <div class="home-hero-content">
@@ -1763,6 +1772,11 @@ select{text-transform:uppercase;letter-spacing:.08em;font-size:11px;}
         <div class="home-hero-date" id="home-sub-date"></div>
         <div class="home-hero-stats" id="home-kpis"></div>
         <div class="home-ephemeris" id="home-ephemeris"></div>
+      </div>
+      <div class="hero-bg-ctl">
+        <button type="button" onclick="document.getElementById('hero-bg-file').click()">Cambiar fondo</button>
+        <button type="button" onclick="clearHeroBg()">Restaurar</button>
+        <input type="file" id="hero-bg-file" accept="image/*" style="display:none" onchange="setHeroBgFromFile(this)">
       </div>
     </div>
 
@@ -3866,8 +3880,38 @@ function initHome(forceRefresh) {
   }
 }
 
+function applyHeroBg(){
+  const bg=document.getElementById('home-hero-bg');
+  const mos=document.getElementById('home-mosaic');
+  let url=null; try{ url=localStorage.getItem('cl_hero_bg'); }catch(e){}
+  if(bg){
+    if(url){ bg.style.backgroundImage='url("'+url+'")'; if(mos) mos.style.display='none'; }
+    else { bg.style.backgroundImage=''; if(mos) mos.style.display=''; }
+  }
+}
+function setHeroBgFromFile(input){
+  const file=input&&input.files&&input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const max=1600; let w=img.width, h=img.height;
+      if(w>max){ h=Math.round(h*max/w); w=max; }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      let data; try{ data=c.toDataURL('image/jpeg',0.82); }catch(err){ data=e.target.result; }
+      try{ localStorage.setItem('cl_hero_bg', data); }catch(err){ if(window.showToast) showToast('La imagen es muy grande'); return; }
+      applyHeroBg(); if(window.showToast) showToast('Fondo del banner actualizado');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  if(input) input.value='';
+}
+function clearHeroBg(){ try{ localStorage.removeItem('cl_hero_bg'); }catch(e){} applyHeroBg(); if(window.showToast) showToast('Fondo restaurado al mosaico'); }
 function buildHomeMosaic() {
   const el = document.getElementById('home-mosaic');
+  applyHeroBg();
   if(!el) return;
   // Pick 7 films with posters for mosaic background
   const withPoster = FILMS.filter(f=>f.poster).sort(()=>Math.random()-.5).slice(0,7);
