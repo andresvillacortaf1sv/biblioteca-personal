@@ -1699,15 +1699,18 @@ select{text-transform:uppercase;letter-spacing:.08em;font-size:11px;}
 /* ═══ Etapa 2 — Portada: carrusel en movimiento + números animados ═══ */
 .home-main{min-width:0;}
 #home-recent-films{display:block !important;overflow:hidden;max-width:100%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);}
+#home-recent-films.home-recent-grid{margin-bottom:48px !important;}
 .ec-reel-track{display:flex;gap:11px;width:max-content;animation:ec-reel 64s linear infinite;}
 .ec-reel-track:hover{animation-play-state:paused;}
 .ec-reel-track .home-recent-tile{width:150px;flex-shrink:0;}
 @keyframes ec-reel{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 /* ── Hero más grande (sin eyebrow) ── */
-.home-hero-content{max-width:860px !important;}
+.home-hero{height:auto !important;min-height:460px;}
+.home-hero-content{max-width:880px !important;height:auto !important;justify-content:flex-start !important;padding-top:52px !important;padding-bottom:42px !important;}
 .home-hero-title{font-size:clamp(72px,9vw,116px) !important;line-height:.88 !important;letter-spacing:-.03em !important;margin-bottom:18px !important;}
+.home-hero-stats{flex-wrap:wrap;row-gap:16px;}
 /* ── Recomendación destacada + lista ── */
-.home-rec-featured{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:0 0 26px;margin-bottom:22px;border-bottom:2px solid var(--text);}
+.home-rec-featured{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:0 0 24px;margin-bottom:22px;border-bottom:1px solid var(--border2);}
 .home-rec-featured .home-rec-poster,.home-rec-featured .home-rec-poster-placeholder{width:150px !important;height:225px !important;border-radius:0 !important;}
 .home-rec-featured-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);margin-bottom:12px;}
 .home-rec-featured-title{font-family:'Fraunces',serif;font-size:30px;font-weight:400;line-height:1.05;margin-bottom:8px;color:var(--text);}
@@ -3902,6 +3905,7 @@ function renderHomeKPIs(){
   const el = document.getElementById('home-kpis');
   if(!el) return;
   el.innerHTML = `
+    <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${FILMS.length}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Películas totales</div></div>
     <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${addedThisMonth}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Añadidas este mes</div></div>
     <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${avg}" data-ec-dec="2">0</div><div class="home-hero-stat-lbl">Nota media general</div></div>
     <div class="home-hero-stat"><div class="home-hero-stat-val" style="font-size:.72em;line-height:1.15;" title="Media ${bestAvg>0?bestAvg.toFixed(2):'—'}">${esc(bestC)}</div><div class="home-hero-stat-lbl">País mejor valorado</div></div>
