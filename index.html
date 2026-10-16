@@ -1695,6 +1695,15 @@ select{text-transform:uppercase;letter-spacing:.08em;font-size:11px;}
 .fbar,.rank-toolbar{border-bottom:1px solid var(--border2) !important;}
 .det-btn,.lmbtn,.chbtn{letter-spacing:.04em;}
 </style>
+<style id="ec-home-motion">
+/* ═══ Etapa 2 — Portada: carrusel en movimiento + números animados ═══ */
+#home-recent-films{display:block !important;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);}
+.ec-reel-track{display:flex;gap:11px;width:max-content;animation:ec-reel 64s linear infinite;}
+.ec-reel-track:hover{animation-play-state:paused;}
+.ec-reel-track .home-recent-tile{width:150px;flex-shrink:0;}
+@keyframes ec-reel{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media (prefers-reduced-motion:reduce){.ec-reel-track{animation:none;}}
+</style>
 </head>
 <body>
 
@@ -3854,6 +3863,16 @@ function buildHomeMosaic() {
   }).join('');
 }
 
+function ecRunCounts(root){
+  (root||document).querySelectorAll('[data-ec-count]').forEach(function(el){
+    const target=parseFloat(el.getAttribute('data-ec-count'))||0;
+    const dec=parseInt(el.getAttribute('data-ec-dec')||'0',10);
+    const dur=1100, start=performance.now();
+    const fmt=function(v){ return dec>0 ? v.toFixed(dec) : Math.round(v).toLocaleString(); };
+    const step=function(now){ const t=Math.min(1,(now-start)/dur); const e=1-Math.pow(1-t,3); el.textContent=fmt(target*e); if(t<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
 function renderHomeKPIs(){
   const total=FILMS.length;
   const ratings=FILMS.filter(f=>f.rating!=null).map(f=>f.rating);
@@ -3863,10 +3882,11 @@ function renderHomeKPIs(){
   const el = document.getElementById('home-kpis');
   if(!el) return;
   el.innerHTML = `
-    <div class="home-hero-stat"><div class="home-hero-stat-val">${total.toLocaleString()}</div><div class="home-hero-stat-lbl">Películas</div></div>
-    <div class="home-hero-stat"><div class="home-hero-stat-val">${avg}</div><div class="home-hero-stat-lbl">Nota media</div></div>
-    <div class="home-hero-stat"><div class="home-hero-stat-val" style="color:var(--gold2)">${perfect}</div><div class="home-hero-stat-lbl">Perfectas</div></div>
-    <div class="home-hero-stat" style="border-right:none;"><div class="home-hero-stat-val">${countries}</div><div class="home-hero-stat-lbl">Países</div></div>`;
+    <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${total}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Películas</div></div>
+    <div class="home-hero-stat"><div class="home-hero-stat-val" data-ec-count="${avg}" data-ec-dec="2">0</div><div class="home-hero-stat-lbl">Nota media</div></div>
+    <div class="home-hero-stat"><div class="home-hero-stat-val" style="color:var(--gold2)" data-ec-count="${perfect}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Perfectas</div></div>
+    <div class="home-hero-stat" style="border-right:none;"><div class="home-hero-stat-val" data-ec-count="${countries}" data-ec-dec="0">0</div><div class="home-hero-stat-lbl">Países</div></div>`;
+  ecRunCounts(el);
 }
 
 function renderHomeRecent(){
@@ -3875,7 +3895,7 @@ function renderHomeRecent(){
   if(badge) badge.textContent = `— ${sorted.length} más recientes`;
   const grid = document.getElementById('home-recent-films');
   if(!grid) return;
-  grid.innerHTML = sorted.map(f => {
+  grid.innerHTML = '<div class="ec-reel-track">' + sorted.concat(sorted).map(f => {
     const posterSrc = f.poster ? (f.poster.startsWith('http') ? f.poster : `https://image.tmdb.org/t/p/w342${f.poster}`) : null;
     const img = posterSrc
       ? `<img src="${posterSrc}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML='<div class=home-recent-tile-noimg>${esc(f.title)}</div>'">`
@@ -3885,7 +3905,7 @@ function renderHomeRecent(){
       ${f.rating!=null?`<div class="home-recent-tile-rating">${f.rating}</div>`:''}
       <div class="home-recent-tile-overlay"><div class="home-recent-tile-title">${esc(f.title)}</div></div>
     </div>`;
-  }).join('');
+  }).join('') + '</div>';
 }
 
 async function loadHomeUpcoming(){
