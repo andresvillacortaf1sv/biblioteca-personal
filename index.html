@@ -1744,6 +1744,26 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .ec-spine-vt{position:relative;z-index:1;flex-grow:1;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:12.5px;font-weight:500;color:#f4efe7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:10px 0;text-shadow:0 1px 4px rgba(0,0,0,.85);}
 .ec-spine-foot{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 8px;}
 .ec-spine-bc{width:26px;height:11px;background:repeating-linear-gradient(90deg,#15130f 0,#15130f 1px,#efe9df 1px,#efe9df 2px);border:2px solid #efe9df;}
+/* ── Watchlist · tarjeta editorial con ficha ── */
+.wl-card--ed{background:var(--bg2);border:1px solid var(--border);overflow:hidden;transition:.18s;position:relative;}
+.wl-card--ed:hover{border-color:var(--gold2);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.45);}
+.wl-card--ed .wl-poster{position:relative;aspect-ratio:2/3;background:var(--bg3);overflow:hidden;}
+.wl-card--ed .wl-poster img,.wl-card--ed .wl-card-noimg{width:100%;height:100%;object-fit:cover;display:block;}
+.wl-card--ed .wl-card-noimg{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);text-align:center;padding:10px;font-family:'Fraunces',serif;line-height:1.3;}
+.wl-card--ed .wl-poster-frame{position:absolute;inset:7px;border:1px solid rgba(240,192,80,.42);pointer-events:none;}
+.wl-card--ed .wl-hover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:linear-gradient(0deg,rgba(10,10,13,.9),rgba(10,10,13,.45));opacity:0;transition:.18s;padding:16px;}
+.wl-card--ed:hover .wl-hover{opacity:1;}
+.wl-card--ed .wl-act{width:100%;max-width:160px;font-family:'Inter',sans-serif;cursor:pointer;}
+.wl-card--ed .wl-act-vista{background:var(--gold2);color:#0b0b0e;border:none;padding:10px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;}
+.wl-card--ed .wl-act-prio{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.28);color:#f0ebe3;padding:8px 10px;font-size:11px;outline:none;font-family:inherit;}
+.wl-card--ed .wl-remove-btn{position:absolute;top:8px;right:8px;width:24px;height:24px;background:rgba(10,10,13,.72);border:1px solid rgba(255,255,255,.22);color:#f0ebe3;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;opacity:0;transition:.15s;z-index:2;}
+.wl-card--ed:hover .wl-remove-btn{opacity:1;}
+.wl-card--ed .wl-ed-info{padding:11px 13px 14px;}
+.wl-card--ed .wl-ed-title{font-family:'Fraunces',serif;font-size:14px;font-weight:500;line-height:1.2;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
+.wl-card--ed .wl-ed-meta{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:9px;}
+.wl-card--ed .wl-ed-prio{font-size:9px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;display:inline-flex;align-items:center;gap:6px;}
+.wl-card--ed .wl-ed-prio::before{content:'';width:8px;height:8px;background:currentColor;display:inline-block;}
+.wl-prio-alta{color:#e0564e;}.wl-prio-media{color:#f0c050;}.wl-prio-baja{color:#4caf82;}
 </style>
 </head>
 <body>
@@ -6121,10 +6141,31 @@ function renderWatchlist(){
   }
   grid.style.display='grid';
   grid.innerHTML=wl.map(item=>{
-    const ps=item.poster?(item.poster.startsWith("http")?item.poster:"https://image.tmdb.org/t/p/w185"+item.poster):null;
-    const pClass={alta:"wl-priority-alta",media:"wl-priority-media",baja:"wl-priority-baja"}[item.priority]||"wl-priority-media";
-    const pLabel={alta:"🔴 Alta",media:"🟡 Media",baja:"🟢 Baja"}[item.priority]||"🟡";
-    return "<div class='wl-card'>"+(ps?"<img src='"+ ps +"' loading='lazy'>": "<div class='wl-card-noimg'>"+esc(item.title.substring(0,20))+"</div>")+"<div class='wl-priority-badge "+pClass+"'>"+ pLabel +"</div><button class='wl-remove-btn' onclick='removeFromWatchlist(&quot;"+item.id+"&quot;)' title='Quitar'>✕</button><div class='wl-card-info'><div class='wl-card-title'>"+esc(item.title)+"</div><div class='wl-card-meta'>"+( item.year||"")+ "</div><div style='display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;'><select onchange='setWlPriority(&quot;"+item.id+"&quot;,this.value)' style='flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--text2);padding:2px 4px;outline:none;font-family:inherit;'><option value='alta' "+(item.priority==="alta"?"selected":"")+">🔴 Alta</option><option value='media' "+(item.priority==="media"?"selected":"")+">🟡 Media</option><option value='baja' "+(item.priority==="baja"?"selected":"")+">🟢 Baja</option></select><button onclick='markWlWatched(&quot;"+item.id+"&quot;)' style='background:var(--gold);color:#0b0b0e;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;'>✓ Vista</button></div></div></div>";
+    const ps=item.poster?(item.poster.startsWith("http")?item.poster:"https://image.tmdb.org/t/p/w342"+item.poster):null;
+    const prio=item.priority||'media';
+    const pLabel={alta:'Alta prioridad',media:'Media prioridad',baja:'Baja prioridad'}[prio];
+    const id=String(item.id).replace(/"/g,'&quot;');
+    const meta=(item.year||'')+(item.director?' · '+esc(item.director):'');
+    return `<div class="wl-card--ed">
+      <div class="wl-poster">
+        ${ps?`<img src="${ps}" loading="lazy">`:`<div class="wl-card-noimg">${esc(item.title.substring(0,40))}</div>`}
+        <div class="wl-poster-frame"></div>
+        <button class="wl-remove-btn" onclick='removeFromWatchlist("${id}")' title="Quitar">✕</button>
+        <div class="wl-hover">
+          <button class="wl-act wl-act-vista" onclick='markWlWatched("${id}")'>✓ Marcar vista</button>
+          <select class="wl-act wl-act-prio" onchange='setWlPriority("${id}",this.value)'>
+            <option value="alta" ${prio==='alta'?'selected':''}>Prioridad alta</option>
+            <option value="media" ${prio==='media'?'selected':''}>Prioridad media</option>
+            <option value="baja" ${prio==='baja'?'selected':''}>Prioridad baja</option>
+          </select>
+        </div>
+      </div>
+      <div class="wl-ed-info">
+        <div class="wl-ed-title">${esc(item.title)}</div>
+        ${meta?`<div class="wl-ed-meta">${meta}</div>`:''}
+        <div class="wl-ed-prio wl-prio-${prio}">${pLabel}</div>
+      </div>
+    </div>`;
   }).join("");
 }
 
