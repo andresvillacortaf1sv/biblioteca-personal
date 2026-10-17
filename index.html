@@ -1764,6 +1764,18 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .wl-card--ed .wl-ed-prio{font-size:9px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;display:inline-flex;align-items:center;gap:6px;}
 .wl-card--ed .wl-ed-prio::before{content:'';width:8px;height:8px;background:currentColor;display:inline-block;}
 .wl-prio-alta{color:#e0564e;}.wl-prio-media{color:#f0c050;}.wl-prio-baja{color:#4caf82;}
+/* ── Ficha editorial (modal de detalle) ── */
+.det-title{font-size:30px !important;letter-spacing:-.01em;line-height:1.05 !important;}
+.det-poster{width:140px !important;}
+.det-bars-hd{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--gold2);margin-bottom:10px;font-weight:600;}
+.det-bars{display:flex;flex-direction:column;margin-bottom:16px;}
+.det-bar-row{display:grid;grid-template-columns:118px 1fr 42px;align-items:center;gap:14px;padding:9px 0;border-top:1px solid var(--border);}
+.det-bar-row:first-child{border-top:none;}
+.det-bar-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
+.det-bar-track{height:5px;background:var(--bg3);position:relative;}
+.det-bar-fill{position:absolute;inset:0 auto 0 0;background:var(--gold2);}
+.det-bar-fill.pers{background:var(--purple);}
+.det-bar-val{font-family:'Fraunces',serif;font-size:15px;color:var(--text);text-align:right;}
 </style>
 </head>
 <body>
@@ -2916,7 +2928,8 @@ function openDetail(id) {
   const hasSub=ss.direction!=null||ss.script!=null||ss.acting!=null||ss.visual!=null||ss.editing!=null||ss.sound!=null||ss.impact!=null||ss.photo!=null||ss.production!=null;
   const hasPers=ss.personal!=null;
   const rwCount=f.rewatchCount||1;
-  const subHTML=hasSub?`<div class="sub-scores">${[['Dirección',ss.direction],['Guión',ss.script],['Actuaciones',ss.acting],['Lenguaje Visual',ss.visual],['Montaje',ss.editing],['Sonido',ss.sound],['Impacto Autoral',ss.impact],['Fotografía',ss.photo],['Producción',ss.production]].map(([l,v])=>v!=null?`<div class="sub-sc"><div class="sub-sc-val">${fmtR(v)}</div><div class="sub-sc-lbl">${l}</div></div>`:'').join('')}${hasPers?`<div class="sub-sc" style="border-color:rgba(155,127,212,.3);background:rgba(155,127,212,.07)"><div class="sub-sc-val" style="color:var(--purple)">${fmtR(ss.personal)}</div><div class="sub-sc-lbl">Gusto</div></div>`:''}</div>`:'';
+  const _indic=[['Dirección',ss.direction],['Guión',ss.script],['Actuaciones',ss.acting],['Lenguaje Visual',ss.visual],['Montaje',ss.editing],['Sonido',ss.sound],['Impacto Autoral',ss.impact],['Fotografía',ss.photo],['Producción',ss.production]].filter(a=>a[1]!=null);
+  const subHTML=hasSub?`<div class="det-bars-hd">Desglose autoral</div><div class="det-bars">${_indic.map(a=>`<div class="det-bar-row"><div class="det-bar-lbl">${a[0]}</div><div class="det-bar-track"><div class="det-bar-fill" style="width:${Math.max(0,Math.min(100,a[1]*10))}%"></div></div><div class="det-bar-val">${fmtR(a[1])}</div></div>`).join('')}${hasPers?`<div class="det-bar-row"><div class="det-bar-lbl" style="color:var(--purple)">Gusto personal</div><div class="det-bar-track"><div class="det-bar-fill pers" style="width:${Math.max(0,Math.min(100,ss.personal*10))}%"></div></div><div class="det-bar-val">${fmtR(ss.personal)}</div></div>`:''}</div>`:'';
   document.getElementById('det-content').innerHTML=`
     <div class="det-top">
       <div class="det-poster">${f.poster?`<img src="${esc(f.poster)}" alt="${esc(f.title)}">`:noImgHTML(f.title)}</div>
@@ -2931,19 +2944,19 @@ function openDetail(id) {
         <div class="tags">
           ${f.year?`<span class="tag">${f.year}</span>`:''}
           ${f.country?`<span class="tag">${esc(f.country)}</span>`:''}
-          ${rwCount>1?`<span class="tag green">🔁 Vista ${rwCount} veces</span>`:''}
+          ${rwCount>1?`<span class="tag green">Vista ×${rwCount}</span>`:''}
           ${f.watchedDate?`<span class="tag">${f.watchedDate}</span>`:''}
         </div>
       </div>
     </div>
     <div class="det-body">
       ${subHTML}
-      ${f.streaming?`<div class="det-meta-row"><span>📺 Dónde ver:</span>${esc(f.streaming)}</div>`:''}
+      ${f.streaming?`<div class="det-meta-row"><span>Dónde ver:</span>${esc(f.streaming)}</div>`:''}
       ${f.comment?`<div class="det-comment">${esc(f.comment)}</div>`:''}
       <div class="det-actions">
         <button class="det-btn edit" onclick="closeOv('ov-detail');openForm(${f.id})">Editar</button>
         ${f.letterboxd?`<a class="det-btn" href="${esc(f.letterboxd)}" target="_blank">Letterboxd</a>`:''}
-        <button class="det-btn del" onclick="closeOv('ov-detail');confirmDel(${f.id})">🗑 Eliminar</button>
+        <button class="det-btn del" onclick="closeOv('ov-detail');confirmDel(${f.id})">Eliminar</button>
       </div>
     </div>`;
   document.getElementById('ov-detail').classList.add('on');
