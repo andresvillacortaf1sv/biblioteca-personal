@@ -781,7 +781,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .fmg-card:hover .fmg-ct{color:var(--gold2);}
 .fmg-cy{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-top:3px;}
 .fmg-miss{opacity:.55;}
-.fmg-miss-poster{aspect-ratio:2/3;border:1px dashed var(--border2);display:flex;align-items:flex-end;padding:9px;}
+.fmg-miss-poster{aspect-ratio:2/3;border:1px dashed var(--border2);display:flex;align-items:flex-end;padding:9px;position:relative;overflow:hidden;}
+.fmg-miss-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.4);}
 .fmg-miss-tt{font-family:'Fraunces',serif;font-size:12px;line-height:1.12;color:var(--text3);}
 .fmg-miss-ct{font-family:'Fraunces',serif;font-size:12.5px;font-weight:500;margin-top:8px;line-height:1.15;color:var(--text2);}
 .fmg-addmini{display:inline-block;margin-top:5px;background:none;border:none;padding:0;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;}
@@ -3724,11 +3725,11 @@ async function renderFilmogDetailInto(name, container){
   const highlights = unseen.slice().sort((a,b)=>(b.vote_count||0)-(a.vote_count||0)).slice(0,12);
 
   const seenCards = seen.map(({m,mf})=>{
-    const poster = m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : '';
+    const poster = m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : (mf.poster || '');
     const title = data.esTitleMap[m.id] || m.title;
     const yr = (m.release_date||'').slice(0,4) || '—';
     return `<a class="fmg-card" onclick="openDetail(${mf.id})">
-      <div class="fmg-poster">${poster?`<img src="${poster}" loading="lazy" alt="">`:''}<span class="fmg-poster-tt">${esc(title)}</span>${mf.rating!=null?`<span class="fmg-rbadge">${fmtR(mf.rating)}</span>`:''}</div>
+      <div class="fmg-poster">${poster?`<img src="${poster}" loading="lazy" alt="" onerror="this.style.display='none'">`:''}<span class="fmg-poster-tt">${esc(title)}</span>${mf.rating!=null?`<span class="fmg-rbadge">${fmtR(mf.rating)}</span>`:''}</div>
       <div class="fmg-ct">${esc(title)}</div><div class="fmg-cy">${yr}</div>
     </a>`;
   }).join('');
@@ -3738,7 +3739,7 @@ async function renderFilmogDetailInto(name, container){
     const yr = (m.release_date||'').slice(0,4) || '—';
     const poster = m.poster_path ? `https://image.tmdb.org/t/p/w185${m.poster_path}` : '';
     return `<div class="fmg-miss">
-      <div class="fmg-miss-poster"><span class="fmg-miss-tt">${esc(title)}</span></div>
+      <div class="fmg-miss-poster">${poster?`<img src="${poster}" loading="lazy" alt="" onerror="this.style.display='none'">`:`<span class="fmg-miss-tt">${esc(title)}</span>`}</div>
       <div class="fmg-miss-ct">${esc(title)}</div>
       <div class="fmg-cy">${yr} · falta</div>
       <button class="fmg-addmini" onclick="preloadForm('${jesc(title)}','${jesc(data.person.name)}','${jesc(poster)}','${yr}')">+ Agregar</button>
