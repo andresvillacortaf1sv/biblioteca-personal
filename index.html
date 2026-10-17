@@ -6074,7 +6074,7 @@ function setWlView(m){ try{localStorage.setItem('cl_wl_view',m);}catch(e){} rend
 function getColView(){ try{return localStorage.getItem('cl_col_view')||'spines';}catch(e){return 'spines';} }
 function setColView(m){ try{localStorage.setItem('cl_col_view',m);}catch(e){} renderCollection(); }
 function ecSpineHTML(o){
-  const t=o.title||''; const h=252+((t.length*7)%22);
+  const t=o.title||''; const h=264;
   const cap=o.capColor||'#f0c050';
   const bg=o.poster?("background-image:url('"+o.poster+"');"):"";
   const click=o.onclick?(' onclick="'+o.onclick+'"'):'';
