@@ -1771,8 +1771,8 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .rank-pod:hover{background:var(--bg2);}
 .rank-pod-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
 .rank-pod-num{font-family:'Fraunces',serif;font-weight:300;font-size:52px;line-height:.72;color:var(--gold2);}
-.rank-pod-rating{font-family:'Fraunces',serif;font-size:22px;color:var(--text);}
-.rank-pod-poster{aspect-ratio:3/4;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:flex-end;margin-bottom:13px;}
+.rank-pod-rating{position:absolute;top:8px;right:8px;background:var(--bg);color:var(--gold2);border:1px solid var(--border2);font-family:'Fraunces',serif;font-size:15px;padding:2px 8px;z-index:2;}
+.rank-pod-poster{position:relative;aspect-ratio:3/4;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:flex-end;margin-bottom:13px;}
 .rank-pod-poster img{width:100%;height:100%;object-fit:cover;display:block;}
 .rank-pod-poster span{font-family:'Fraunces',serif;font-size:14px;color:var(--text2);padding:10px;line-height:1.2;}
 .rank-pod-title{font-family:'Fraunces',serif;font-size:17px;font-weight:400;line-height:1.1;margin:0 0 7px;color:var(--text);}
@@ -1797,9 +1797,9 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .rank-card-ed:hover .rank-card-ed-poster{border-color:var(--gold2);}
 .rank-card-ed-poster img{width:100%;height:100%;object-fit:cover;display:block;}
 .rank-card-ed-noimg{font-family:'Fraunces',serif;font-size:13px;color:var(--text2);padding:10px;}
-.rank-card-ed-meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px;}
+.rank-card-ed-meta{display:flex;align-items:baseline;margin-top:8px;}
 .rank-card-ed-num{font-family:'Fraunces',serif;font-weight:400;font-size:18px;line-height:1;color:var(--gold2);}
-.rank-card-ed-rating{font-family:'Fraunces',serif;font-size:14px;color:var(--text2);}
+.rank-card-ed-rating{position:absolute;top:6px;right:6px;background:var(--bg);color:var(--gold2);border:1px solid var(--border2);font-family:'Fraunces',serif;font-size:12px;padding:2px 6px;z-index:2;}
 .rank-card-ed-title{font-family:'Fraunces',serif;font-size:13px;font-weight:500;margin-top:3px;line-height:1.2;color:var(--text);}
 .rank-card-ed.dragging{opacity:.4;}
 .rank-card-ed.drag-over .rank-card-ed-poster{border-color:var(--gold2);}
@@ -3410,8 +3410,8 @@ function makeRankPodium(f,pos,canDrag,type){
   const val=type==='obj'?f.rating:(f.subscores?.personal??null);
   const ps=f.poster?esc(f.poster):null;
   const note=f.comment?`<p class="rank-pod-note">${esc(f.comment)}</p>`:'';
-  el.innerHTML=`<div class="rank-pod-top"><span class="rank-pod-num">${pos}</span><span class="rank-pod-rating">${val!=null?fmtR(val):'—'}</span></div>`
-    +`<div class="rank-pod-poster">${ps?`<img src="${ps}" loading="lazy" onerror="this.style.display='none'">`:`<span>${esc(f.title)}</span>`}</div>`
+  el.innerHTML=`<div class="rank-pod-top"><span class="rank-pod-num">${pos}</span></div>`
+    +`<div class="rank-pod-poster">${val!=null?`<span class="rank-pod-rating">${fmtR(val)}</span>`:''}${ps?`<img src="${ps}" loading="lazy" onerror="this.style.display='none'">`:`<span>${esc(f.title)}</span>`}</div>`
     +`<h3 class="rank-pod-title">${esc(f.title)}</h3>`
     +`<div class="rank-pod-meta">${f.director?esc(f.director.split(',')[0]):'—'}${f.country?' · '+esc(f.country):''}${f.year?' · '+f.year:''}</div>`
     +note;
@@ -3437,8 +3437,8 @@ function makeRankCard(f,pos,canDrag,type){
   el.addEventListener('click',()=>openDetail(f.id));
   const val=type==='obj'?f.rating:(f.subscores?.personal??null);
   const ps=f.poster?esc(f.poster):null;
-  el.innerHTML=`<div class="rank-card-ed-poster">${ps?`<img src="${ps}" loading="lazy" onerror="this.style.display='none'">`:`<span class="rank-card-ed-noimg">${esc(f.title)}</span>`}</div>`
-    +`<div class="rank-card-ed-meta"><span class="rank-card-ed-num">${pos}</span><span class="rank-card-ed-rating">${val!=null?fmtR(val):''}</span></div>`
+  el.innerHTML=`<div class="rank-card-ed-poster">${val!=null?`<span class="rank-card-ed-rating">${fmtR(val)}</span>`:''}${ps?`<img src="${ps}" loading="lazy" onerror="this.style.display='none'">`:`<span class="rank-card-ed-noimg">${esc(f.title)}</span>`}</div>`
+    +`<div class="rank-card-ed-meta"><span class="rank-card-ed-num">${pos}</span></div>`
     +`<div class="rank-card-ed-title">${esc(f.title)}</div>`;
   return el;
 }
