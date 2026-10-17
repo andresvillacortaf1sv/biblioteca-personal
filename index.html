@@ -1728,6 +1728,43 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .home-rec-featured-desc{font-size:13px;color:var(--text3);line-height:1.7;font-style:italic;}
 .home-rec-featured .home-rec-tags{margin-top:14px;}
 </style>
+<style id="ec-shelf-view">
+/* ═══ Etapa 3 — Estantería de lomos (Watchlist / Colección) ═══ */
+.ec-view-toggle{display:inline-flex;border:1px solid var(--border2);}
+.ec-view-toggle button{background:transparent;border:none;color:var(--text2);font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:6px 13px;cursor:pointer;transition:.15s;}
+.ec-view-toggle button.on{background:var(--gold2);color:#0b0b0e;font-weight:500;}
+.ec-view-toggle button+button{border-left:1px solid var(--border2);}
+.ec-shelf{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 5px;padding:10px 0 6px;}
+.ec-spine{position:relative;flex-shrink:0;width:50px;display:flex;flex-direction:column;align-items:stretch;border:1px solid rgba(0,0,0,.6);box-shadow:inset 3px 0 0 rgba(255,255,255,.1),inset -5px 0 9px rgba(0,0,0,.5),0 14px 20px -12px rgba(0,0,0,.85);cursor:pointer;transition:transform .18s ease;overflow:hidden;background-size:cover;background-position:center;background-color:#1a1a20;}
+.ec-spine:hover{transform:translateY(-15px);}
+.ec-spine-ov{position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,10,13,.84),rgba(10,10,13,.4) 46%,rgba(10,10,13,.74));}
+.ec-spine-cap{position:relative;z-index:1;height:7px;flex-shrink:0;}
+.ec-spine-label{position:relative;z-index:1;height:18px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(0,0,0,.35);}
+.ec-spine-label span{font-size:5.5px;letter-spacing:.07em;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;max-width:46px;text-overflow:ellipsis;}
+.ec-spine-vt{position:relative;z-index:1;flex-grow:1;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:12.5px;font-weight:500;color:#f4efe7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:10px 0;text-shadow:0 1px 4px rgba(0,0,0,.85);}
+.ec-spine-foot{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 8px;}
+.ec-spine-bc{width:26px;height:11px;background:repeating-linear-gradient(90deg,#15130f 0,#15130f 1px,#efe9df 1px,#efe9df 2px);border:2px solid #efe9df;}
+/* ── Watchlist · tarjeta editorial con ficha ── */
+.wl-card--ed{background:var(--bg2);border:1px solid var(--border);overflow:hidden;transition:.18s;position:relative;}
+.wl-card--ed:hover{border-color:var(--gold2);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.45);}
+.wl-card--ed .wl-poster{position:relative;aspect-ratio:2/3;background:var(--bg3);overflow:hidden;}
+.wl-card--ed .wl-poster img,.wl-card--ed .wl-card-noimg{width:100%;height:100%;object-fit:cover;display:block;}
+.wl-card--ed .wl-card-noimg{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);text-align:center;padding:10px;font-family:'Fraunces',serif;line-height:1.3;}
+.wl-card--ed .wl-poster-frame{position:absolute;inset:7px;border:1px solid rgba(240,192,80,.42);pointer-events:none;}
+.wl-card--ed .wl-hover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:linear-gradient(0deg,rgba(10,10,13,.9),rgba(10,10,13,.45));opacity:0;transition:.18s;padding:16px;}
+.wl-card--ed:hover .wl-hover{opacity:1;}
+.wl-card--ed .wl-act{width:100%;max-width:160px;font-family:'Inter',sans-serif;cursor:pointer;}
+.wl-card--ed .wl-act-vista{background:var(--gold2);color:#0b0b0e;border:none;padding:10px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;}
+.wl-card--ed .wl-act-prio{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.28);color:#f0ebe3;padding:8px 10px;font-size:11px;outline:none;font-family:inherit;}
+.wl-card--ed .wl-remove-btn{position:absolute;top:8px;right:8px;width:24px;height:24px;background:rgba(10,10,13,.72);border:1px solid rgba(255,255,255,.22);color:#f0ebe3;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;opacity:0;transition:.15s;z-index:2;}
+.wl-card--ed:hover .wl-remove-btn{opacity:1;}
+.wl-card--ed .wl-ed-info{padding:11px 13px 14px;}
+.wl-card--ed .wl-ed-title{font-family:'Fraunces',serif;font-size:14px;font-weight:500;line-height:1.2;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
+.wl-card--ed .wl-ed-meta{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:9px;}
+.wl-card--ed .wl-ed-prio{font-size:9px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;display:inline-flex;align-items:center;gap:6px;}
+.wl-card--ed .wl-ed-prio::before{content:'';width:8px;height:8px;background:currentColor;display:inline-block;}
+.wl-prio-alta{color:#e0564e;}.wl-prio-media{color:#f0c050;}.wl-prio-baja{color:#4caf82;}
+</style>
 </head>
 <body>
 
@@ -2034,7 +2071,11 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
           <button onclick="setColFormat('DVD')" id="col-fmt-DVD" class="col-fmt-btn">DVD</button>
           <button onclick="setColFormat('VHS')" id="col-fmt-VHS" class="col-fmt-btn">VHS</button>
           <button onclick="setColFormat('Laserdisc')" id="col-fmt-Laserdisc" class="col-fmt-btn">Laserdisc</button>
-          <select id="col-sort" onchange="renderCollection()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;padding:4px 8px;outline:none;font-family:inherit;margin-left:auto;">
+          <div class="ec-view-toggle" style="margin-left:auto;">
+            <button id="col-view-lomos" onclick="setColView('spines')">☰ Lomos</button>
+            <button id="col-view-posters" onclick="setColView('posters')">⊞ Pósters</button>
+          </div>
+          <select id="col-sort" onchange="renderCollection()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;padding:4px 8px;outline:none;font-family:inherit;margin-left:8px;">
             <option value="price_desc">Mayor precio</option>
             <option value="price_asc">Menor precio</option>
             <option value="title">Título A→Z</option>
@@ -2166,6 +2207,10 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
         <option value="priority">Por prioridad</option>
         <option value="title">Título A→Z</option>
       </select>
+      <div class="ec-view-toggle" style="margin-left:auto;">
+        <button id="wl-view-lomos" onclick="setWlView('spines')">☰ Lomos</button>
+        <button id="wl-view-posters" onclick="setWlView('posters')">⊞ Pósters</button>
+      </div>
     </div>
     <div id="wl-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;"></div>
     <div id="wl-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--text3);">
@@ -5281,6 +5326,19 @@ function renderCollection() {
   else if(sort==='title') filtered.sort((a,b)=>a.title.localeCompare(b.title));
   else if(sort==='format') filtered.sort((a,b)=>(a.format||'').localeCompare(b.format||''));
 
+  const _colvm=getColView();
+  { const cbl=document.getElementById('col-view-lomos'), cbp=document.getElementById('col-view-posters'); if(cbl&&cbp){ cbl.classList.toggle('on',_colvm==='spines'); cbp.classList.toggle('on',_colvm!=='spines'); } }
+  if(_colvm==='spines'){
+    grid.style.display='block';
+    grid.innerHTML='<div class="ec-shelf">'+filtered.map(f=>{
+      const ps=f.poster?(f.poster.startsWith('http')?f.poster:'https://image.tmdb.org/t/p/w342'+f.poster):null;
+      const k=(f.format||'').toLowerCase();
+      const capColor=k.includes('criterion')?'#f0c050':k.includes('4k')?'#e0564e':k.includes('blu')?'#9b7fd4':k.includes('dvd')?'#5a8fd4':k.includes('vhs')?'#c9952e':'#8a857d';
+      return ecSpineHTML({title:f.title,year:f.year,poster:ps,label:(f.format||'FÍSICO'),capColor:capColor,onclick:'openDetail('+f.id+')'});
+    }).join('')+'</div>';
+    return;
+  }
+  grid.style.display='grid';
   grid.innerHTML='';
   filtered.forEach(f=>grid.appendChild(makeColCard(f)));
 }
@@ -6031,6 +6089,24 @@ function openWlAddCustom(){
   addToWatchlist(null,t.trim(),y?parseInt(y):null);
 }
 
+function getWlView(){ try{return localStorage.getItem('cl_wl_view')||'spines';}catch(e){return 'spines';} }
+function setWlView(m){ try{localStorage.setItem('cl_wl_view',m);}catch(e){} renderWatchlist(); }
+function getColView(){ try{return localStorage.getItem('cl_col_view')||'spines';}catch(e){return 'spines';} }
+function setColView(m){ try{localStorage.setItem('cl_col_view',m);}catch(e){} renderCollection(); }
+function ecSpineHTML(o){
+  const t=o.title||''; const h=264;
+  const cap=o.capColor||'#f0c050';
+  const bg=o.poster?("background-image:url('"+o.poster+"');"):"";
+  const click=o.onclick?(' onclick="'+o.onclick+'"'):'';
+  return '<div class="ec-spine" style="height:'+h+'px;'+bg+'" title="'+esc(t)+(o.year?' ('+o.year+')':'')+'"'+click+'>'
+    +'<div class="ec-spine-ov"></div>'
+    +'<div class="ec-spine-cap" style="background:'+cap+'"></div>'
+    +'<div class="ec-spine-label"><span>'+esc(o.label||'')+'</span></div>'
+    +'<div class="ec-spine-vt">'+esc(t)+'</div>'
+    +'<div class="ec-spine-foot"><div class="ec-spine-bc"></div></div>'
+    +'<div class="ec-spine-cap" style="background:'+cap+'"></div>'
+    +'</div>';
+}
 function renderWatchlist(){
   let wl=getWatchlist();
   const priority=document.getElementById("wl-priority")?.value||"";
@@ -6051,11 +6127,45 @@ function renderWatchlist(){
   }
   if(!wl.length){grid.innerHTML="";empty.style.display="block";return;}
   empty.style.display="none";
+  const _wlvm=getWlView();
+  { const bl=document.getElementById('wl-view-lomos'), bp=document.getElementById('wl-view-posters'); if(bl&&bp){ bl.classList.toggle('on',_wlvm==='spines'); bp.classList.toggle('on',_wlvm!=='spines'); } }
+  if(_wlvm==='spines'){
+    grid.style.display='block';
+    grid.innerHTML='<div class="ec-shelf">'+wl.map(item=>{
+      const ps=item.poster?(item.poster.startsWith("http")?item.poster:"https://image.tmdb.org/t/p/w342"+item.poster):null;
+      const capColor={alta:'#e0564e',media:'#f0c050',baja:'#4caf82'}[item.priority]||'#f0c050';
+      const label={alta:'PRIORIDAD ALTA',media:'PRIORIDAD MEDIA',baja:'PRIORIDAD BAJA'}[item.priority]||'WATCHLIST';
+      return ecSpineHTML({title:item.title,year:item.year,poster:ps,label:label,capColor:capColor});
+    }).join('')+'</div>';
+    return;
+  }
+  grid.style.display='grid';
   grid.innerHTML=wl.map(item=>{
-    const ps=item.poster?(item.poster.startsWith("http")?item.poster:"https://image.tmdb.org/t/p/w185"+item.poster):null;
-    const pClass={alta:"wl-priority-alta",media:"wl-priority-media",baja:"wl-priority-baja"}[item.priority]||"wl-priority-media";
-    const pLabel={alta:"🔴 Alta",media:"🟡 Media",baja:"🟢 Baja"}[item.priority]||"🟡";
-    return "<div class='wl-card'>"+(ps?"<img src='"+ ps +"' loading='lazy'>": "<div class='wl-card-noimg'>"+esc(item.title.substring(0,20))+"</div>")+"<div class='wl-priority-badge "+pClass+"'>"+ pLabel +"</div><button class='wl-remove-btn' onclick='removeFromWatchlist(&quot;"+item.id+"&quot;)' title='Quitar'>✕</button><div class='wl-card-info'><div class='wl-card-title'>"+esc(item.title)+"</div><div class='wl-card-meta'>"+( item.year||"")+ "</div><div style='display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;'><select onchange='setWlPriority(&quot;"+item.id+"&quot;,this.value)' style='flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--text2);padding:2px 4px;outline:none;font-family:inherit;'><option value='alta' "+(item.priority==="alta"?"selected":"")+">🔴 Alta</option><option value='media' "+(item.priority==="media"?"selected":"")+">🟡 Media</option><option value='baja' "+(item.priority==="baja"?"selected":"")+">🟢 Baja</option></select><button onclick='markWlWatched(&quot;"+item.id+"&quot;)' style='background:var(--gold);color:#0b0b0e;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;'>✓ Vista</button></div></div></div>";
+    const ps=item.poster?(item.poster.startsWith("http")?item.poster:"https://image.tmdb.org/t/p/w342"+item.poster):null;
+    const prio=item.priority||'media';
+    const pLabel={alta:'Alta prioridad',media:'Media prioridad',baja:'Baja prioridad'}[prio];
+    const id=String(item.id).replace(/"/g,'&quot;');
+    const meta=(item.year||'')+(item.director?' · '+esc(item.director):'');
+    return `<div class="wl-card--ed">
+      <div class="wl-poster">
+        ${ps?`<img src="${ps}" loading="lazy">`:`<div class="wl-card-noimg">${esc(item.title.substring(0,40))}</div>`}
+        <div class="wl-poster-frame"></div>
+        <button class="wl-remove-btn" onclick='removeFromWatchlist("${id}")' title="Quitar">✕</button>
+        <div class="wl-hover">
+          <button class="wl-act wl-act-vista" onclick='markWlWatched("${id}")'>✓ Marcar vista</button>
+          <select class="wl-act wl-act-prio" onchange='setWlPriority("${id}",this.value)'>
+            <option value="alta" ${prio==='alta'?'selected':''}>Prioridad alta</option>
+            <option value="media" ${prio==='media'?'selected':''}>Prioridad media</option>
+            <option value="baja" ${prio==='baja'?'selected':''}>Prioridad baja</option>
+          </select>
+        </div>
+      </div>
+      <div class="wl-ed-info">
+        <div class="wl-ed-title">${esc(item.title)}</div>
+        ${meta?`<div class="wl-ed-meta">${meta}</div>`:''}
+        <div class="wl-ed-prio wl-prio-${prio}">${pLabel}</div>
+      </div>
+    </div>`;
   }).join("");
 }
 
