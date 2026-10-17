@@ -3679,10 +3679,19 @@ function fetchDirFilmogTMDB(name){
   return p;
 }
 
-// Empareja películas TMDB con la biblioteca (título original, español o alterno)
-function filmogSeenSplit(directed, esTitleMap){
+function normName(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}
+
+// Empareja películas TMDB con la biblioteca por título PERO sólo entre las películas
+// que en la biblioteca están atribuidas a este mismo director (evita falsos positivos
+// por títulos homónimos de otros directores, p.ej. "Revenge" Hitchcock vs Fargeat).
+function filmogSeenSplit(directed, esTitleMap, dirNames){
+  const allow = new Set((dirNames||[]).map(normName).filter(Boolean));
   const byTitle = {};
-  FILMS.forEach(f=>{ byTitle[f.title.toLowerCase().trim()] = f; });
+  FILMS.forEach(f=>{
+    if(!f.director) return;
+    if(allow.size && !allow.has(normName(f.director))) return;
+    byTitle[f.title.toLowerCase().trim()] = f;
+  });
   const myFilm = m => byTitle[(m.title||'').toLowerCase().trim()]
     || byTitle[(esTitleMap[m.id]||'').toLowerCase().trim()]
     || byTitle[(m.original_title||'').toLowerCase().trim()] || null;
@@ -3712,7 +3721,7 @@ async function renderFilmogDetailInto(name, container){
   if(!data){ container.innerHTML = `<div class="fmg-empty">No encontramos a “${esc(name)}” en TMDB.</div>`; return; }
   filmogTotals[name]=data.total; updateFilmogRow(name);
 
-  const {seen, unseen} = filmogSeenSplit(data.directed, data.esTitleMap);
+  const {seen, unseen} = filmogSeenSplit(data.directed, data.esTitleMap, [name, data.person.name]);
   const total = data.total || (seen.length+unseen.length);
   const rated = seen.filter(s=>s.mf.rating!=null);
   const avg = rated.length ? (rated.reduce((a,s)=>a+s.mf.rating,0)/rated.length) : null;
