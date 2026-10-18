@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="Cinéfilo">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/supabase-config.js"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -3073,6 +3075,7 @@ function idbGetSync(key, def) {
 function idbSetSync(key, value) {
   _idbCache[key] = value;
   _idbWrite(key, value);
+  if (typeof ecOnLocalWrite === 'function') ecOnLocalWrite(key);
 }
 
 // Load all keys we care about into _idbCache before boot
@@ -3150,6 +3153,7 @@ async function boot() {
   initTheme();
   await migrateFromLocalStorage();
   await idbPreload();
+  try { await ecBootSync(); } catch(e) { console.warn('sync boot', e); }
   try { const r = await fetch('films_data.json'); FILMS = await r.json(); } catch(e) { FILMS = window.__FILMS_DATA__ || []; }
   try {
     const saved = idbGetSync('cl_films', []);
@@ -3158,6 +3162,7 @@ async function boot() {
     FILMS = FILMS.filter(f => !dels.includes(f.id));
   } catch(e) {}
   populateOpts(); applyFilters(); applyPersonal(); renderStats();
+  try { ecInitAccountBtn(); } catch(e) {}
 }
 
 function populateOpts() {
@@ -7673,6 +7678,161 @@ function ecRenderYear(){
     years.forEach(function(y){ if(!best||ym[y]>ym[best])best=y; });
     el.innerHTML=years.map(function(y){ var h=Math.max(4,Math.round(ym[y]/max*76)); var col=ym[y]>200?'var(--gold2)':ym[y]>100?'var(--gold)':ym[y]>50?'var(--purple)':'var(--bg4)'; return '<div class="stats-year-bar ec-yearbar'+(y===best?' best':'')+'" style="height:'+h+'px;background:'+col+';" title="'+y+': '+ym[y]+' películas"></div>'; }).join('');
   }
+}
+
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SINCRONIZACIÓN EN LA NUBE (Supabase) — un único registro JSON con todo el
+   estado de la biblioteca. Lectura pública, escritura solo del dueño.
+   Inerte si supabase-config.js tiene placeholders.
+   ══════════════════════════════════════════════════════════════════════════ */
+var EC_SYNC_KEYS = ['cl_films','cl_dels','cl_rankorder','cl_rankorder_pers','cl_blog','cl_col_wish','cl_watchlist','cl_lists'];
+var ecSB = null, ecOwnerEmail = null, ecPushTimer = null, ecLastServerAt = null;
+
+function ecConfigured(){
+  try{ var c=window.EC_SUPABASE; return !!(c && c.url && c.anonKey && c.url.indexOf('__')<0 && c.anonKey.indexOf('__')<0 && window.supabase); }catch(e){ return false; }
+}
+function ecClient(){
+  if(ecSB) return ecSB;
+  if(!ecConfigured()) return null;
+  ecSB = window.supabase.createClient(window.EC_SUPABASE.url, window.EC_SUPABASE.anonKey, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+  return ecSB;
+}
+function ecDirty(v){ try{ if(v===undefined) return localStorage.getItem('cl_sync_dirty')==='1'; localStorage.setItem('cl_sync_dirty', v?'1':'0'); }catch(e){} return v; }
+function ecCanWrite(){ return !!(ecOwnerEmail && (!window.EC_SUPABASE.ownerEmail || ecOwnerEmail.toLowerCase()===window.EC_SUPABASE.ownerEmail.toLowerCase())); }
+
+function ecCollectState(){
+  var data={};
+  EC_SYNC_KEYS.forEach(function(k){ var v=(typeof _idbCache!=='undefined' && k in _idbCache)?_idbCache[k]:null; if(v!=null) data[k]=v; });
+  return data;
+}
+function ecApplyState(data){
+  if(!data) return;
+  EC_SYNC_KEYS.forEach(function(k){ if(k in data){ _idbCache[k]=data[k]; try{ _idbWrite(k, data[k]); }catch(e){} } });
+}
+function ecRehydrate(){
+  // Rearma FILMS y vuelve a pintar la vista actual tras aplicar estado remoto
+  try{
+    if(typeof window.__FILMS_BASE__ === 'undefined'){ /* nada */ }
+  }catch(e){}
+}
+
+async function ecPull(){
+  var sb=ecClient(); if(!sb) return false;
+  try{
+    var res=await sb.from('library_state').select('data,updated_at').eq('id','main').maybeSingle();
+    if(res.error) throw res.error;
+    if(res.data && res.data.data){ ecApplyState(res.data.data); ecLastServerAt=res.data.updated_at; ecDirty(false); return true; }
+  }catch(e){ console.warn('ecPull', e.message||e); }
+  return false;
+}
+async function ecPush(){
+  var sb=ecClient(); if(!sb || !ecCanWrite()) return false;
+  try{
+    var payload={ id:'main', data: ecCollectState(), updated_at: new Date().toISOString() };
+    var res=await sb.from('library_state').upsert(payload, { onConflict:'id' }).select('updated_at').maybeSingle();
+    if(res.error) throw res.error;
+    ecLastServerAt = (res.data && res.data.updated_at) || payload.updated_at;
+    ecDirty(false); ecSyncStatus('ok');
+    return true;
+  }catch(e){ console.warn('ecPush', e.message||e); ecSyncStatus('err'); return false; }
+}
+function ecSchedulePush(){
+  if(!ecConfigured() || !ecCanWrite()) return;
+  if(ecPushTimer) clearTimeout(ecPushTimer);
+  ecSyncStatus('pending');
+  ecPushTimer=setTimeout(function(){ ecPush(); }, 1600);
+}
+/* llamado desde idbSetSync */
+function ecOnLocalWrite(key){
+  if(EC_SYNC_KEYS.indexOf(key)<0) return;
+  ecDirty(true);
+  ecSchedulePush();
+}
+
+async function ecBootSync(){
+  if(!ecConfigured()) return;
+  var sb=ecClient(); if(!sb) return;
+  try{
+    var s=await sb.auth.getSession();
+    ecOwnerEmail = s && s.data && s.data.session && s.data.session.user ? s.data.session.user.email : null;
+  }catch(e){ ecOwnerEmail=null; }
+  // Si hay cambios locales sin subir y podemos escribir → suben (gana lo local).
+  // Si no → bajamos lo del servidor (gana la nube) para ver la misma data en todos lados.
+  if(ecDirty() && ecCanWrite()){ await ecPush(); }
+  else { await ecPull(); }
+  // Reacciona a login/logout
+  sb.auth.onAuthStateChange(function(_ev, session){
+    ecOwnerEmail = session && session.user ? session.user.email : null;
+    ecUpdateAccountUI();
+    if(ecOwnerEmail && ecDirty()) ecPush();
+  });
+}
+
+/* ── UI de cuenta/sincronización ── */
+var EC_SYNC_STATE='idle';
+function ecSyncStatus(st){ EC_SYNC_STATE=st; ecUpdateAccountUI(); }
+function ecInitAccountBtn(){
+  if(!ecConfigured()) return;
+  var hdr=document.querySelector('.header-top'); if(!hdr || document.getElementById('ec-acct-btn')) return;
+  var b=document.createElement('button');
+  b.id='ec-acct-btn'; b.title='Sincronización'; b.onclick=ecOpenAccount;
+  b.style.cssText='background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text2);font-size:12px;padding:7px 11px;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:7px;';
+  b.innerHTML='<span id="ec-acct-dot" style="width:8px;height:8px;border-radius:50%;background:var(--text3);"></span><span id="ec-acct-lbl">Sincronizar</span>';
+  hdr.appendChild(b);
+  ecUpdateAccountUI();
+}
+function ecUpdateAccountUI(){
+  var dot=document.getElementById('ec-acct-dot'), lbl=document.getElementById('ec-acct-lbl'); if(!dot||!lbl) return;
+  if(ecOwnerEmail){
+    lbl.textContent = EC_SYNC_STATE==='pending'?'Guardando…':(EC_SYNC_STATE==='err'?'Error sync':'Sincronizado');
+    dot.style.background = EC_SYNC_STATE==='err'?'var(--red)':(EC_SYNC_STATE==='pending'?'var(--gold2)':'var(--green)');
+  } else {
+    lbl.textContent='Sincronizar'; dot.style.background='var(--text3)';
+  }
+}
+function ecOpenAccount(){
+  var logged=!!ecOwnerEmail;
+  var ov=document.createElement('div');
+  ov.id='ec-acct-ov';
+  ov.style.cssText='position:fixed;inset:0;z-index:970;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;';
+  ov.onclick=function(e){ if(e.target===ov) ov.remove(); };
+  var inner = logged ? (
+    '<div style="font-family:\'Fraunces\',serif;font-size:22px;margin-bottom:6px;">Sincronización activa</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:20px;">Sesión: '+esc(ecOwnerEmail)+'</div>'+
+    '<button onclick="ecPush().then(()=>showToast&&showToast(\'Sincronizado\'))" style="width:100%;background:var(--gold);color:#0b0b0e;border:none;border-radius:8px;padding:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">Sincronizar ahora</button>'+
+    '<button onclick="ecSignOut()" style="width:100%;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:8px;padding:12px;font-family:inherit;cursor:pointer;">Cerrar sesión</button>'
+  ) : (
+    '<div style="font-family:\'Fraunces\',serif;font-size:22px;margin-bottom:6px;">Sincronizar tu biblioteca</div>'+
+    '<div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;">Inicia sesión con tu correo para editar y que tus cambios se guarden en la nube y aparezcan en todos tus dispositivos. Te enviamos un enlace mágico (sin contraseña).</div>'+
+    '<input id="ec-email" type="email" placeholder="tu@correo.com" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:12px 14px;font-size:15px;font-family:inherit;outline:none;margin-bottom:12px;box-sizing:border-box;">'+
+    '<button onclick="ecSendLink()" style="width:100%;background:var(--gold);color:#0b0b0e;border:none;border-radius:8px;padding:13px;font-weight:600;font-family:inherit;cursor:pointer;">Enviar enlace</button>'+
+    '<div id="ec-auth-msg" style="font-size:12px;color:var(--text3);margin-top:12px;min-height:16px;"></div>'
+  );
+  ov.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:26px;max-width:380px;width:100%;position:relative;">'+
+    '<button onclick="document.getElementById(\'ec-acct-ov\').remove()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;">✕</button>'+inner+'</div>';
+  document.body.appendChild(ov);
+  var em=document.getElementById('ec-email'); if(em) em.focus();
+}
+async function ecSendLink(){
+  var sb=ecClient(); if(!sb) return;
+  var email=(document.getElementById('ec-email').value||'').trim();
+  var msg=document.getElementById('ec-auth-msg');
+  if(!email){ msg.textContent='Escribe tu correo.'; return; }
+  msg.textContent='Enviando…';
+  try{
+    var res=await sb.auth.signInWithOtp({ email: email, options:{ emailRedirectTo: location.origin } });
+    if(res.error) throw res.error;
+    msg.textContent='Listo — revisa tu correo y abre el enlace en este dispositivo.';
+  }catch(e){ msg.textContent='Error: '+(e.message||e); }
+}
+async function ecSignOut(){
+  var sb=ecClient(); if(!sb) return;
+  try{ await sb.auth.signOut(); }catch(e){}
+  ecOwnerEmail=null; ecUpdateAccountUI();
+  var ov=document.getElementById('ec-acct-ov'); if(ov) ov.remove();
+  if(typeof showToast==='function') showToast('Sesión cerrada');
 }
 
 </script>
