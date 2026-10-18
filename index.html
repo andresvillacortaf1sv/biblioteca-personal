@@ -1938,6 +1938,71 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .det-bar-fill.pers{background:var(--purple);}
 .det-bar-val{font-family:'Fraunces',serif;font-size:15px;color:var(--text);text-align:right;}
 </style>
+<style id="ec-ed-styles">
+/* Cuaderno + Listas — estilo editorial, hereda el tema claro/oscuro del sitio */
+.ced-eyebrow,.led-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.22em;color:var(--gold2);}
+.ced-display,.led-display{font-family:'Fraunces',Georgia,serif;font-weight:300;letter-spacing:-.025em;line-height:.98;}
+.ced-rule{height:1px;background:var(--border2);}
+.ced-rule-soft{height:1px;background:var(--border);}
+.ced-back,.led-back{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--text2);margin-bottom:34px;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;}
+.ced-back:hover,.led-back:hover{color:var(--text);}
+.ced-entry{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:24px;align-items:baseline;padding:26px 12px;border-top:1px solid var(--border);transition:.18s;cursor:pointer;}
+.ced-entry:hover{background:var(--bg2);}
+.ced-entry:hover .ced-title{color:var(--gold2);}
+.ced-num{font-family:'Fraunces',Georgia,serif;font-size:22px;color:var(--text3);}
+.ced-kicker{font-size:9.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--gold2);}
+.ced-title{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:26px;line-height:1.12;letter-spacing:-.01em;transition:.18s;}
+.ced-meta{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);text-align:right;white-space:nowrap;}
+.ced-panel{border:1px solid var(--border);padding:28px;}
+.ced-panel+.ced-panel{border-top:none;}
+.ced-chip{font-size:11px;letter-spacing:.04em;color:var(--text2);border:1px solid var(--border2);padding:7px 12px;}
+.ced-prose p{font-size:17px;line-height:1.78;color:var(--text);margin:0 0 24px;}
+.ced-prose .ced-drop{float:left;font-family:'Fraunces',Georgia,serif;font-weight:300;font-size:78px;line-height:.74;padding:6px 14px 0 0;color:var(--gold2);}
+.ced-sub{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:26px;margin:34px 0 14px;}
+.ced-pull{margin:38px 0;padding:4px 0 4px 28px;border-left:2px solid var(--gold2);}
+.ced-pull p{font-family:'Fraunces',Georgia,serif;font-weight:400;font-style:italic;font-size:27px;line-height:1.35;color:var(--text);margin:0;}
+.ced-tag{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text2);border:1px solid var(--border2);padding:7px 12px;}
+.ced-field{display:block;margin-bottom:22px;}
+.ced-field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--text3);margin-bottom:8px;}
+.ced-field input,.ced-field textarea,.ced-field select{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:12px 14px;font-size:15px;font-family:inherit;}
+.ced-field textarea{min-height:240px;resize:vertical;line-height:1.7;}
+.ced-field input:focus,.ced-field textarea:focus,.ced-field select:focus{outline:none;border-color:var(--gold2);}
+.ced-primary{font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;color:#17130a;background:var(--gold2);border:none;padding:14px 28px;cursor:pointer;}
+.ced-danger{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--red);background:none;border:1px solid var(--border2);padding:14px 22px;cursor:pointer;}
+.ced-ghost{display:inline-block;font-size:10.5px;text-transform:uppercase;letter-spacing:.16em;font-weight:500;color:var(--text);border:1px solid var(--border2);padding:13px 26px;background:none;cursor:pointer;}
+.ced-ghost:hover{border-color:var(--gold2);}
+.ced-cta,.led-cta{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;color:#17130a;background:var(--gold2);padding:11px 18px;border:none;cursor:pointer;}
+.led-card{display:block;border:1px solid var(--border2);transition:.18s;cursor:pointer;}
+.led-card:hover{border-color:var(--gold2);transform:translateY(-2px);}
+.led-card:hover .led-title{color:var(--gold2);}
+.led-title{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:28px;line-height:1.08;letter-spacing:-.01em;transition:.18s;}
+.led-pmini{width:58px;height:86px;flex:none;background:var(--bg3) center/cover no-repeat;border:1px solid var(--border);}
+.led-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:44px;}
+.led-row{display:grid;grid-template-columns:40px 56px minmax(0,1fr) auto auto;gap:22px;align-items:center;padding:18px 12px;border-bottom:1px solid var(--border);transition:.18s;}
+.led-row:hover{background:var(--bg2);}
+.led-thumb{width:56px;height:82px;background:var(--bg3) center/cover no-repeat;border:1px solid var(--border);}
+.led-badge{font-family:'Fraunces',Georgia,serif;font-size:18px;color:var(--gold2);border:1px solid var(--border2);padding:9px 12px;white-space:nowrap;}
+.led-x{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:6px;}
+.led-x:hover{color:var(--red);}
+.led-pick{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:11px 14px;font-size:14px;font-family:inherit;}
+.led-pick:focus{outline:none;border-color:var(--gold2);}
+.led-presult{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;}
+.led-presult:hover{background:var(--bg2);}
+.led-pt{width:40px;height:58px;background:var(--bg3) center/cover no-repeat;}
+.led-addpill{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold2);border:1px solid var(--border2);padding:6px 10px;white-space:nowrap;}
+.led-ghost{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;font-weight:500;color:var(--text2);border:1px solid var(--border2);padding:10px 16px;background:none;cursor:pointer;}
+.led-ghost:hover{border-color:var(--gold2);color:var(--text);}
+@media(max-width:860px){
+  .ced-display,.led-display{font-size:52px !important;}
+  .ced-entry{grid-template-columns:36px minmax(0,1fr);}
+  .ced-entry .ced-meta{display:none;}
+  .led-grid{grid-template-columns:1fr !important;}
+  .ced-two{grid-template-columns:1fr !important;}
+  .led-row{grid-template-columns:30px 48px minmax(0,1fr) auto;}
+  .led-row .led-x{display:none;}
+}
+</style>
+
 </head>
 <body>
 
@@ -1960,8 +2025,8 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
       <button class="nav-btn on" onclick="switchView('films',this)">Películas</button>
       <button class="nav-btn" onclick="switchView('watchlist',this)">Watchlist</button>
       <button class="nav-btn" onclick="switchView('ranking',this)">Mi Ranking</button>
-      <button class="nav-btn" onclick="location.href='listas.html'">Listas</button>
-      <button class="nav-btn" onclick="location.href='blog.html'">Cuaderno</button>
+      <button class="nav-btn" onclick="switchView('lists',this)">Listas</button>
+      <button class="nav-btn" onclick="switchView('blog',this)">Cuaderno</button>
       <button class="nav-btn" onclick="switchView('rewatched',this)">Re-vistas</button>
       <button class="nav-btn" onclick="switchView('filmog',this)">Filmografías</button>
       <button class="nav-btn" onclick="switchView('top100',this)">Top 100 Directores</button>
@@ -6329,7 +6394,8 @@ function switchView(view,el) {
   else if(view==='collection') renderCollection();
   else if(view==='festivals') renderFestivals();
   else if(view==='news') { renderNewsView(); return; }
-  else if(view==='blog') { renderBlog(); return; }
+  else if(view==='blog') { CED.mode='list'; renderBlog(); return; }
+  else if(view==='lists') { LED.mode='index'; renderLists(); return; }
   else if(view==='newsletter') return;
   else if(view==='top100') renderTop100();
   else if(view==='filmog') renderFilmogDirList();
@@ -6795,6 +6861,323 @@ async function loadCmpExternal(){
 
 
 boot();
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CUADERNO + LISTAS — vistas editoriales integradas al SPA (tema día/noche)
+   Sobrescriben renderBlog() y renderLists(); reusan cl_blog / cl_lists y FILMS.
+   ══════════════════════════════════════════════════════════════════════════ */
+var CED = { mode:'list', id:null };
+var LED = { mode:'index', id:null, q:'' };
+var CED_MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+var CED_SECS = ['Ensayo','Crítica','Diario','Técnica','Lista comentada'];
+var LED_TAGS = ['Por director','Por país','Por década','Por humor','Otra'];
+
+function cedFmtDate(ts){ var d=new Date(ts); if(isNaN(d)) return ''; return d.getDate()+' '+CED_MESES[d.getMonth()]+' '+d.getFullYear(); }
+function cedReadMin(b){ var w=(b||'').split(/\s+/).length; return Math.max(2, Math.round(w/200)); }
+function cedInline(s){ return esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>'); }
+function cedBodyHTML(body){
+  var blocks=(body||'').split(/\n\s*\n/).map(function(b){return b.trim();}).filter(Boolean);
+  return blocks.map(function(b,i){
+    if(b.indexOf('> ')===0) return '<blockquote class="ced-pull"><p>'+cedInline(b.slice(2))+'</p></blockquote>';
+    if(b.indexOf('## ')===0) return '<h2 class="ced-sub">'+cedInline(b.slice(3))+'</h2>';
+    var h=cedInline(b);
+    if(i===0) return '<p><span class="ced-drop">'+h.charAt(0)+'</span>'+h.slice(1)+'</p>';
+    return '<p>'+h+'</p>';
+  }).join('');
+}
+function cedSeedIfEmpty(){
+  var posts=getBlogPosts();
+  if(posts && posts.length) return posts;
+  var seed=[
+    {id:'ced1',pinned:true,category:'Ensayo',title:'Ver y volver a ver: el reloj interno del espectador',
+     dek:'Hay películas que la primera vez te ganan por la trama y la segunda por el montaje. Sobre el rewatch como forma de lectura.',
+     cover:'https://image.tmdb.org/t/p/w500/2C3k44qqbaqJ0JfJyXVI6r7IWMr.jpg',
+     date:Date.parse('2026-10-12'),tags:['Montaje','Rewatch','Murch'],
+     body:'Hay una idea cómoda que conviene dejar atrás: que una película se ve una vez y ya está leída. No es así. La primera proyección es casi siempre un secuestro: la trama tira de nosotros y apenas alcanzamos a registrar de qué está hecha. Recién en la segunda, sabiendo a dónde vamos, empezamos a mirar.\n\nLo noté ordenando mi propia biblioteca. Las películas con más revisiones no son las que más me gustaron de entrada, sino las que me dejaron una pregunta.\n\n> El rewatch no es nostalgia. Es la única forma de leer un montaje con los ojos quietos.\n\nEl montaje se entiende de atrás hacia adelante. Walter Murch lo escribió mejor que nadie en *En el momento del parpadeo*: cortamos donde el ojo ya decidió dejar de mirar.'},
+    {id:'ced2',category:'Crítica',title:'Harakiri y la geometría del honor',date:Date.parse('2026-10-09'),tags:['Kobayashi','Japón'],
+     dek:'Kobayashi encuadra el ritual como una trampa de líneas rectas. Un plano a plano de la secuencia final.',
+     body:'[Texto de ejemplo — reemplázalo con tu crítica desde "Editar".]\n\nKobayashi compone en rectas: el patio, los biombos, las lanzas. Todo converge hacia un centro del que el protagonista no puede salir.'},
+    {id:'ced3',category:'Diario',title:'Tres noches con Bergman',date:Date.parse('2026-10-05'),tags:['Bergman','Suecia'],
+     dek:'Sonata de otoño, Persona y Gritos y susurros seguidas. Lo que queda cuando el rostro ocupa toda la pantalla.',
+     body:'[Texto de ejemplo.] Tres noches, tres películas, un mismo rostro repetido hasta volverse paisaje.'},
+    {id:'ced4',category:'Lista comentada',title:'Por qué 8½ encabeza mi ranking',date:Date.parse('2026-09-28'),tags:['Fellini','Ranking'],
+     dek:'No es la mejor película que he visto; es la que mejor explica por qué sigo viendo. Defensa de un número uno.',
+     body:'[Texto de ejemplo.] Defender un número uno es defender un criterio.'},
+    {id:'ced5',category:'Técnica',title:'Lo que aprendí colorizando en Lumetri',date:Date.parse('2026-09-21'),tags:['Color','Premiere'],
+     dek:'De LOG a Rec.709 sin matar las sombras. Notas de taller que terminaron cambiando cómo miro el color ajeno.',
+     body:'[Texto de ejemplo.] Trabajar el color propio cambia cómo lees el ajeno.'}
+  ];
+  saveBlogPosts(seed);
+  return seed;
+}
+function cedGo(mode,id){ CED.mode=mode; CED.id=(id!=null?id:null); renderBlog(); }
+
+function cedViewList(posts){
+  var featured = posts.filter(function(p){return p.pinned;})[0] || posts[0];
+  var rest = posts.filter(function(p){return p!==featured;});
+  var counts={}; CED_SECS.forEach(function(s){counts[s]=0;});
+  posts.forEach(function(p){ counts[p.category]=(counts[p.category]||0)+1; });
+  var months={}; posts.forEach(function(p){ var d=new Date(p.date); if(!isNaN(d)) months[CED_MESES[d.getMonth()]+' '+d.getFullYear()]=1; });
+  var feat = featured ? (
+    '<section style="max-width:1180px;margin:0 auto;padding:48px 40px 0;">'+
+      '<div class="ced-two" onclick="cedGo(\'post\',\''+esc(featured.id)+'\')" style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:44px;align-items:start;cursor:pointer;">'+
+        '<div>'+
+          '<div class="ced-eyebrow" style="letter-spacing:.2em;margin-bottom:18px;">Destacado · '+esc(featured.category||'')+'</div>'+
+          '<h2 class="led-display" style="font-weight:400;font-size:44px;line-height:1.04;margin-bottom:18px;">'+esc(featured.title)+'</h2>'+
+          '<p style="font-size:15px;line-height:1.75;color:var(--text2);max-width:54ch;margin-bottom:22px;">'+esc(featured.dek||'')+'</p>'+
+          '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);">'+cedFmtDate(featured.date)+' &nbsp;·&nbsp; '+esc(featured.category||'')+' &nbsp;·&nbsp; '+cedReadMin(featured.body)+' min</div>'+
+        '</div>'+
+        '<div style="aspect-ratio:3/4;background:var(--bg3) center/cover no-repeat;'+(featured.cover?'background-image:url(\''+esc(featured.cover)+'\');':'')+'border:1px solid var(--border2);"></div>'+
+      '</div>'+
+    '</section>'+
+    '<div style="max-width:1180px;margin:48px auto 0;padding:0 40px;"><div class="ced-rule-soft"></div></div>'
+  ) : '';
+  var entries = rest.map(function(p,i){
+    return '<div class="ced-entry" onclick="cedGo(\'post\',\''+esc(p.id)+'\')">'+
+      '<div class="ced-num">'+String(i+1).padStart(2,'0')+'</div>'+
+      '<div>'+
+        '<div class="ced-kicker" style="margin-bottom:10px;">'+esc(p.category||'')+'</div>'+
+        '<h3 class="ced-title" style="margin-bottom:10px;">'+esc(p.title)+'</h3>'+
+        '<p style="font-size:14px;line-height:1.65;color:var(--text2);max-width:60ch;">'+esc(p.dek||'')+'</p>'+
+      '</div>'+
+      '<div class="ced-meta">'+cedFmtDate(p.date)+'</div>'+
+    '</div>';
+  }).join('') || '<p style="color:var(--text3);padding:30px 0;">Aún no hay más entradas. Crea una con “+ Nueva entrada”.</p>';
+  var secs = CED_SECS.map(function(s){ return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;border-top:1px solid var(--border);font-size:14px;"><span style="font-family:\'Fraunces\',Georgia,serif;">'+s+'</span><span style="font-size:11px;color:var(--text3);">'+(counts[s]||0)+'</span></div>'; }).join('');
+  var chips = Object.keys(months).slice(0,6).map(function(m){ return '<span class="ced-chip">'+m+'</span>'; }).join('') || '<span class="ced-chip">—</span>';
+  return (
+    '<section style="max-width:1180px;margin:0 auto;padding:40px 40px 40px;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;">'+
+        '<div class="ced-eyebrow" style="margin-bottom:22px;">Cuaderno · Escritos desde la butaca</div>'+
+        '<button class="ced-cta" onclick="cedGo(\'new\')">+ Nueva entrada</button>'+
+      '</div>'+
+      '<h1 class="ced-display" style="font-size:72px;margin-bottom:24px;max-width:14ch;">El cuaderno</h1>'+
+      '<p style="font-size:16px;line-height:1.7;color:var(--text2);max-width:62ch;">Notas, ensayos y diarios sobre lo que veo. Un lugar para escribir de más largo que un comentario de ficha.</p>'+
+    '</section>'+
+    '<div style="max-width:1180px;margin:0 auto;padding:0 40px;"><div class="ced-rule"></div></div>'+
+    feat+
+    '<section style="max-width:1180px;margin:0 auto;padding:40px 40px 48px;display:flex;flex-wrap:wrap;gap:56px;">'+
+      '<div style="flex:999 1 560px;min-width:0;">'+
+        '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--text3);margin-bottom:8px;">Últimas entradas</div>'+
+        entries+
+      '</div>'+
+      '<aside style="flex:1 1 280px;min-width:0;">'+
+        '<div class="ced-panel"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--text3);margin-bottom:12px;">Secciones</div>'+secs+'</div>'+
+        '<div class="ced-panel"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--text3);margin-bottom:16px;">Archivo</div><div style="display:flex;flex-wrap:wrap;gap:8px;">'+chips+'</div></div>'+
+      '</aside>'+
+    '</section>'
+  );
+}
+
+function cedViewPost(posts,id){
+  var p=posts.filter(function(x){return String(x.id)===String(id);})[0];
+  if(!p) return '<section style="max-width:720px;margin:0 auto;padding:60px 40px;"><button class="ced-back" onclick="cedGo(\'list\')">← Cuaderno</button><h1 class="led-display" style="font-size:36px;">Entrada no encontrada.</h1></section>';
+  var related=posts.filter(function(x){return x!==p;}).slice(0,3);
+  var rel = related.length ? (
+    '<section style="max-width:1020px;margin:0 auto;padding:16px 40px 0;">'+
+      '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--text3);border-top:1px solid var(--border2);padding-top:30px;">Más del cuaderno</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:22px;">'+
+      related.map(function(r){ return '<div style="cursor:pointer;" onclick="cedGo(\'post\',\''+esc(r.id)+'\')"><div class="ced-kicker" style="margin-bottom:10px;">'+esc(r.category||'')+'</div><h4 style="font-family:\'Fraunces\',Georgia,serif;font-weight:400;font-size:20px;line-height:1.18;margin-bottom:8px;">'+esc(r.title)+'</h4><div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);">'+cedFmtDate(r.date)+'</div></div>'; }).join('')+
+      '</div></section>'
+  ) : '';
+  var tags = (p.tags&&p.tags.length) ? '<div style="display:flex;flex-wrap:wrap;gap:8px;padding:36px 0;border-top:1px solid var(--border);margin-top:40px;">'+p.tags.map(function(t){return '<span class="ced-tag">'+esc(t)+'</span>';}).join('')+'</div>' : '';
+  return (
+    '<article>'+
+      '<div style="max-width:720px;margin:0 auto;padding:40px 40px 0;">'+
+        '<button class="ced-back" onclick="cedGo(\'list\')">← Cuaderno</button>'+
+        '<div class="ced-eyebrow" style="margin-bottom:20px;">'+esc(p.category||'')+'</div>'+
+        '<h1 class="ced-display" style="font-size:50px;line-height:1.05;margin-bottom:22px;">'+esc(p.title)+'</h1>'+
+        '<p style="font-size:19px;line-height:1.6;color:var(--text2);margin-bottom:26px;">'+esc(p.dek||'')+'</p>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);padding-bottom:36px;border-bottom:1px solid var(--border2);">'+
+          '<span>Por Andrés</span><span style="opacity:.4;">/</span><span>'+cedFmtDate(p.date)+'</span><span style="opacity:.4;">/</span><span>'+cedReadMin(p.body)+' min</span>'+
+          '<span style="margin-left:auto;"><a style="color:var(--gold2);cursor:pointer;" onclick="cedGo(\'edit\',\''+esc(p.id)+'\')">Editar</a></span>'+
+        '</div>'+
+      '</div>'+
+      (p.cover?'<div style="max-width:1020px;margin:40px auto 0;padding:0 40px;"><div style="aspect-ratio:21/9;background:var(--bg3) center 30%/cover no-repeat;background-image:url(\''+esc(p.cover)+'\');border:1px solid var(--border2);"></div></div>':'')+
+      '<div class="ced-prose" style="max-width:720px;margin:0 auto;padding:48px 40px 0;">'+cedBodyHTML(p.body)+tags+'</div>'+
+    '</article>'+rel
+  );
+}
+
+function cedViewEditor(posts,id){
+  var p=id?posts.filter(function(x){return String(x.id)===String(id);})[0]:null;
+  var dateVal = p&&p.date ? new Date(p.date).toISOString().slice(0,10) : new Date().toISOString().slice(0,10);
+  var v=p||{category:'Ensayo'};
+  var opts=CED_SECS.map(function(s){return '<option '+(s===v.category?'selected':'')+'>'+s+'</option>';}).join('');
+  return (
+    '<section style="max-width:720px;margin:0 auto;padding:40px 40px 40px;">'+
+      '<button class="ced-back" onclick="'+(p?'cedGo(\'post\',\''+esc(p.id)+'\')':'cedGo(\'list\')')+'">← '+(p?'Cancelar':'Cuaderno')+'</button>'+
+      '<h1 class="led-display" style="font-weight:300;font-size:40px;margin-bottom:32px;">'+(p?'Editar entrada':'Nueva entrada')+'</h1>'+
+      '<form onsubmit="cedSaveForm(event,\''+(p?esc(p.id):'')+'\')">'+
+        '<div class="ced-field"><label>Título</label><input name="title" required value="'+esc(v.title||'')+'"></div>'+
+        '<div style="display:flex;gap:22px;flex-wrap:wrap;"><div class="ced-field" style="flex:1 1 200px;"><label>Sección</label><select name="category">'+opts+'</select></div><div class="ced-field" style="flex:1 1 160px;"><label>Fecha</label><input type="date" name="date" value="'+dateVal+'"></div></div>'+
+        '<div class="ced-field"><label>Entradilla</label><input name="dek" value="'+esc(v.dek||'')+'"></div>'+
+        '<div class="ced-field"><label>Imagen de portada (URL, opcional)</label><input name="cover" value="'+esc(v.cover||'')+'" placeholder="https://..."></div>'+
+        '<div class="ced-field"><label>Cuerpo — párrafos separados por línea en blanco · “## ” subtítulo · “> ” cita · **negrita** *cursiva*</label><textarea name="body">'+esc(v.body||'')+'</textarea></div>'+
+        '<div class="ced-field"><label>Etiquetas (separadas por coma)</label><input name="tags" value="'+esc((v.tags||[]).join(', '))+'"></div>'+
+        '<div style="display:flex;gap:14px;align-items:center;padding:8px 0 20px;"><button type="submit" class="ced-primary">'+(p?'Guardar cambios':'Publicar')+'</button>'+(p?'<button type="button" class="ced-danger" onclick="cedDelete(\''+esc(p.id)+'\')">Eliminar</button>':'')+'</div>'+
+      '</form>'+
+    '</section>'
+  );
+}
+function cedSaveForm(ev,id){
+  ev.preventDefault();
+  var f=ev.target, posts=getBlogPosts();
+  var data={ category:f.category.value, title:f.title.value.trim(), dek:f.dek.value.trim(), cover:f.cover.value.trim(), body:f.body.value, tags:f.tags.value.split(',').map(function(t){return t.trim();}).filter(Boolean), date:(f.date.value?Date.parse(f.date.value):Date.now()) };
+  if(id){ var p=posts.filter(function(x){return String(x.id)===String(id);})[0]; if(p) Object.assign(p,data); }
+  else { data.id='ced'+Date.now(); data.pinned=false; posts.push(data); id=data.id; }
+  saveBlogPosts(posts); cedGo('post',id);
+}
+function cedDelete(id){ if(!confirm('¿Eliminar esta entrada? No se puede deshacer.')) return; saveBlogPosts(getBlogPosts().filter(function(x){return String(x.id)!==String(id);})); cedGo('list'); }
+
+function renderBlog(){
+  var inner=document.getElementById('blog-inner'); if(!inner) return;
+  var posts=cedSeedIfEmpty().slice().sort(function(a,b){return (b.date||0)-(a.date||0);});
+  if(CED.mode==='post') inner.innerHTML=cedViewPost(posts,CED.id);
+  else if(CED.mode==='edit'||CED.mode==='new') inner.innerHTML=cedViewEditor(posts,CED.mode==='edit'?CED.id:null);
+  else inner.innerHTML=cedViewList(posts);
+  window.scrollTo(0,0);
+}
+
+/* ─────────────────────────── LISTAS ─────────────────────────── */
+function ledPoster(f){ if(!f||!f.poster) return null; return f.poster.indexOf('http')===0 ? f.poster : 'https://image.tmdb.org/t/p/w342'+f.poster; }
+function ledFilms(l){ return (l.films||[]).map(function(id){ return FILMS.filter(function(f){return f.id===id;})[0]; }).filter(Boolean); }
+function ledNum(f){ var r=parseFloat(f&&f.rating); return isNaN(r)?0:r; }
+function ledAvg(l){ var fs=ledFilms(l); if(!fs.length) return '—'; return (fs.reduce(function(s,f){return s+ledNum(f);},0)/fs.length).toFixed(1); }
+function ledFmtDate(ts){ var d=new Date(ts); if(isNaN(d)) return ''; return d.getDate()+' '+CED_MESES[d.getMonth()]+' '+d.getFullYear(); }
+function ledSeedIfEmpty(){
+  var lists=getLists(); if(lists && lists.length) return lists;
+  function pick(pred,n){ return FILMS.filter(pred).sort(function(a,b){return ledNum(b)-ledNum(a);}).slice(0,n).map(function(f){return f.id;}); }
+  var now=Date.now();
+  var seed=[
+    {id:'led1',emoji:'🎬',title:'Kurosawa, de principio a fin',tag:'Por director',desc:'Las que tengo del maestro, en orden de nota. Si alguien me pregunta por dónde entrar, mando las tres primeras.',films:pick(function(f){return /kurosawa/i.test(f.director||'');},14),created:now,updated:now},
+    {id:'led2',emoji:'🏆',title:'Los dieces: cine sin reproche',tag:'Por humor',desc:'Las de nota perfecta en mi biblioteca. El techo, sin orden jerárquico.',films:pick(function(f){return ledNum(f)===10;},20),created:now,updated:now},
+    {id:'led3',emoji:'🎭',title:'Bergman y el rostro',tag:'Por director',desc:'Sobre la cara humana como paisaje. Del Séptimo sello a Sonata de otoño.',films:pick(function(f){return /bergman/i.test(f.director||'');},12),created:now,updated:now}
+  ];
+  saveLists(seed); return seed;
+}
+function ledGo(mode,id){ LED.mode=mode; LED.id=(id!=null?id:null); LED.q=''; renderLists(); }
+
+function ledViewIndex(lists){
+  var cards=lists.map(function(l,i){
+    var fs=ledFilms(l); var posters=fs.filter(function(f){return ledPoster(f);}).slice(0,5);
+    var strip=posters.map(function(f){ return '<div class="led-pmini" style="background-image:url(\''+esc(ledPoster(f))+'\');"></div>'; }).join('') || '<div style="height:86px;"></div>';
+    return '<div class="led-card" onclick="ledGo(\'detail\',\''+esc(l.id)+'\')">'+
+      '<div style="display:flex;gap:8px;padding:20px 24px 0;">'+strip+'</div>'+
+      '<div style="padding:22px 24px 24px;">'+
+        '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;"><span style="font-family:\'Fraunces\',Georgia,serif;font-size:16px;color:var(--text3);">'+String(i+1).padStart(2,'0')+'</span><span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--gold2);">'+esc(l.tag||'Lista')+'</span></div>'+
+        '<h3 class="led-title" style="margin-bottom:12px;">'+esc(l.title)+'</h3>'+
+        '<p class="led-clamp" style="font-size:14px;line-height:1.6;color:var(--text2);margin-bottom:18px;">'+esc(l.desc||'')+'</p>'+
+        '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);border-top:1px solid var(--border);padding-top:14px;">'+fs.length+' películas · prom '+ledAvg(l)+' · act. '+ledFmtDate(l.updated||l.created)+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  var grid = lists.length ? '<div class="led-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;">'+cards+'</div>' : '<p style="color:var(--text3);padding:40px 0;">Aún no tienes listas. Crea una con “+ Nueva lista”.</p>';
+  return (
+    '<section style="max-width:1180px;margin:0 auto;padding:40px 40px 40px;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;">'+
+        '<div class="led-eyebrow" style="margin-bottom:22px;">Listas curadas · Selecciones de autor</div>'+
+        '<button class="led-cta" onclick="ledGo(\'new\')">+ Nueva lista</button>'+
+      '</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;">'+
+        '<h1 class="led-display" style="font-size:72px;">Listas</h1>'+
+        '<p style="font-size:15px;line-height:1.7;color:var(--text2);max-width:46ch;margin-bottom:10px;">Agrupo películas de la biblioteca con un criterio propio y una nota. No son rankings: son recorridos.</p>'+
+      '</div>'+
+    '</section>'+
+    '<div style="max-width:1180px;margin:0 auto;padding:0 40px;"><div style="display:flex;gap:20px;align-items:center;padding:16px 0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border);"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text);">Todas · '+lists.length+'</span></div></div>'+
+    '<section style="max-width:1180px;margin:0 auto;padding:40px 40px 48px;">'+grid+'</section>'
+  );
+}
+
+function ledViewDetail(lists,id){
+  var l=lists.filter(function(x){return String(x.id)===String(id);})[0];
+  if(!l) return '<section style="max-width:1020px;margin:0 auto;padding:60px 40px;"><button class="led-back" onclick="ledGo(\'index\')">← Listas</button><h1 class="led-display" style="font-size:36px;">Lista no encontrada.</h1></section>';
+  var fs=ledFilms(l);
+  var rows=fs.map(function(f,i){
+    var note=(l.notes&&l.notes[f.id])||f.comment||'';
+    return '<div class="led-row">'+
+      '<div style="font-family:\'Fraunces\',Georgia,serif;font-size:20px;color:var(--text3);text-align:center;">'+String(i+1).padStart(2,'0')+'</div>'+
+      '<div class="led-thumb" style="'+(ledPoster(f)?'background-image:url(\''+esc(ledPoster(f))+'\');':'')+'"></div>'+
+      '<div style="min-width:0;"><h3 style="font-family:\'Fraunces\',Georgia,serif;font-weight:400;font-size:23px;line-height:1.1;margin-bottom:5px;">'+esc(f.title)+' <span style="color:var(--text3);font-size:18px;">'+esc(f.year||'')+'</span></h3><div style="font-size:12px;color:var(--text2);margin-bottom:7px;">'+esc(f.director||'—')+(f.country?' · '+esc(f.country):'')+'</div>'+(note?'<p style="font-size:13px;line-height:1.5;color:var(--text3);margin:0;font-style:italic;">'+esc(note)+'</p>':'')+'</div>'+
+      '<div class="led-badge">'+(ledNum(f)?fmtR(f.rating):'—')+'</div>'+
+      '<button class="led-x" title="Quitar" onclick="ledRemoveFilm(\''+esc(l.id)+'\',\''+esc(f.id)+'\')">×</button>'+
+    '</div>';
+  }).join('') || '<p style="color:var(--text3);padding:30px 0;">Esta lista está vacía. Añade películas abajo.</p>';
+  return (
+    '<section style="max-width:1020px;margin:0 auto;padding:40px 40px 0;">'+
+      '<button class="led-back" onclick="ledGo(\'index\')">← Listas</button>'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;">'+
+        '<div class="led-eyebrow" style="margin-bottom:20px;">Lista curada · '+esc(l.tag||'Lista')+'</div>'+
+        '<div style="display:flex;gap:10px;"><button class="led-ghost" onclick="ledGo(\'edit\',\''+esc(l.id)+'\')">Editar</button><button class="led-ghost" onclick="ledDelete(\''+esc(l.id)+'\')">Eliminar</button></div>'+
+      '</div>'+
+      '<h1 class="led-display" style="font-size:58px;margin-bottom:22px;max-width:16ch;">'+esc(l.title)+'</h1>'+
+      '<p style="font-size:17px;line-height:1.72;color:var(--text2);max-width:60ch;margin-bottom:28px;">'+esc(l.desc||'')+'</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);padding-bottom:30px;border-bottom:1px solid var(--border2);"><span style="color:var(--text);">'+fs.length+' películas</span><span style="opacity:.4;">/</span><span>Promedio '+ledAvg(l)+'</span><span style="opacity:.4;">/</span><span>Actualizada '+ledFmtDate(l.updated||l.created)+'</span></div>'+
+    '</section>'+
+    '<section style="max-width:1020px;margin:0 auto;padding:8px 40px 48px;">'+
+      rows+
+      '<div style="margin-top:26px;"><div class="led-eyebrow" style="margin-bottom:12px;">Añadir película</div>'+
+      '<div style="border:1px solid var(--border2);"><div style="padding:16px;border-bottom:1px solid var(--border);"><input id="led-pick" class="led-pick" type="text" placeholder="Busca por título o director…" value="'+esc(LED.q||'')+'" oninput="LED.q=this.value;ledRenderPicker(\''+esc(l.id)+'\')"></div><div class="led-presults" id="led-presults"></div></div></div>'+
+    '</section>'
+  );
+}
+function ledPickerHint(){ return '<div style="padding:16px;color:var(--text3);font-size:13px;">Escribe al menos dos letras…</div>'; }
+function ledRenderPicker(listId){
+  var el=document.getElementById('led-pick'); var box=document.getElementById('led-presults'); if(!box) return;
+  var q=(el?el.value:'').trim().toLowerCase();
+  if(q.length<2){ box.innerHTML=ledPickerHint(); return; }
+  var l=getLists().filter(function(x){return String(x.id)===String(listId);})[0]; var inList={}; (l&&l.films||[]).forEach(function(id){inList[id]=1;});
+  var res=FILMS.filter(function(f){ return !inList[f.id] && (((f.title||'').toLowerCase().indexOf(q)>=0)||((f.director||'').toLowerCase().indexOf(q)>=0)); }).sort(function(a,b){return ledNum(b)-ledNum(a);}).slice(0,25);
+  box.innerHTML = res.map(function(f){
+    return '<div class="led-presult" onclick="ledAddFilm(\''+esc(listId)+'\',\''+esc(f.id)+'\')"><div class="led-pt" style="'+(ledPoster(f)?'background-image:url(\''+esc(ledPoster(f))+'\');':'')+'"></div><div style="min-width:0;"><div style="font-family:\'Fraunces\',Georgia,serif;font-size:16px;">'+esc(f.title)+' <span style="color:var(--text3);font-size:13px;">'+esc(f.year||'')+'</span></div><div style="font-size:12px;color:var(--text2);">'+esc(f.director||'—')+(f.country?' · '+esc(f.country):'')+'</div></div><div class="led-addpill">+ Añadir</div></div>';
+  }).join('') || '<div style="padding:16px;color:var(--text3);font-size:13px;">Sin resultados.</div>';
+}
+function ledAddFilm(listId,filmId){
+  var lists=getLists(); var l=lists.filter(function(x){return String(x.id)===String(listId);})[0]; if(!l) return;
+  l.films=l.films||[]; if(l.films.indexOf(filmId)<0) l.films.push(filmId); l.updated=Date.now(); saveLists(lists);
+  renderLists();
+  var el=document.getElementById('led-pick'); if(el){ el.value=LED.q||''; el.focus(); ledRenderPicker(listId); }
+}
+function ledRemoveFilm(listId,filmId){
+  var lists=getLists(); var l=lists.filter(function(x){return String(x.id)===String(listId);})[0]; if(!l) return;
+  l.films=(l.films||[]).filter(function(x){return x!==filmId;}); l.updated=Date.now(); saveLists(lists); renderLists();
+}
+function ledViewEditor(lists,id){
+  var l=id?lists.filter(function(x){return String(x.id)===String(id);})[0]:null; var v=l||{tag:'Por director'};
+  var opts=LED_TAGS.map(function(t){return '<option '+(t===v.tag?'selected':'')+'>'+t+'</option>';}).join('');
+  return (
+    '<section style="max-width:720px;margin:0 auto;padding:40px 40px 40px;">'+
+      '<button class="led-back" onclick="'+(l?'ledGo(\'detail\',\''+esc(l.id)+'\')':'ledGo(\'index\')')+'">← '+(l?'Cancelar':'Listas')+'</button>'+
+      '<h1 class="led-display" style="font-weight:300;font-size:40px;margin-bottom:32px;">'+(l?'Editar lista':'Nueva lista')+'</h1>'+
+      '<form onsubmit="ledSaveForm(event,\''+(l?esc(l.id):'')+'\')">'+
+        '<div class="ced-field"><label>Título de la lista</label><input name="title" required value="'+esc(v.title||'')+'" placeholder="Ej: Cine negro de los 50"></div>'+
+        '<div class="ced-field"><label>Criterio</label><select name="tag">'+opts+'</select></div>'+
+        '<div class="ced-field"><label>Nota de curaduría</label><textarea name="desc" style="min-height:90px;">'+esc(v.desc||'')+'</textarea></div>'+
+        '<div style="display:flex;gap:14px;align-items:center;padding:8px 0 20px;"><button type="submit" class="ced-primary">'+(l?'Guardar cambios':'Crear lista')+'</button>'+(l?'<button type="button" class="ced-danger" onclick="ledDelete(\''+esc(l.id)+'\')">Eliminar</button>':'')+'</div>'+
+        (l?'':'<p style="font-size:13px;color:var(--text3);">Después de crearla podrás añadir películas desde tu biblioteca.</p>')+
+      '</form>'+
+    '</section>'
+  );
+}
+function ledSaveForm(ev,id){
+  ev.preventDefault(); var f=ev.target; var lists=getLists();
+  var data={title:f.title.value.trim(),tag:f.tag.value,desc:f.desc.value.trim()};
+  if(id){ var l=lists.filter(function(x){return String(x.id)===String(id);})[0]; if(l){ Object.assign(l,data); l.updated=Date.now(); } saveLists(lists); ledGo('detail',id); }
+  else { var nl={id:'led'+Date.now(),emoji:'🎬',title:data.title,tag:data.tag,desc:data.desc,films:[],created:Date.now(),updated:Date.now()}; lists.unshift(nl); saveLists(lists); ledGo('detail',nl.id); }
+}
+function ledDelete(id){ if(!confirm('¿Eliminar esta lista? No se puede deshacer.')) return; saveLists(getLists().filter(function(x){return String(x.id)!==String(id);})); ledGo('index'); }
+
+function renderLists(){
+  var host=document.getElementById('view-lists'); if(!host) return;
+  var lists=ledSeedIfEmpty();
+  if(LED.mode==='detail') host.innerHTML=ledViewDetail(lists,LED.id);
+  else if(LED.mode==='edit'||LED.mode==='new') host.innerHTML=ledViewEditor(lists,LED.mode==='edit'?LED.id:null);
+  else host.innerHTML=ledViewIndex(lists);
+  window.scrollTo(0,0);
+  if(LED.mode==='detail'){ var pr=document.getElementById('led-presults'); if(pr){ if((LED.q||'').trim().length>=2) ledRenderPicker(LED.id); else pr.innerHTML=ledPickerHint(); } }
+}
+
 </script>
 </body>
 </html>
