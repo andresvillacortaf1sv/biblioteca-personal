@@ -2111,6 +2111,15 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 <style id="ec-mobile">
 html,body{max-width:100%;}
 @media (max-width:640px){
+  /* El encabezado se acomoda: busca ocupa una línea propia y los botones
+     (incluido Sincronizar) quedan siempre visibles. */
+  .header-top{flex-wrap:wrap;height:auto;min-height:56px;row-gap:8px;}
+  .logo{flex:0 1 auto;min-width:0;}
+  .logo-rule{display:none;}
+  .search-wrap{order:20;flex:1 1 100%;}
+  #ec-acct-btn{flex-shrink:0;}
+}
+@media (max-width:640px){
   html,body{overflow-x:hidden;}
 
   /* ── HEADER + NAV ── */
