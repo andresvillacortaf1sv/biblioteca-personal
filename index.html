@@ -2060,6 +2060,8 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 </style>
 
 <style id="ec-stats-ext">
+#stats-wrap .est-kpi{padding:26px 28px 26px 28px;}
+#fc-nocountry.on{background:var(--gold2)!important;color:#0b0b0e!important;border-color:var(--gold2)!important;font-weight:600;}
 .ec-typebar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px;}
 .ec-typechip{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);border:1px solid var(--border2);background:var(--bg2);padding:8px 14px;cursor:pointer;border-radius:7px;transition:.15s;font-family:inherit;}
 .ec-typechip:hover{border-color:var(--gold2);color:var(--text);}
@@ -2213,6 +2215,7 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 <div id="view-films" class="view on">
   <div class="fbar">
     <select id="fc-country" onchange="applyFilters()"><option value="">Todos los países</option></select>
+    <button id="fc-nocountry" type="button" onclick="this.classList.toggle('on');applyFilters()" title="Mostrar solo películas sin país asignado" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:7px 12px;cursor:pointer;font-family:inherit;white-space:nowrap;">Sin país</button>
     <input id="fc-director" class="fc-input" list="fc-directors-dl" placeholder="Todos los directores" oninput="applyFilters()" style="min-width:170px;">
     <datalist id="fc-directors-dl"></datalist>
     <select id="fc-sort" onchange="applyFilters()">
@@ -3163,8 +3166,10 @@ function applyFilters() {
   const bucket=hasBucket?parseInt(ratingBucket):null;
   const decade=parseInt(document.getElementById('fc-decade')?.value)||0;
   const yearExact=parseInt(document.getElementById('fc-year')?.value)||0;
+  const noCtry=document.getElementById('fc-nocountry')?.classList.contains('on');
   filtered = FILMS.filter(f => {
     if (q && !f.title.toLowerCase().includes(q) && !(f.director||'').toLowerCase().includes(q)) return false;
+    if (noCtry && f.country && String(f.country).trim()!=='') return false;
     if (ctry && f.country!==ctry) return false;
     if (dir && !(f.director||'').toLowerCase().includes(dir)) return false;
     if (hasBucket) { if(f.rating==null) return false; if(Math.floor(f.rating)!==bucket) return false; }
@@ -7476,9 +7481,7 @@ function ecStatsEnhance(SF){
     var extra=[
       {val:avg.toFixed(2), lbl:'Nota promedio', cls:'gold'},
       bestDir?{val:'★'+bestDir.avg.toFixed(1), lbl:'Mejor valorado · '+esc(bestDir.name)}:null,
-      {val:countries.size, lbl:'Países distintos'},
-      mostRe?{val:'×'+(mostRe.rewatchCount), lbl:'Más revista · '+esc(mostRe.title)}:null,
-      {val:(minY+'–'+String(maxY).slice(-2)), lbl:'Rango temporal'}
+      {val:countries.size, lbl:'Países distintos'}
     ].filter(Boolean);
     extra.forEach(function(k){ var d=document.createElement('div'); d.className='est-kpi'; d.innerHTML='<div class="est-kpi-val '+(k.cls||'')+'">'+k.val+'</div><div class="est-kpi-lbl est-lbl">'+k.lbl+'</div>'; kpis.appendChild(d); });
   }
