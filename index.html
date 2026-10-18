@@ -7266,7 +7266,7 @@ function vcGroups(films){
 
 function vcCaseHTML(f){
   var p=vcPoster(f), price=(f.price!=null)?('$'+(f.price%1===0?f.price:f.price.toFixed(2))):'';
-  return '<div class="vc-case" onclick="openDetail('+f.id+')" title="'+esc(f.title)+'">'+
+  return '<div class="vc-case" onclick="openDetail('+f.id+')" title="'+esc(f.title)+'" style="'+(p?'background-image:url(\''+p+'\');':'')+'">'+
     '<div class="vc-case-spine"></div><div class="vc-case-gloss"></div>'+
     (p?'':'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10px;font-size:11px;color:#9a865f;text-align:center;">'+esc(f.title)+'</div>')+
     (price?'<div class="vc-case-price">'+price+'</div>':'')+
