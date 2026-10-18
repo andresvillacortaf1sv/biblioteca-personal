@@ -6174,7 +6174,7 @@ async function showPriceResults(title, format, containerId, compact=false){
 }
 function renderStats() {
   if(typeof window.statTipo==='undefined') window.statTipo='todos';
-  const SF = (statTipo && statTipo!=='todos') ? SF.filter(f=>(f.tipo||'largometraje')===statTipo) : SF;
+  const SF = (statTipo && statTipo!=='todos') ? FILMS.filter(f=>(f.tipo||'largometraje')===statTipo) : FILMS;
   const rated=SF.filter(f=>f.rating!=null);
   const ratings=rated.map(f=>f.rating);
   const avg=ratings.length?ratings.reduce((a,b)=>a+b,0)/ratings.length:0;
