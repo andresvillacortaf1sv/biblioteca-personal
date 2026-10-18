@@ -2059,6 +2059,42 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .bc-close{background:#f0c050;color:#1a0f04;border:none;font-weight:600;font-size:13px;padding:11px 22px;cursor:pointer;font-family:inherit;}
 </style>
 
+<style id="ec-stats-ext">
+.ec-typebar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px;}
+.ec-typechip{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);border:1px solid var(--border2);background:var(--bg2);padding:8px 14px;cursor:pointer;border-radius:7px;transition:.15s;font-family:inherit;}
+.ec-typechip:hover{border-color:var(--gold2);color:var(--text);}
+.ec-typechip.on{background:var(--gold2);color:#0b0b0e;border-color:var(--gold2);font-weight:600;}
+.ec-seg-row{display:flex;gap:0;margin:2px 0 14px;}
+.ec-seg{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border:1px solid var(--border2);background:transparent;padding:6px 12px;cursor:pointer;font-family:inherit;transition:.15s;}
+.ec-seg+.ec-seg{border-left:none;}
+.ec-seg.on{background:var(--gold2);color:#0b0b0e;border-color:var(--gold2);}
+.ec-donut-wrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding:8px 0;}
+.ec-donut{width:150px;height:150px;border-radius:50%;flex:none;position:relative;}
+.ec-donut::after{content:'';position:absolute;inset:30px;border-radius:50%;background:var(--bg2);}
+.ec-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;}
+.ec-donut-center b{font-family:'Fraunces',serif;font-size:22px;line-height:1;}
+.ec-donut-center span{font-size:8px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-top:3px;}
+.ec-legend{flex:1;min-width:180px;display:flex;flex-direction:column;gap:6px;}
+.ec-leg{display:flex;align-items:center;gap:9px;font-size:12px;}
+.ec-leg-dot{width:10px;height:10px;flex:none;border-radius:2px;}
+.ec-leg-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ec-leg-val{color:var(--text3);font-size:11px;font-variant-numeric:tabular-nums;}
+.ec-top10{display:flex;gap:12px;overflow-x:auto;padding:6px 2px 10px;scrollbar-width:thin;}
+.ec-top10-item{flex:none;width:92px;cursor:pointer;}
+.ec-top10-pos{position:relative;aspect-ratio:2/3;background:var(--bg3) center/cover no-repeat;border:1px solid var(--border);transition:.15s;}
+.ec-top10-item:hover .ec-top10-pos{border-color:var(--gold2);transform:translateY(-4px);}
+.ec-top10-rk{position:absolute;top:0;left:0;background:var(--gold2);color:#0b0b0e;font-family:'Fraunces',serif;font-size:13px;font-weight:600;padding:2px 7px;}
+.ec-top10-rt{position:absolute;bottom:0;right:0;background:rgba(10,10,13,.85);color:var(--gold2);font-size:11px;font-weight:600;padding:2px 6px;}
+.ec-top10-t{font-size:10px;line-height:1.2;color:var(--text2);margin-top:6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.ec-yearbar{cursor:default;transition:background .15s;}
+.ec-yearbar.best{outline:1px solid var(--gold2);outline-offset:1px;}
+.ec-crank{display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center;margin-top:12px;max-height:280px;overflow-y:auto;padding-right:4px;scrollbar-width:thin;}
+.ec-crank-rk{font-family:'Fraunces',serif;font-size:13px;color:var(--text3);text-align:right;}
+.ec-crank-name{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ec-crank-val{font-size:12px;color:var(--text2);font-variant-numeric:tabular-nums;}
+.ec-crank-bar{grid-column:1/-1;height:2px;background:var(--border);margin-bottom:2px;}
+</style>
+
 </head>
 <body>
 
@@ -2739,6 +2775,7 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
         <div class="fg"><label>País</label><input type="text" id="f-country" placeholder="País de producción"></div>
       </div>
       <div class="frow">
+        <div class="fg"><label>Tipo</label><select id="f-tipo" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:inherit;"><option value="largometraje">Largometraje</option><option value="cortometraje">Cortometraje</option><option value="documental">Documental</option><option value="serie">Serie</option></select></div>
         <div class="fg"><label>Año</label><input type="number" id="f-year" placeholder="2024" min="1900" max="2030"></div>
         <div class="fg"><label>Fecha de visionado</label><input type="date" id="f-watched-date"></div>
       </div>
@@ -3286,6 +3323,7 @@ function openForm(id) {
   document.getElementById('f-poster').value=f?.poster||'';
   document.getElementById('f-watched-date').value=f?.watchedDate||'';
   document.getElementById('f-rewatch-count').value=f?.rewatchCount||1;
+  document.getElementById('f-tipo').value=f?.tipo||'largometraje';
   document.getElementById('f-physical').checked=f?.physical||false;
   document.getElementById('f-format').value=f?.format||'';
   document.getElementById('f-price').value=f?.price||'';
@@ -3468,6 +3506,7 @@ function saveFilm() {
     poster:document.getElementById('f-poster').value||null,
     watchedDate:document.getElementById('f-watched-date').value||null,
     rewatchCount:rwCount,
+    tipo:document.getElementById('f-tipo').value||'largometraje',
     physical:document.getElementById('f-physical').checked,
     format:document.getElementById('f-format').value||null,
     price:parseFloat(document.getElementById('f-price').value)||null,
@@ -6134,16 +6173,18 @@ async function showPriceResults(title, format, containerId, compact=false){
   </div>`;
 }
 function renderStats() {
-  const rated=FILMS.filter(f=>f.rating!=null);
+  if(typeof window.statTipo==='undefined') window.statTipo='todos';
+  const SF = (statTipo && statTipo!=='todos') ? SF.filter(f=>(f.tipo||'largometraje')===statTipo) : SF;
+  const rated=SF.filter(f=>f.rating!=null);
   const ratings=rated.map(f=>f.rating);
   const avg=ratings.length?ratings.reduce((a,b)=>a+b,0)/ratings.length:0;
   const perfect=ratings.filter(r=>r===10).length;
   const perfectPct=ratings.length?(perfect/ratings.length*100):0;
-  const seenCountries=new Set(FILMS.map(f=>f.country).filter(Boolean));
+  const seenCountries=new Set(SF.map(f=>f.country).filter(Boolean));
 
   // Directores (desdobla co-dirección)
   const dm={};
-  FILMS.forEach(f=>{
+  SF.forEach(f=>{
     if(!f.director)return;
     f.director.split(',').map(d=>d.trim()).forEach(d=>{
       if(!d)return;
@@ -6163,7 +6204,7 @@ function renderStats() {
 
   // Países
   const cm={};
-  FILMS.forEach(f=>{if(!f.country)return;if(!cm[f.country])cm[f.country]={n:0,sum:0,rn:0};cm[f.country].n++;if(f.rating!=null){cm[f.country].sum+=f.rating;cm[f.country].rn++;}});
+  SF.forEach(f=>{if(!f.country)return;if(!cm[f.country])cm[f.country]={n:0,sum:0,rn:0};cm[f.country].n++;if(f.rating!=null){cm[f.country].sum+=f.rating;cm[f.country].rn++;}});
   const countriesSorted=Object.entries(cm).map(([name,v])=>({name,n:v.n})).sort((a,b)=>b.n-a.n);
   const totalCountryFilms=countriesSorted.reduce((s,c)=>s+c.n,0);
   const topCountry=countriesSorted[0]||{name:'—',n:0};
@@ -6179,14 +6220,14 @@ function renderStats() {
 
   // ── Módulos extra (análisis detallado) ──
   const yearMap={};
-  FILMS.forEach(f=>{if(f.year){yearMap[f.year]=(yearMap[f.year]||0)+1;}});
+  SF.forEach(f=>{if(f.year){yearMap[f.year]=(yearMap[f.year]||0)+1;}});
   const years=Object.keys(yearMap).map(Number).sort((a,b)=>a-b);
   const maxYear=years.length?Math.max(...Object.values(yearMap)):1;
   const dist={};for(let i=0;i<=10;i++)dist[i]=0;
   ratings.forEach(r=>{const b=Math.round(r);dist[b]=(dist[b]||0)+1;});
   const maxD=Math.max(1,...Object.values(dist));
   const decadeMap={};
-  FILMS.forEach(f=>{
+  SF.forEach(f=>{
     if(!f.year)return;
     const dec=Math.floor(f.year/10)*10;
     if(!decadeMap[dec])decadeMap[dec]={films:[],sum:0,n:0};
@@ -6204,10 +6245,10 @@ function renderStats() {
   w.innerHTML=`
   <!-- HERO -->
   <div class="est-head">
-    <div class="est-eyebrow est-lbl">El perfil completo · ${FILMS.length.toLocaleString('en-US')} películas</div>
+    <div class="est-eyebrow est-lbl">El perfil completo · ${SF.length.toLocaleString('en-US')} películas</div>
     <h1 class="est-title">Estadísticas</h1>
     <div class="est-kpis">
-      <div class="est-kpi"><div class="est-kpi-val">${FILMS.length.toLocaleString('en-US')}</div><div class="est-kpi-lbl est-lbl">Películas vistas</div></div>
+      <div class="est-kpi"><div class="est-kpi-val">${SF.length.toLocaleString('en-US')}</div><div class="est-kpi-lbl est-lbl">Películas vistas</div></div>
       <div class="est-kpi"><div class="est-kpi-val gold">${perfect}</div><div class="est-kpi-lbl est-lbl">Notas perfectas · ${perfectPct.toFixed(1)}%</div></div>
       <div class="est-kpi"><div class="est-kpi-val">${topCountryPct}<small>%</small></div><div class="est-kpi-lbl est-lbl">Origen ${esc(topCountry.name)}</div></div>
       <div class="est-kpi"><div class="est-kpi-val">${maxDirN}</div><div class="est-kpi-lbl est-lbl">Máx. · ${esc(topDirNames.join(' / '))}</div></div>
@@ -6269,9 +6310,10 @@ function renderStats() {
     </div>
   </div>
   <!-- FOOTER -->
-  <div class="est-foot"><span class="est-lbl">Datos sobre ${FILMS.length.toLocaleString('en-US')} registros · biblioteca personal</span><span class="est-lbl">Actualizado · ${meses[hoy.getMonth()]} ${hoy.getFullYear()}</span></div>`;
+  <div class="est-foot"><span class="est-lbl">Datos sobre ${SF.length.toLocaleString('en-US')} registros · biblioteca personal</span><span class="est-lbl">Actualizado · ${meses[hoy.getMonth()]} ${hoy.getFullYear()}</span></div>`;
   renderWorldMap(seenCountries, cm);
   setTimeout(fetchAllMissingDecadePosters, 300);
+  try{ ecStatsEnhance(SF); }catch(e){ console.error('stats enhance', e); }
 }
 
 function showDistTip(e, score, count, pct) {
@@ -7389,6 +7431,175 @@ function closeBarcodeScanner(){
   try{ if(VC_SCAN.stream) VC_SCAN.stream.getTracks().forEach(function(t){t.stop();}); }catch(e){}
   VC_SCAN.stream=null; VC_SCAN.reader=null;
   var ov=document.getElementById('bc-scan-ov'); if(ov) ov.remove();
+}
+
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ESTADÍSTICAS — mejoras: filtro por tipo, toggles barra/circular,
+   top 10 con pósters, año por cantidad/nota, ranking de países, KPIs.
+   ══════════════════════════════════════════════════════════════════════════ */
+var statGeoMode='bars', statDirMode='bars', statYearMode='count';
+var EC_PAL=['var(--gold2)','var(--gold)','var(--purple)','var(--green)','var(--red)','#5a8fd4','#d98f5a','#5ad4c0','#c05ad4','#8fd45a','#d4b35a','#7a9bd4'];
+var EC_OTHER='#2a2a30';
+var ecSF=[];
+var EC_TIPOS=[['todos','Todos'],['largometraje','Largometrajes'],['cortometraje','Cortometrajes'],['documental','Documentales'],['serie','Series']];
+function ecPoster(f,size){ if(!f.poster) return ''; return f.poster.startsWith('http')?f.poster:('https://image.tmdb.org/t/p/'+(size||'w185')+f.poster); }
+function ecTipo(f){ return f.tipo||'largometraje'; }
+
+function ecSetTipo(t){ window.statTipo=t; renderStats(); }
+function ecSetGeo(m){ statGeoMode=m; ecRenderGeo(); }
+function ecSetDir(m){ statDirMode=m; ecRenderDir(); }
+function ecSetYear(m){ statYearMode=m; ecRenderYear(); }
+
+function ecStatsEnhance(SF){
+  ecSF=SF||FILMS;
+  var wrap=document.getElementById('stats-wrap'); if(!wrap) return;
+
+  /* 1 ── barra de filtro por tipo (cuenta sobre TODA la biblioteca) */
+  var tc={}; FILMS.forEach(function(f){ var t=ecTipo(f); tc[t]=(tc[t]||0)+1; });
+  var tbar=document.createElement('div'); tbar.className='ec-typebar';
+  tbar.innerHTML=EC_TIPOS.map(function(p){ var k=p[0],lbl=p[1]; var n=(k==='todos')?FILMS.length:(tc[k]||0); return '<button class="ec-typechip'+(window.statTipo===k?' on':'')+'" onclick="ecSetTipo(\''+k+'\')">'+lbl+' · '+n+'</button>'; }).join('');
+  wrap.insertBefore(tbar, wrap.firstChild);
+
+  /* 2 ── KPIs extra */
+  var kpis=wrap.querySelector('.est-kpis');
+  if(kpis){
+    var rated=ecSF.filter(function(f){return f.rating!=null;});
+    var avg=rated.length?(rated.reduce(function(s,f){return s+f.rating;},0)/rated.length):0;
+    var dm={}; ecSF.forEach(function(f){ if(!f.director)return; f.director.split(',').map(function(d){return d.trim();}).forEach(function(d){ if(!d)return; if(!dm[d])dm[d]={n:0,s:0}; dm[d].n++; if(f.rating!=null)dm[d].s+=f.rating; }); });
+    var bestDir=Object.entries(dm).map(function(e){return {name:e[0],n:e[1].n,avg:e[1].n?e[1].s/e[1].n:0};}).filter(function(d){return d.n>=4;}).sort(function(a,b){return b.avg-a.avg;})[0];
+    var countries=new Set(ecSF.map(function(f){return f.country;}).filter(Boolean));
+    var mostRe=ecSF.filter(function(f){return (f.rewatchCount||0)>1;}).sort(function(a,b){return (b.rewatchCount||0)-(a.rewatchCount||0);})[0];
+    var yrs=ecSF.map(function(f){return f.year;}).filter(Boolean);
+    var minY=yrs.length?Math.min.apply(null,yrs):'—', maxY=yrs.length?Math.max.apply(null,yrs):'—';
+    var extra=[
+      {val:avg.toFixed(2), lbl:'Nota promedio', cls:'gold'},
+      bestDir?{val:'★'+bestDir.avg.toFixed(1), lbl:'Mejor valorado · '+esc(bestDir.name)}:null,
+      {val:countries.size, lbl:'Países distintos'},
+      mostRe?{val:'×'+(mostRe.rewatchCount), lbl:'Más revista · '+esc(mostRe.title)}:null,
+      {val:(minY+'–'+String(maxY).slice(-2)), lbl:'Rango temporal'}
+    ].filter(Boolean);
+    extra.forEach(function(k){ var d=document.createElement('div'); d.className='est-kpi'; d.innerHTML='<div class="est-kpi-val '+(k.cls||'')+'">'+k.val+'</div><div class="est-kpi-lbl est-lbl">'+k.lbl+'</div>'; kpis.appendChild(d); });
+  }
+
+  /* 3 ── Geografía y Directores: montar contenedor + toggle */
+  var geoCol=wrap.querySelector('.est-two .est-col.l');
+  if(geoCol){ geoCol.innerHTML=
+    '<div class="est-sec-hd"><span class="t est-lbl">Geografía del gusto</span><span class="rule"></span></div>'+
+    '<div class="ec-seg-row"><button class="ec-seg'+(statGeoMode==='bars'?' on':'')+'" onclick="ecSetGeo(\'bars\')">Barras</button><button class="ec-seg'+(statGeoMode==='pie'?' on':'')+'" onclick="ecSetGeo(\'pie\')">Circular</button></div>'+
+    '<div id="est-geo-chart"></div>'; ecRenderGeo(); }
+
+  var dirCol=wrap.querySelector('.est-two .est-col:not(.l)');
+  if(dirCol){ dirCol.innerHTML=
+    '<div class="est-sec-hd"><span class="t est-lbl">Directores más vistos</span><span class="rule"></span></div>'+
+    '<div class="ec-seg-row"><button class="ec-seg'+(statDirMode==='bars'?' on':'')+'" onclick="ecSetDir(\'bars\')">Barras</button><button class="ec-seg'+(statDirMode==='pie'?' on':'')+'" onclick="ecSetDir(\'pie\')">Circular</button></div>'+
+    '<div id="est-dir-chart"></div>'; ecRenderDir(); }
+
+  /* 4 ── Top 10 películas con pósters (tras el pull-quote) */
+  var quote=wrap.querySelector('.est-quote');
+  if(quote && !document.getElementById('ec-top10-sec')){
+    var top=ecSF.filter(function(f){return f.rating!=null;}).sort(function(a,b){return b.rating-a.rating;}).slice(0,10);
+    var sec=document.createElement('div'); sec.id='ec-top10-sec'; sec.className='stats-section'; sec.style.marginTop='14px';
+    sec.innerHTML='<div class="stats-section-hd"><span>Top 10 películas</span></div><div class="ec-top10">'+
+      top.map(function(f,i){ var p=ecPoster(f,'w185'); return '<div class="ec-top10-item" onclick="openDetail('+f.id+')" title="'+esc(f.title)+'"><div class="ec-top10-pos" style="'+(p?'background-image:url(\''+p+'\');':'')+'"><div class="ec-top10-rk">'+(i+1)+'</div><div class="ec-top10-rt">'+(typeof fmtR==='function'?fmtR(f.rating):f.rating)+'</div></div><div class="ec-top10-t">'+esc(f.title)+'</div></div>'; }).join('')+
+      '</div>';
+    quote.parentNode.insertBefore(sec, quote.nextSibling);
+  }
+
+  /* 5 ── Año: toggle cantidad/nota */
+  var yChart=wrap.querySelector('.stats-year-chart');
+  if(yChart){
+    var ysec=yChart.closest('.stats-section');
+    if(ysec && !ysec.querySelector('.ec-seg-row')){
+      var hd=ysec.querySelector('.stats-section-hd');
+      var seg=document.createElement('div'); seg.className='ec-seg-row'; seg.style.marginTop='6px';
+      seg.innerHTML='<button class="ec-seg'+(statYearMode==='count'?' on':'')+'" onclick="ecSetYear(\'count\')">Cantidad</button><button class="ec-seg'+(statYearMode==='rating'?' on':'')+'" onclick="ecSetYear(\'rating\')">Nota promedio</button>';
+      if(hd) hd.insertAdjacentElement('afterend', seg); else ysec.insertBefore(seg, ysec.firstChild);
+    }
+    ecRenderYear();
+  }
+
+  /* 6 ── Mapa: ranking de países por cantidad */
+  var mapC=document.getElementById('world-map-container');
+  if(mapC && !document.getElementById('ec-crank')){
+    var mapSec=mapC.closest('.stats-section');
+    var cm2={}; ecSF.forEach(function(f){ if(f.country) cm2[f.country]=(cm2[f.country]||0)+1; });
+    var arr=Object.entries(cm2).map(function(e){return {name:e[0],n:e[1]};}).sort(function(a,b){return b.n-a.n;});
+    var maxN=arr.length?arr[0].n:1;
+    var box=document.createElement('div');
+    box.innerHTML='<div class="stats-section-hd" style="margin-top:20px;"><span>Países por cantidad</span></div><div class="ec-crank" id="ec-crank">'+
+      arr.slice(0,20).map(function(c,i){ return '<div class="ec-crank-rk">'+(i+1)+'</div><div class="ec-crank-name">'+esc(c.name)+'</div><div class="ec-crank-val">'+c.n.toLocaleString('en-US')+'</div><div class="ec-crank-bar" style="background:linear-gradient(90deg,var(--gold2) '+(c.n/maxN*100).toFixed(1)+'%,var(--border) 0);"></div>'; }).join('')+
+      '</div>';
+    if(mapSec) mapSec.appendChild(box);
+  }
+}
+
+/* ── GEOGRAFÍA ── */
+function ecGeoData(){
+  var cm={}; ecSF.forEach(function(f){ if(f.country) cm[f.country]=(cm[f.country]||0)+1; });
+  var arr=Object.entries(cm).map(function(e){return {name:e[0],n:e[1]};}).sort(function(a,b){return b.n-a.n;});
+  var total=arr.reduce(function(s,c){return s+c.n;},0);
+  var major=arr.filter(function(c){ return total && (c.n/total*100)>=0.8; });
+  var minorN=total-major.reduce(function(s,c){return s+c.n;},0);
+  return {major:major,minorN:minorN,total:total};
+}
+function ecRenderGeo(){
+  var el=document.getElementById('est-geo-chart'); if(!el) return;
+  var d=ecGeoData(); if(!d.total){ el.innerHTML='<div style="color:var(--text3);font-size:12px;padding:16px 0;">Sin datos de país.</div>'; return; }
+  var items=d.major.map(function(c,i){return {name:c.name,n:c.n,color:EC_PAL[i%EC_PAL.length]};});
+  if(d.minorN>0) items.push({name:'Otros',n:d.minorN,color:EC_OTHER});
+  if(statGeoMode==='pie'){ el.innerHTML=ecDonut(items,d.total,d.major.length+' países ≥0.8%'); return; }
+  var max=items[0]?items[0].n:1;
+  el.innerHTML='<div class="est-propbar">'+items.map(function(c){return '<div style="width:'+(c.n/d.total*100).toFixed(2)+'%;background:'+c.color+';" title="'+esc(c.name)+'"></div>';}).join('')+'</div>'+
+    '<div class="est-prophint est-lbl">Participación por país (individual ≥ 0.8%)</div>'+
+    items.map(function(c){return '<div class="est-crow"><span class="est-cname">'+esc(c.name)+'</span><div class="est-ctrack"><div class="est-cfill" style="width:'+(c.n/max*100).toFixed(1)+'%;background:'+c.color+';"></div></div><span class="est-cval">'+c.n.toLocaleString('en-US')+' <small>'+(c.n/d.total*100).toFixed(1)+'%</small></span></div>';}).join('');
+}
+
+/* ── DIRECTORES ── */
+function ecDirData(){
+  var dm={}; ecSF.forEach(function(f){ if(!f.director)return; f.director.split(',').map(function(d){return d.trim();}).forEach(function(d){ if(!d)return; dm[d]=(dm[d]||0)+1; }); });
+  return Object.entries(dm).map(function(e){return {name:e[0],n:e[1]};}).sort(function(a,b){return b.n-a.n;});
+}
+function ecRenderDir(){
+  var el=document.getElementById('est-dir-chart'); if(!el) return;
+  var all=ecDirData(); if(!all.length){ el.innerHTML='<div style="color:var(--text3);font-size:12px;padding:16px 0;">Sin datos.</div>'; return; }
+  if(statDirMode==='pie'){
+    var top=all.slice(0,9); var total=all.reduce(function(s,d){return s+d.n;},0);
+    var shown=top.reduce(function(s,d){return s+d.n;},0);
+    var items=top.map(function(d,i){return {name:d.name,n:d.n,color:EC_PAL[i%EC_PAL.length]};});
+    if(total-shown>0) items.push({name:'Otros',n:total-shown,color:EC_OTHER});
+    el.innerHTML=ecDonut(items,total,all.length+' directores'); return;
+  }
+  var top=all.slice(0,8); var maxN=top[0].n;
+  el.innerHTML=top.map(function(d,i){return '<div class="est-drow"><div class="est-drow-top"><span class="est-dname"><span class="rk">'+String(i+1).padStart(2,'0')+'</span>'+esc(d.name)+'</span><span class="est-dn">'+d.n+'</span></div><div class="est-dbar"><div class="est-dbar-fill" style="width:'+(d.n/maxN*100).toFixed(0)+'%"></div></div></div>';}).join('');
+}
+
+/* ── DONA (conic-gradient) ── */
+function ecDonut(items,total,centerLbl){
+  var acc=0, stops=[];
+  items.forEach(function(it){ var a=total?(it.n/total*100):0; stops.push(it.color+' '+acc.toFixed(2)+'% '+(acc+a).toFixed(2)+'%'); acc+=a; });
+  var leg=items.map(function(it){ var pct=total?(it.n/total*100):0; return '<div class="ec-leg"><span class="ec-leg-dot" style="background:'+it.color+';"></span><span class="ec-leg-name">'+esc(it.name)+'</span><span class="ec-leg-val">'+it.n.toLocaleString('en-US')+' · '+pct.toFixed(1)+'%</span></div>'; }).join('');
+  return '<div class="ec-donut-wrap"><div class="ec-donut" style="background:conic-gradient('+stops.join(',')+');"><div class="ec-donut-center"><b>'+total.toLocaleString('en-US')+'</b><span>'+esc(centerLbl||'')+'</span></div></div><div class="ec-legend">'+leg+'</div></div>';
+}
+
+/* ── AÑO ── */
+function ecRenderYear(){
+  var el=document.querySelector('.stats-year-chart'); if(!el) return;
+  var ym={},ys={};
+  ecSF.forEach(function(f){ if(!f.year)return; ym[f.year]=(ym[f.year]||0)+1; if(f.rating!=null){ if(!ys[f.year])ys[f.year]={s:0,n:0}; ys[f.year].s+=f.rating; ys[f.year].n++; } });
+  var years=Object.keys(ym).map(Number).sort(function(a,b){return a-b;});
+  if(!years.length){ el.innerHTML=''; return; }
+  var best=null;
+  if(statYearMode==='rating'){
+    var maxAvg=0;
+    years.forEach(function(y){ var a=ys[y]&&ys[y].n>=3?ys[y].s/ys[y].n:0; if(a>maxAvg){maxAvg=a;best=y;} });
+    el.innerHTML=years.map(function(y){ var a=ys[y]&&ys[y].n?ys[y].s/ys[y].n:0; var h=Math.max(4,Math.round(a/10*76)); var col=a>=9?'var(--gold2)':a>=8?'var(--gold)':a>=7?'var(--purple)':a>0?'var(--text3)':'var(--bg4)'; return '<div class="stats-year-bar ec-yearbar'+(y===best?' best':'')+'" style="height:'+h+'px;background:'+col+';" title="'+y+': ★'+a.toFixed(2)+' ('+(ys[y]?ys[y].n:0)+')"></div>'; }).join('');
+  } else {
+    var max=Math.max.apply(null,years.map(function(y){return ym[y];}));
+    years.forEach(function(y){ if(!best||ym[y]>ym[best])best=y; });
+    el.innerHTML=years.map(function(y){ var h=Math.max(4,Math.round(ym[y]/max*76)); var col=ym[y]>200?'var(--gold2)':ym[y]>100?'var(--gold)':ym[y]>50?'var(--purple)':'var(--bg4)'; return '<div class="stats-year-bar ec-yearbar'+(y===best?' best':'')+'" style="height:'+h+'px;background:'+col+';" title="'+y+': '+ym[y]+' películas"></div>'; }).join('');
+  }
 }
 
 </script>
