@@ -2474,9 +2474,14 @@ html,body{max-width:100%;}
 </div>
 
 <div id="view-rewatched" class="view">
-  <div class="rewatched-wrap">
-    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Películas que has vuelto a ver — ordenadas por número de visionados.</div>
-    <div class="films-grid" id="rewatch-grid"></div>
+  <div class="rewatched-wrap" style="padding:0 0 40px;">
+    <div style="padding:34px 20px 0;border-bottom:1px solid var(--border2);">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.22em;color:var(--gold2);margin-bottom:16px;">Las que vuelves a poner</div>
+      <h1 style="font-family:'Fraunces',serif;font-weight:300;font-size:clamp(40px,7vw,64px);line-height:.9;letter-spacing:-.02em;margin:0 0 14px;">Re-vistas</h1>
+      <p style="font-size:14px;line-height:1.7;color:var(--text2);max-width:60ch;margin:0 0 22px;">Las películas que no te bastó ver una vez — ordenadas por cuántas veces volviste a ellas.</p>
+      <div id="rewatch-kpis" style="display:flex;gap:30px;flex-wrap:wrap;padding-bottom:22px;"></div>
+    </div>
+    <div class="films-grid" id="rewatch-grid" style="padding:24px 20px 0;"></div>
   </div>
 </div>
 
@@ -3698,7 +3703,7 @@ function confirmDel(id) {
 
 // ── RANKING ──
 function buildOrder(type) {
-  const LIMIT = 1200; // max extended scope; the UI slices this down to 1000 or 1200
+  const LIMIT = 5000; // guarda casi todo el catálogo ordenado; la UI corta a 1000/1200 por tipo
   const getScore = f => type==='obj' ? (f.rating??-1) : (f.subscores?.personal??-1);
   const storageKey = type==='obj' ? 'cl_rankorder' : 'cl_rankorder_pers';
 
@@ -3763,25 +3768,29 @@ function renderRankingMain() {
   if(mlab) mlab.innerHTML='<strong style="color:var(--text)">Ranking '+(rankCurrentMode==='pers'?'Subjetivo':'Objetivo')+(tipoLbl?(' · '+tipoLbl):'')+'</strong>';
 
   // Limit to current scope (Top 1000 or extended Top 1200)
-  const limitedOrder = order.slice(0, rankExtended?1200:1000);
-  // Build one continuous ranked sequence (real position among valid films)
+  const scopeLimit = rankExtended?1200:1000;
+  // Secuencia continua: las posiciones cuentan solo el tipo elegido y se toman
+  // de todo el orden hasta llenar el tope (así largometrajes llega a 1000/1200
+  // aunque haya documentales/series/cortos intercalados).
   const seq=[];
   let seqPos=0, totalShown=0;
-  limitedOrder.forEach(id=>{
-    const f=FILMS.find(x=>x.id===id);if(!f)return;
-    if(filterTipo && (f.tipo||'largometraje')!==filterTipo) return;
+  for(const id of order){
+    const f=FILMS.find(x=>x.id===id);
+    if(!f) continue;
+    if(filterTipo && (f.tipo||'largometraje')!==filterTipo) continue;
     seqPos++;
+    if(seqPos>scopeLimit) break;
     const realPos=seqPos;
-    if(filterDir && f.director!==filterDir) return;
-    if(filterCountry && f.country!==filterCountry) return;
+    if(filterDir && f.director!==filterDir) continue;
+    if(filterCountry && f.country!==filterCountry) continue;
     if(filterDecade){
       const yr=f.year||0;
-      if(filterDecade===1920){if(yr>=1930)return;}
-      else{if(yr<filterDecade||yr>=filterDecade+10)return;}
+      if(filterDecade===1920){if(yr>=1930)continue;}
+      else{if(yr<filterDecade||yr>=filterDecade+10)continue;}
     }
     seq.push({f, realPos});
     totalShown++;
-  });
+  }
 
   // Update count badge
   const badge=document.getElementById('rank-filter-badge');
@@ -3946,7 +3955,15 @@ function setupDragFlat(el,filmId){
 function renderRewatched() {
   const g=document.getElementById('rewatch-grid');
   const rewatched=FILMS.filter(f=>(f.rewatchCount||1)>1).sort((a,b)=>(b.rewatchCount||1)-(a.rewatchCount||1));
-  if(!rewatched.length){g.innerHTML='<div class="empty"><p>Aún no registraste ningún re-visionado.<br>En el formulario, aumentá el número de veces vistas a más de 1.</p></div>';return;}
+  const k=document.getElementById('rewatch-kpis');
+  if(!rewatched.length){ if(k) k.innerHTML=''; g.innerHTML='<div class="empty"><p>Aún no registraste ningún re-visionado.<br>En el formulario, aumentá el número de veces vistas a más de 1.</p></div>';return;}
+  if(k){
+    const totalRe=rewatched.reduce((s,f)=>s+((f.rewatchCount||1)-1),0);
+    const top=rewatched[0];
+    const cell=(v,l,gold)=>'<div><div style="font-family:\'Fraunces\',serif;font-size:28px;'+(gold?'color:var(--gold2);':'')+'">'+v+'</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);">'+l+'</div></div>';
+    k.innerHTML=cell(rewatched.length,'Películas revisitadas')+cell(totalRe,'Revisiones en total',true)+
+      (top?'<div><div style="font-family:\'Fraunces\',serif;font-size:19px;max-width:24ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(top.title)+'</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);">La más revista · ×'+(top.rewatchCount)+'</div></div>':'');
+  }
   g.innerHTML='';
   rewatched.forEach(f=>g.appendChild(makeCard(f,'films')));
 }
@@ -5196,61 +5213,43 @@ async function loadCycleFilmPoster(title,year,el){
 
 // ── EPHEMERIS DATA ─────────────────────────────────────────────────────────
 const CINEMA_EPHEMERIS = [
-  {day:'01-01',text:'<strong>1895:</strong> Los hermanos Lumière patentan el cinematógrafo. El cine nace como herramienta científica.'},
-  {day:'01-15',text:'<strong>1929:</strong> Se celebra la primera entrega de los Óscar en el Hollywood Roosevelt Hotel. Duró 15 minutos.'},
-  {day:'01-28',text:'<strong>1939:</strong> Se estrena <em>Lo que el viento se llevó</em>, que se convertiría en la película más taquillera ajustada a la inflación.'},
-  {day:'02-04',text:'<strong>1906:</strong> Nace en Copenhagen Carl Theodor Dreyer, uno de los grandes maestros del cine silente europeo.'},
-  {day:'02-10',text:'<strong>1920:</strong> Nace en Tokio Akira Kurosawa. Dirigiría 30 películas y transformaría el lenguaje cinematográfico.'},
-  {day:'02-14',text:'<strong>1919:</strong> Se funda United Artists por Chaplin, Pickford, Fairbanks y Griffith. El primer estudio de artistas.'},
-  {day:'02-20',text:'<strong>1924:</strong> Nace Sidney Lumet en Filadelfia. Dirigió <em>12 Angry Men</em>, <em>Dog Day Afternoon</em> y <em>Network</em>.'},
-  {day:'02-22',text:'<strong>1857:</strong> Nace Heinrich Hertz. Sus ondas electromagnéticas harían posible el cine sonoro décadas después.'},
-  {day:'03-01',text:'<strong>1941:</strong> Se estrena <em>Citizen Kane</em> de Orson Welles, considerada por muchos la mejor película jamás filmada.'},
-  {day:'03-08',text:'<strong>1973:</strong> Nace en Tokyo Sofia Coppola. <em>Lost in Translation</em> le valdrá el Oscar al mejor guión en 2004.'},
-  {day:'03-15',text:'<strong>1954:</strong> Se estrena en Japón <em>Godzilla</em> de Ishirō Honda, alegoría sobre el trauma de Hiroshima.'},
-  {day:'03-19',text:'<strong>1932:</strong> Nace en Cambridge Miloš Forman. Dirigió <em>One Flew Over the Cuckoo\'s Nest</em> y <em>Amadeus</em>.'},
-  {day:'03-23',text:'<strong>1970:</strong> Nace en Seúl Park Chan-wook. Su trilogía de la venganza redefiniría el thriller coreano para siempre.'},
-  {day:'04-01',text:'<strong>1957:</strong> Se estrena <em>The Seventh Seal</em> de Bergman en Suecia. El caballero jugando al ajedrez con la Muerte.'},
-  {day:'04-08',text:'<strong>1973:</strong> Nace en Buenos Aires Lucrecia Martel. <em>La Ciénaga</em> y <em>Zama</em> la sitúan entre los grandes del cine latinoamericano.'},
-  {day:'04-13',text:'<strong>1906:</strong> Samuel Beckett nace en Irlanda. Sus obras influirían en el cine de Bergman, Godard y Haneke.'},
-  {day:'04-20',text:'<strong>1889:</strong> Nace en Londres Charlie Chaplin, que transformaría la pantomima en arte cinematográfico universal.'},
-  {day:'04-25',text:'<strong>1945:</strong> Roberto Rossellini termina de filmar <em>Roma città aperta</em>, fundando el neorrealismo italiano.'},
-  {day:'05-01',text:'<strong>1970:</strong> Nace en Busan Bong Joon-ho. En 2020 <em>Parasite</em> se convirtió en la primera película no anglófona en ganar el Oscar a Mejor Película.'},
-  {day:'05-10',text:'<strong>1946:</strong> Se celebra la primera edición del Festival de Cannes tras su suspensión por la Segunda Guerra Mundial.'},
-  {day:'05-14',text:'<strong>1984:</strong> Nace en Daejeon Lee Chang-dong. <em>Poetry</em> y <em>Burning</em> lo consolidan como voz moral del cine coreano.'},
-  {day:'05-22',text:'<strong>1931:</strong> Se estrena <em>M</em> de Fritz Lang, el primer gran thriller psicológico del cine sonoro alemán.'},
-  {day:'06-01',text:'<strong>1926:</strong> Nace en Lyon Claude Chabrol, uno de los fundadores de la Nouvelle Vague francesa.'},
-  {day:'06-08',text:'<strong>1949:</strong> Nace en Osaka Juzo Itami. Sus sátiras sobre la sociedad japonesa como <em>Tampopo</em> son obras únicas.'},
-  {day:'06-15',text:'<strong>1960:</strong> Se estrena <em>Psycho</em> de Alfred Hitchcock. Mató a su protagonista en el primer tercio del film y cambió el cine para siempre.'},
-  {day:'06-20',text:'<strong>1975:</strong> <em>Jaws</em> de Spielberg establece el concepto del blockbuster de verano y transforma Hollywood.'},
-  {day:'06-27',text:'<strong>1880:</strong> Nace en Paris Georges Méliès. Padre de los efectos especiales con <em>Le Voyage dans la Lune</em> (1902).'},
-  {day:'07-04',text:'<strong>1929:</strong> Nace en Calcuta Satyajit Ray. Su trilogía Apu reveló el cine indio al mundo occidental.'},
-  {day:'07-10',text:'<strong>1957:</strong> Nace en Santiago de Chile Pablo Larraín. <em>No</em>, <em>Jackie</em> y <em>El Conde</em> lo posicionan en el cine mundial.'},
-  {day:'07-14',text:'<strong>1900:</strong> Nace en Madrid Luis Buñuel. Surrealista, anticlerical y genial. <em>Un chien andalou</em> nació de sus sueños.'},
-  {day:'07-20',text:'<strong>1950:</strong> Se estrena <em>All About Eve</em> de Mankiewicz. 14 nominaciones al Oscar, récord que duró hasta <em>Titanic</em>.'},
-  {day:'07-28',text:'<strong>1948:</strong> Nace en St. Louis Wes Anderson. Sus composiciones simétricas y paleta de colores son inconfundibles.'},
-  {day:'08-05',text:'<strong>1921:</strong> Nace en Oita Kenji Mizoguchi. Maestro del plano secuencia y de los relatos de mujeres japonesas.'},
-  {day:'08-12',text:'<strong>1964:</strong> Nace en Daegu Kim Ki-duk. <em>Spring, Summer, Fall, Winter... and Spring</em> es meditación zen en imágenes.'},
-  {day:'08-18',text:'<strong>1937:</strong> Nace en Paris Roman Polanski. <em>Chinatown</em>, <em>The Pianist</em> y <em>Rosemary\'s Baby</em> son hitos del séptimo arte.'},
-  {day:'08-25',text:'<strong>1930:</strong> Nace en Kyoto Kon Ichikawa. Representó a Japón en múltiples festivales internacionales durante dos décadas.'},
-  {day:'09-01',text:'<strong>1932:</strong> La primera edición del Festival de Venecia corona al cine europeo como arte mayor frente a Hollywood.'},
-  {day:'09-06',text:'<strong>1943:</strong> Nace en Catania Giuseppe Tornatore. <em>Cinema Paradiso</em> es la carta de amor más bella jamás filmada al cine.'},
-  {day:'09-14',text:'<strong>1959:</strong> La Nouvelle Vague irrumpe en el mundo con <em>Les Quatre Cents Coups</em> de Truffaut en Cannes.'},
-  {day:'09-20',text:'<strong>1952:</strong> Nace en Hong Kong Wong Kar-wai. <em>In the Mood for Love</em> es el poema visual del amor no consumado.'},
-  {day:'09-28',text:'<strong>1970:</strong> Nace en Buenos Aires Mariana Enriquez. Sus relatos de horror inspiraron a varios directores latinoamericanos.'},
-  {day:'10-04',text:'<strong>1924:</strong> Nace en Moscú el teórico Andréi Tarkovsky. Su libro <em>Esculpir en el tiempo</em> es la Biblia del cine de autor.'},
-  {day:'10-10',text:'<strong>1930:</strong> Nace en Montebelluna Michelangelo Antonioni. <em>L\'avventura</em> introdujo el silencio como lenguaje cinematográfico.'},
-  {day:'10-17',text:'<strong>1906:</strong> Nace en Estocolmo Ingmar Bergman. 62 películas que interrogan a Dios, la muerte y el alma humana.'},
-  {day:'10-25',text:'<strong>1881:</strong> Nace en Lyon Louis Lumière. Junto a su hermano Auguste, filmaron los primeros instantes del mundo en movimiento.'},
-  {day:'11-01',text:'<strong>1964:</strong> Nace en Osaka Hirokazu Kore-eda. <em>Shoplifters</em> y <em>Monster</em> exploran la familia como construcción emocional.'},
-  {day:'11-08',text:'<strong>1895:</strong> Wilhelm Röntgen descubre los rayos X. La misma semana, los Lumière realizan su primera proyección pública.'},
-  {day:'11-15',text:'<strong>1932:</strong> Nace en Łódź Krzysztof Kieślowski. <em>Dekalog</em> y la trilogía Trois Couleurs son cimas del cine europeo.'},
-  {day:'11-20',text:'<strong>1946:</strong> Se celebra la primera edición del Festival de Cannes en su formato actual, con películas de 20 países.'},
-  {day:'11-28',text:'<strong>1974:</strong> Nace en Daegu Lee Chang-dong. <em>Oasis</em> y <em>Poetry</em> muestran un realismo social sin igual en el cine asiático.'},
-  {day:'12-01',text:'<strong>1980:</strong> Nace en Tokio Ryusuke Hamaguchi. <em>Drive My Car</em> ganó el Oscar al Mejor Filme Internacional en 2022.'},
-  {day:'12-08',text:'<strong>1942:</strong> Nace en Haifa Amos Gitai. Sus documentales y ficciones son testimonio vivo del conflicto israelí-palestino.'},
-  {day:'12-15',text:'<strong>1954:</strong> Se estrena <em>La Strada</em> de Fellini. Ganó el primer Oscar a Mejor Película Extranjera de la historia.'},
-  {day:'12-22',text:'<strong>1858:</strong> Nace en Lyon Auguste Lumière. Junto a su hermano Louis inventó el cine tal como lo conocemos.'},
-  {day:'12-28',text:'<strong>1895:</strong> Los hermanos Lumière realizan la primera proyección pública de la historia en el Grand Café de París.'},
+  {day:'02-13',text:'<strong>1895:</strong> Los hermanos Lumière patentan el Cinématographe en Lyon.'},
+  {day:'12-28',text:'<strong>1895:</strong> Primera proyección pública de cine de los Lumière en el Grand Café de París.'},
+  {day:'05-16',text:'<strong>1929:</strong> Se celebra la primera entrega de los Premios de la Academia (los Óscar) en Hollywood.'},
+  {day:'05-01',text:'<strong>1941:</strong> Se estrena <em>Citizen Kane</em> de Orson Welles en Nueva York.'},
+  {day:'12-15',text:'<strong>1939:</strong> Se estrena <em>Lo que el viento se llevó</em> en Atlanta.'},
+  {day:'05-25',text:'<strong>1977:</strong> Se estrena <em>Star Wars</em> y cambia para siempre el cine de Hollywood.'},
+  {day:'06-20',text:'<strong>1975:</strong> Se estrena <em>Tiburón</em> de Spielberg, que inventa el blockbuster de verano.'},
+  {day:'03-31',text:'<strong>1999:</strong> Se estrena <em>The Matrix</em> de las hermanas Wachowski.'},
+  {day:'08-13',text:'<strong>1899:</strong> Nace en Londres Alfred Hitchcock, el maestro del suspenso.'},
+  {day:'03-23',text:'<strong>1910:</strong> Nace en Tokio Akira Kurosawa. Transformaría el lenguaje cinematográfico.'},
+  {day:'04-16',text:'<strong>1889:</strong> Nace en Londres Charlie Chaplin, que convirtió al vagabundo en arte universal.'},
+  {day:'02-03',text:'<strong>1889:</strong> Nace en Copenhague Carl Theodor Dreyer, uno de los grandes del cine silente.'},
+  {day:'07-14',text:'<strong>1918:</strong> Nace en Uppsala Ingmar Bergman, cronista del alma y la fe.'},
+  {day:'05-06',text:'<strong>1915:</strong> Nace Orson Welles, que dirigió <em>Citizen Kane</em> a los 25 años.'},
+  {day:'04-03',text:'<strong>1924:</strong> Nace en Omaha Marlon Brando, que redefinió la actuación en el cine.'},
+  {day:'06-01',text:'<strong>1926:</strong> Nace Marilyn Monroe, el mito más grande del Hollywood clásico.'},
+  {day:'08-29',text:'<strong>1915:</strong> Nace en Estocolmo Ingrid Bergman, protagonista de <em>Casablanca</em>.'},
+  {day:'12-25',text:'<strong>1899:</strong> Nace en Nueva York Humphrey Bogart, el rostro del cine negro.'},
+  {day:'12-05',text:'<strong>1901:</strong> Nace en Chicago Walt Disney, pionero de la animación.'},
+  {day:'12-18',text:'<strong>1946:</strong> Nace en Cincinnati Steven Spielberg, el cineasta más taquillero de la historia.'},
+  {day:'07-30',text:'<strong>1970:</strong> Nace en Londres Christopher Nolan, obsesionado con el tiempo y la memoria.'},
+  {day:'08-16',text:'<strong>1954:</strong> Nace en Canadá James Cameron, director de <em>Titanic</em> y <em>Avatar</em>.'},
+  {day:'08-18',text:'<strong>1933:</strong> Nace en París Roman Polanski.'},
+  {day:'08-23',text:'<strong>1963:</strong> Nace en Seúl Park Chan-wook, autor de la trilogía de la venganza.'},
+  {day:'06-25',text:'<strong>1924:</strong> Nace en Filadelfia Sidney Lumet, director de <em>12 Angry Men</em> y <em>Network</em>.'},
+  {day:'02-18',text:'<strong>1932:</strong> Nace Miloš Forman, director de <em>Amadeus</em> y <em>One Flew Over the Cuckoo\'s Nest</em>.'},
+  {day:'05-14',text:'<strong>1971:</strong> Nace en Nueva York Sofia Coppola.'},
+  {day:'07-06',text:'<strong>1946:</strong> Nace Sylvester Stallone, que escribió y protagonizó <em>Rocky</em>.'},
+  {day:'11-11',text:'<strong>1974:</strong> Nace en Los Ángeles Leonardo DiCaprio.'},
+  {day:'09-16',text:'<strong>1924:</strong> Nace Lauren Bacall, musa del cine negro.'},
+  {day:'10-01',text:'<strong>1935:</strong> Nace Julie Andrews, protagonista de <em>Mary Poppins</em> y <em>Sonrisas y lágrimas</em>.'},
+  {day:'10-05',text:'<strong>1975:</strong> Nace en Reading Kate Winslet.'},
+  {day:'10-17',text:'<strong>1918:</strong> Nace Rita Hayworth, la gran estrella de <em>Gilda</em>.'},
+  {day:'10-19',text:'<strong>1945:</strong> Nace John Lithgow, actor de reparto inagotable del cine y la TV.'},
+  {day:'10-20',text:'<strong>1882:</strong> Nace Béla Lugosi, inmortal como el conde <em>Drácula</em>.'},
+  {day:'10-22',text:'<strong>1943:</strong> Nace en París Catherine Deneuve, ícono del cine francés.'},
+  {day:'10-28',text:'<strong>1967:</strong> Nace en Atlanta Julia Roberts.'}
 ];
 
 function renderHomeEphemeris(){
@@ -7661,7 +7660,15 @@ function ecStatsEnhance(SF){
   /* 4 ── Top 10 películas con pósters (tras el pull-quote) */
   var quote=wrap.querySelector('.est-quote');
   if(quote && !document.getElementById('ec-top10-sec')){
-    var top=ecSF.filter(function(f){return f.rating!=null;}).sort(function(a,b){return b.rating-a.rating;}).slice(0,10);
+    var top;
+    if(typeof rankObjOrder!=='undefined' && rankObjOrder && rankObjOrder.length){
+      // Mismo orden que tu Ranking (objetivo), respetando el filtro de tipo activo
+      top=rankObjOrder.map(function(id){return FILMS.find(function(f){return f.id===id;});}).filter(Boolean)
+        .filter(function(f){ return !(window.statTipo&&statTipo!=='todos') || (f.tipo||'largometraje')===statTipo; })
+        .slice(0,10);
+    } else {
+      top=ecSF.filter(function(f){return f.rating!=null;}).sort(function(a,b){return b.rating-a.rating;}).slice(0,10);
+    }
     var sec=document.createElement('div'); sec.id='ec-top10-sec'; sec.className='stats-section'; sec.style.marginTop='14px';
     sec.innerHTML='<div class="stats-section-hd"><span>Top 10 películas</span></div><div class="ec-top10">'+
       top.map(function(f,i){ var p=ecPoster(f,'w185'); return '<div class="ec-top10-item" onclick="openDetail('+f.id+')" title="'+esc(f.title)+'"><div class="ec-top10-pos" style="'+(p?'background-image:url(\''+p+'\');':'')+'"><div class="ec-top10-rk">'+(i+1)+'</div><div class="ec-top10-rt">'+(typeof fmtR==='function'?fmtR(f.rating):f.rating)+'</div></div><div class="ec-top10-t">'+esc(f.title)+'</div></div>'; }).join('')+
