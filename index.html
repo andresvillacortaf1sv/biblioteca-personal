@@ -2145,12 +2145,28 @@ html,body{max-width:100%;}
   .fbar{padding:9px 12px;gap:6px;}
   .fbar select,.fbar .fc-input,.fbar input,.fbar button{font-size:12px;}
 
-  /* ── GRIDS DE PÓSTERS ── */
-  .films-grid{grid-template-columns:repeat(auto-fill,minmax(102px,1fr));gap:9px;}
-  #collection-grid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:10px;}
+  /* ── GRIDS DE PÓSTERS (más chicos en celular) ── */
+  .films-grid{grid-template-columns:repeat(auto-fill,minmax(78px,1fr)) !important;gap:8px !important;}
+  #collection-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr)) !important;gap:8px !important;}
 
-  /* ── HOME ── */
-  .home-hero{height:300px;}
+  /* ── HOME (apila todo, nada superpuesto) ── */
+  .home-hero{height:auto;min-height:auto;overflow:visible;}
+  .home-hero-content{padding:22px 16px;max-width:none;height:auto;}
+  .home-hero-title{font-size:34px;}
+  .home-hero-stats{flex-wrap:wrap;gap:0;}
+  .home-hero-stat{padding:0 16px 0 0;margin-right:16px;margin-bottom:14px;}
+  .home-hero-stat:last-child{margin-bottom:0;}
+  .hero-bg-ctl{top:10px;right:12px;}
+  .home-body{grid-template-columns:1fr;}
+  .home-main{padding:24px 16px;border-right:none;border-bottom:1px solid var(--border);}
+  .home-sidebar{padding:24px 16px;gap:28px;}
+  .home-recent-grid{grid-template-columns:repeat(4,1fr) !important;gap:6px !important;}
+  .home-rec-featured{grid-template-columns:92px 1fr;gap:16px;}
+  .home-rec-featured .home-rec-poster,
+  .home-rec-featured .home-rec-poster-placeholder{width:92px !important;height:138px !important;}
+  .home-rec-featured-title{font-size:21px;overflow-wrap:anywhere;}
+  .home-rec-item{grid-template-columns:26px 52px 1fr;gap:10px;}
+  .home-section-hd{flex-wrap:wrap;gap:4px 10px;}
 
   /* ── ESTADÍSTICAS ── */
   .est-head{padding:22px 16px 0;}
