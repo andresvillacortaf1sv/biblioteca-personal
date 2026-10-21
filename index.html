@@ -3229,15 +3229,23 @@ async function boot() {
   await migrateFromLocalStorage();
   await idbPreload();
   try { await ecBootSync(); } catch(e) { console.warn('sync boot', e); }
-  try { const r = await fetch('films_data.json'); FILMS = await r.json(); } catch(e) { FILMS = window.__FILMS_DATA__ || []; }
+  try { const r = await fetch('films_data.json'); window.__FILMS_BASE__ = await r.json(); } catch(e) { window.__FILMS_BASE__ = window.__FILMS_DATA__ || []; }
+  rebuildFilmsFromDeltas();
+  populateOpts(); applyFilters(); applyPersonal(); renderStats();
+  try { ecInitAccountBtn(); } catch(e) {}
+}
+
+/* Reconstruye FILMS a partir de la base (films_data.json) + los deltas locales
+   (cl_films añadidos/editados, cl_dels borrados). Reutilizable tras un sync. */
+function rebuildFilmsFromDeltas() {
+  const base = window.__FILMS_BASE__ || [];
+  FILMS = base.slice();
   try {
     const saved = idbGetSync('cl_films', []);
     saved.forEach(s => { const i = FILMS.findIndex(f => f.id === s.id); if (i >= 0) FILMS[i] = s; else FILMS.unshift(s); });
     const dels = idbGetSync('cl_dels', []);
     FILMS = FILMS.filter(f => !dels.includes(f.id));
   } catch(e) {}
-  populateOpts(); applyFilters(); applyPersonal(); renderStats();
-  try { ecInitAccountBtn(); } catch(e) {}
 }
 
 function populateOpts() {
@@ -7802,6 +7810,42 @@ function ecApplyState(data){
   if(!data) return;
   EC_SYNC_KEYS.forEach(function(k){ if(k in data){ _idbCache[k]=data[k]; try{ _idbWrite(k, data[k]); }catch(e){} } });
 }
+/* Fusiona el estado remoto con el local SIN perder nada:
+   - claves de registros (con .id): unión por id (si coincide el id, gana lo local).
+   - cl_dels (ids borrados): unión.
+   - orden / otras: se prefiere lo local si existe.
+   Así, si la PC agregó películas (están en la nube) y el celular también tenía
+   cambios, se conservan AMBOS conjuntos. */
+var EC_RECORD_KEYS = ['cl_films','cl_lists','cl_blog','cl_watchlist','cl_col_wish'];
+function ecMergeState(srv){
+  srv = srv || {};
+  var out = {};
+  EC_SYNC_KEYS.forEach(function(k){
+    var loc = (typeof _idbCache!=='undefined' && k in _idbCache) ? _idbCache[k] : null;
+    var rem = (k in srv) ? srv[k] : null;
+    if(EC_RECORD_KEYS.indexOf(k) >= 0){
+      var byId = {}, order = [];
+      function add(arr){ if(!Array.isArray(arr)) return; arr.forEach(function(r){
+        if(r==null) return;
+        var id = (r && r.id!=null) ? r.id : JSON.stringify(r);
+        if(!(id in byId)) order.push(id);
+        byId[id] = r;
+      }); }
+      add(rem); add(loc); // local después → gana lo local en caso de id repetido
+      out[k] = order.map(function(id){ return byId[id]; });
+    } else if(k === 'cl_dels'){
+      var seen = {}, res = [];
+      [rem, loc].forEach(function(arr){ if(Array.isArray(arr)) arr.forEach(function(x){
+        var key = (typeof x==='object') ? JSON.stringify(x) : x;
+        if(!(key in seen)){ seen[key]=1; res.push(x); }
+      }); });
+      out[k] = res;
+    } else {
+      out[k] = (loc != null) ? loc : rem; // orden y demás: preferir lo local
+    }
+  });
+  return out;
+}
 function ecRehydrate(){
   // Rearma FILMS y vuelve a pintar la vista actual tras aplicar estado remoto
   try{
@@ -7814,7 +7858,7 @@ async function ecPull(){
   try{
     var res=await sb.from('library_state').select('data,updated_at').eq('id','main').maybeSingle();
     if(res.error) throw res.error;
-    if(res.data && res.data.data){ ecApplyState(res.data.data); ecLastServerAt=res.data.updated_at; ecDirty(false); return true; }
+    if(res.data && res.data.data){ ecApplyState(res.data.data); ecLastServerAt=res.data.updated_at; ecDirty(false); try{localStorage.setItem('cl_sync_at', res.data.updated_at||'');}catch(e){} return true; }
   }catch(e){ console.warn('ecPull', e.message||e); }
   return false;
 }
@@ -7826,6 +7870,7 @@ async function ecPush(){
     if(res.error) throw res.error;
     ecLastServerAt = (res.data && res.data.updated_at) || payload.updated_at;
     ecDirty(false); ecSyncStatus('ok');
+    try{localStorage.setItem('cl_sync_at', ecLastServerAt||'');}catch(e){}
     return true;
   }catch(e){ console.warn('ecPush', e.message||e); ecSyncStatus('err'); return false; }
 }
@@ -7842,6 +7887,48 @@ function ecOnLocalWrite(key){
   ecSchedulePush();
 }
 
+/* Reconcilia local ↔ nube con comparación de versiones para NO perder datos:
+   - baseAt = versión de la nube sobre la que se basa este dispositivo.
+   - srv.updated_at = versión actual de la nube.
+   Sin cambios locales → convergemos a la nube.
+   Con cambios y la nube no se movió → subimos.
+   Ambos cambiaron (conflicto) → FUSIONAMOS y, si podemos, subimos la fusión.
+   Devuelve 'merged' | 'pulled' | 'pushed' | 'seeded' | 'noop' para refrescar la UI. */
+async function ecReconcile(){
+  var sb=ecClient(); if(!sb) return 'noop';
+  var baseAt=''; try{ baseAt=localStorage.getItem('cl_sync_at')||''; }catch(e){}
+  var srv=null;
+  try{
+    var r=await sb.from('library_state').select('data,updated_at').eq('id','main').maybeSingle();
+    if(!r.error) srv=r.data;
+  }catch(e){ console.warn('ecReconcile fetch', e.message||e); return 'noop'; }
+  var dirty=ecDirty();
+  if(!srv || !srv.data){
+    if(dirty && ecCanWrite()){ await ecPush(); return 'seeded'; }
+    return 'noop';
+  }
+  if(!dirty){
+    ecApplyState(srv.data);
+    ecLastServerAt=srv.updated_at;
+    try{localStorage.setItem('cl_sync_at', srv.updated_at||'');}catch(e){}
+    return 'pulled';
+  }
+  if(srv.updated_at===baseAt){
+    await ecPush();
+    return 'pushed';
+  }
+  // Conflicto: la nube cambió y yo también → fusiono sin perder nada.
+  var merged=ecMergeState(srv.data);
+  ecApplyState(merged);
+  if(ecCanWrite()){
+    await ecPush(); // sube la fusión (lee _idbCache ya fusionado) y fija cl_sync_at
+  } else {
+    ecLastServerAt=srv.updated_at;
+    try{localStorage.setItem('cl_sync_at', srv.updated_at||'');}catch(e){}
+  }
+  return 'merged';
+}
+
 async function ecBootSync(){
   if(!ecConfigured()) return;
   var sb=ecClient(); if(!sb) return;
@@ -7849,16 +7936,28 @@ async function ecBootSync(){
     var s=await sb.auth.getSession();
     ecOwnerEmail = s && s.data && s.data.session && s.data.session.user ? s.data.session.user.email : null;
   }catch(e){ ecOwnerEmail=null; }
-  // Si hay cambios locales sin subir y podemos escribir → suben (gana lo local).
-  // Si no → bajamos lo del servidor (gana la nube) para ver la misma data en todos lados.
-  if(ecDirty() && ecCanWrite()){ await ecPush(); }
-  else { await ecPull(); }
-  // Reacciona a login/logout
-  sb.auth.onAuthStateChange(function(_ev, session){
+  await ecReconcile();
+  // Reacciona a login/logout: al iniciar sesión, reconcilia (fusiona si hace falta)
+  // y repinta, en vez de pisar la nube con un push ciego.
+  sb.auth.onAuthStateChange(async function(_ev, session){
     ecOwnerEmail = session && session.user ? session.user.email : null;
     ecUpdateAccountUI();
-    if(ecOwnerEmail && ecDirty()) ecPush();
+    if(ecOwnerEmail){
+      var res=await ecReconcile();
+      if((res==='pulled' || res==='merged') && typeof ecRepaintAfterSync==='function'){ try{ ecRepaintAfterSync(); }catch(e){} }
+    }
   });
+}
+
+/* Tras aplicar/fusionar estado remoto, rearma FILMS y repinta la vista. */
+function ecRepaintAfterSync(){
+  try{
+    if(typeof rebuildFilmsFromDeltas==='function'){ rebuildFilmsFromDeltas(); }
+  }catch(e){}
+  try{ if(typeof populateOpts==='function') populateOpts(); }catch(e){}
+  try{ if(typeof applyFilters==='function') applyFilters(); }catch(e){}
+  try{ if(typeof applyPersonal==='function') applyPersonal(); }catch(e){}
+  try{ if(typeof renderStats==='function') renderStats(); }catch(e){}
 }
 
 /* ── UI de cuenta/sincronización ── */
