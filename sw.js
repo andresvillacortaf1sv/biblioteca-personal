@@ -1,6 +1,14 @@
 /* Espacio Cinéfilo — service worker (offline + instalable) */
-const CACHE = 'ec-pwa-v1';
+const CACHE = 'ec-pwa-v2';
 const SHELL = ['/', '/index.html', '/films_data.json', '/manifest.json', '/icon-192.png', '/icon-512.png'];
+
+// Hosts de API dinámica que NUNCA deben cachearse (si no, se sirve estado viejo):
+// Supabase (sincronización) y la API de datos de TMDB. Las IMÁGENES de TMDB
+// (image.tmdb.org) y Pinterest sí se cachean más abajo.
+function isDynamicApi(url) {
+  return url.hostname.endsWith('.supabase.co') ||
+         url.hostname === 'api.themoviedb.org';
+}
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -19,6 +27,10 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+
+  // Supabase / API de TMDB: siempre a la red, sin tocar la caché. Así la
+  // sincronización y los datos siempre son frescos en todos los dispositivos.
+  if (isDynamicApi(url)) return;
 
   // Navegación: network-first (ve actualizaciones online), cae a caché offline.
   if (req.mode === 'navigate') {
