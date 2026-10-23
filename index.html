@@ -4118,7 +4118,7 @@ async function fillFilmogTotals(names){
       const data = await fetchDirFilmogTMDB(name);
       if(data){ filmogTotals[name]=data.total; updateFilmogRow(name); }
     }catch(e){/* ignore, se intenta al seleccionar */}
-    await new Promise(r=>setTimeout(r,120)); // no saturar TMDB
+    await new Promise(r=>setTimeout(r,260)); // no saturar TMDB (evita 429 que dejaban directores vacíos)
   }
 }
 function updateFilmogRow(name){
@@ -4133,23 +4133,39 @@ function updateFilmogRow(name){
 // Trae y cachea datos TMDB del director (créditos + bio)
 function fetchDirFilmogTMDB(name){
   if(filmogCache[name]) return filmogCache[name];
+  // fetch con un reintento ante el límite de TMDB (429 / status_code 25)
+  const tf = async (url)=>{
+    let r = await fetch(url); let j = await r.json().catch(()=>({}));
+    if(r.status===429 || (j && j.status_code===25)){ await new Promise(s=>setTimeout(s,1600)); r = await fetch(url); j = await r.json().catch(()=>({})); }
+    return j||{};
+  };
   const p = (async()=>{
-    const pData = await fetch(`https://api.themoviedb.org/3/search/person?api_key=${TMDB_KEY}&query=${encodeURIComponent(name)}`).then(r=>r.json());
-    const person = pData.results?.[0];
+    const q = encodeURIComponent(name);
+    const pData = await tf(`https://api.themoviedb.org/3/search/person?api_key=${TMDB_KEY}&query=${q}&language=es`);
+    const results = pData.results || [];
+    const norm = normName(name);
+    // elegí a la persona correcta: coincidencia de nombre y/o que sea director (evita homónimos)
+    const person =
+      results.find(r=>normName(r.name)===norm && r.known_for_department==='Directing') ||
+      results.find(r=>normName(r.name)===norm) ||
+      results.find(r=>r.known_for_department==='Directing') ||
+      results[0];
     if(!person) return null;
     const [cred, credEs, det] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/person/${person.id}/movie_credits?api_key=${TMDB_KEY}`).then(r=>r.json()),
-      fetch(`https://api.themoviedb.org/3/person/${person.id}/movie_credits?api_key=${TMDB_KEY}&language=es`).then(r=>r.json()),
-      fetch(`https://api.themoviedb.org/3/person/${person.id}?api_key=${TMDB_KEY}&language=es`).then(r=>r.json()),
+      tf(`https://api.themoviedb.org/3/person/${person.id}/movie_credits?api_key=${TMDB_KEY}`),
+      tf(`https://api.themoviedb.org/3/person/${person.id}/movie_credits?api_key=${TMDB_KEY}&language=es`),
+      tf(`https://api.themoviedb.org/3/person/${person.id}?api_key=${TMDB_KEY}&language=es`),
     ]);
     const directed = (cred.crew||[]).filter(m=>m.job==='Director'&&m.release_date).sort((a,b)=>b.release_date.localeCompare(a.release_date));
     const esTitleMap = {}; (credEs.crew||[]).forEach(m=>{ if(m.id) esTitleMap[m.id]=m.title; });
     const country = (det.place_of_birth||'').split(',').pop().trim();
+    if(!directed.length) return null;
     return { person, directed, esTitleMap, total:directed.length, country,
              by:(det.birthday||'').slice(0,4), dy:(det.deathday||'').slice(0,4) };
   })();
   filmogCache[name] = p;
-  p.catch(()=>{ delete filmogCache[name]; });
+  // No cachear fallos ni vacíos: si no hubo datos (429, sin resultados), permití reintentar al próximo clic.
+  p.then(v=>{ if(!v) delete filmogCache[name]; }).catch(()=>{ delete filmogCache[name]; });
   return p;
 }
 
