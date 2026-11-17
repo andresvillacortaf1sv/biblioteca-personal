@@ -156,6 +156,7 @@ select:hover{border-color:var(--border2);}
 .score-inp-grp input[type=number]:focus{border-color:var(--gold);}
 .score-inp-grp input[type=number].pers-inp{color:var(--purple);}
 .score-hint{font-size:10px;color:var(--text3);text-align:center;}
+.score-qual{font-size:10px;line-height:1.25;color:var(--gold2);text-align:center;min-height:13px;font-weight:500;}
 .avg-preview{background:rgba(201,149,46,.09);border:1px solid rgba(201,149,46,.22);border-radius:6px;padding:7px 11px;display:flex;align-items:center;justify-content:space-between;}
 .avg-preview span{font-size:12px;color:var(--text2);}
 .avg-preview strong{font-size:19px;font-family:'Fraunces',serif;color:var(--gold2);}
@@ -1957,7 +1958,8 @@ body.light .home-hero{--text:#f4efe7;--text2:#b8b3ab;--text3:#8a857d;--gold:#e0b
 .det-poster{width:140px !important;}
 .det-bars-hd{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--gold2);margin-bottom:10px;font-weight:600;}
 .det-bars{display:flex;flex-direction:column;margin-bottom:16px;}
-.det-bar-row{display:grid;grid-template-columns:118px 1fr 42px;align-items:center;gap:14px;padding:9px 0;border-top:1px solid var(--border);}
+.det-bar-row{display:grid;grid-template-columns:150px 1fr 42px;align-items:center;gap:14px;padding:9px 0;border-top:1px solid var(--border);}
+.det-bar-qual{display:block;font-size:9.5px;text-transform:none;letter-spacing:.01em;color:var(--gold2);margin-top:3px;font-weight:500;line-height:1.2;}
 .det-bar-row:first-child{border-top:none;}
 .det-bar-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
 .det-bar-track{height:5px;background:var(--bg3);position:relative;}
@@ -2494,6 +2496,7 @@ html,body{max-width:100%;}
     <select id="rank-fc-decade" onchange="renderRankingMain()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 10px;outline:none;font-family:inherit;flex-shrink:0;transition:.15s;">
       <option value="">Todas las décadas</option>
     </select>
+    <input id="rank-fc-year" type="number" inputmode="numeric" min="1870" max="2035" placeholder="Año" oninput="renderRankingMain()" title="Filtrar el ranking por un año exacto" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 10px;outline:none;font-family:inherit;flex-shrink:0;width:76px;transition:.15s;" onfocus="this.style.borderColor='var(--gold2)'" onblur="this.style.borderColor='var(--border)'">
     <button onclick="clearRankFilters()" id="rank-clear-btn" style="display:none;background:none;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text3);cursor:pointer;font-family:inherit;transition:.15s;padding:5px 10px;flex-shrink:0;" onmouseover="this.style.color='var(--gold2)';this.style.borderColor='var(--gold2)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">✕ Limpiar</button>
     <!-- Cuadrito estilo Letterboxd -->
     <div id="rank-filter-badge" style="display:none;margin-left:auto;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;text-align:center;flex-shrink:0;">
@@ -3007,43 +3010,48 @@ html,body{max-width:100%;}
       <div class="divider"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:2px;">
         <div class="sec-lbl" style="margin:0;">🎯 Notas y evaluación</div>
-        <button type="button" onclick="clearFilmScores()" title="Borra las 7 notas objetivas y el Gusto Personal para volver a evaluar la película desde cero. La reseña y el resto de los datos no se tocan." style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text3);cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">🗑 Borrar todas las notas</button>
+        <button type="button" onclick="clearFilmScores()" title="Borra las 8 notas objetivas y el Gusto Personal para volver a evaluar la película desde cero. La reseña y el resto de los datos no se tocan." style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text3);cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">🗑 Borrar todas las notas</button>
       </div>
       <div class="subscores-grid">
         <div class="score-inp-grp">
           <label>Dirección</label>
           <input type="number" id="ss-direction" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10</span>
+          <span class="score-qual" id="sq-direction"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Guión</label>
+          <label>Guion</label>
           <input type="number" id="ss-script" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10</span>
+          <span class="score-qual" id="sq-script"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Actuaciones</label>
+          <label>Interpretaciones</label>
           <input type="number" id="ss-acting" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10</span>
+          <span class="score-qual" id="sq-acting"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Lenguaje Visual</label>
+          <label>Lenguaje cinematográfico</label>
           <input type="number" id="ss-visual" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10</span>
+          <span class="score-qual" id="sq-visual"></span>
         </div>
         <div class="score-inp-grp">
           <label>Montaje</label>
           <input type="number" id="ss-editing" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10</span>
+          <span class="score-qual" id="sq-editing"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Sonido</label>
+          <label>BSO/Sonido</label>
           <input type="number" id="ss-sound" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10</span>
+          <span class="score-qual" id="sq-sound"></span>
         </div>
-        <div class="score-inp-grp" style="grid-column:span 3;">
-          <label>Impacto y Propuesta Autoral</label>
+        <div class="score-inp-grp">
+          <label>Impacto</label>
           <input type="number" id="ss-impact" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
-          <span class="score-hint">0 – 10</span>
+          <span class="score-qual" id="sq-impact"></span>
+        </div>
+        <div class="score-inp-grp">
+          <label>Propuesta autoral</label>
+          <input type="number" id="ss-authorial" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
+          <span class="score-qual" id="sq-authorial"></span>
         </div>
       </div>
       <div class="avg-preview">
@@ -3268,6 +3276,7 @@ async function boot() {
     const dels = idbGetSync('cl_dels', []);
     FILMS = FILMS.filter(f => !dels.includes(f.id));
   } catch(e) {}
+  try { migrateEvalSchema(); } catch(e) { console.warn('migrateEvalSchema', e); }
   populateOpts(); applyFilters(); applyPersonal(); renderStats();
   try { ecInitAccountBtn(); } catch(e) {}
 }
@@ -3452,11 +3461,11 @@ function emptyEl(){return`<div class="empty"><svg width="38" height="38" fill="n
 function openDetail(id) {
   const f=FILMS.find(x=>x.id===id); if(!f) return;
   const ss=f.subscores||{};
-  const hasSub=ss.direction!=null||ss.script!=null||ss.acting!=null||ss.visual!=null||ss.editing!=null||ss.sound!=null||ss.impact!=null||ss.photo!=null||ss.production!=null;
+  const hasSub=ss.direction!=null||ss.script!=null||ss.acting!=null||ss.visual!=null||ss.editing!=null||ss.sound!=null||ss.impact!=null||ss.authorial!=null||ss.photo!=null||ss.production!=null;
   const hasPers=ss.personal!=null;
   const rwCount=f.rewatchCount||1;
-  const _indic=[['Dirección',ss.direction],['Guión',ss.script],['Actuaciones',ss.acting],['Lenguaje Visual',ss.visual],['Montaje',ss.editing],['Sonido',ss.sound],['Impacto Autoral',ss.impact],['Fotografía',ss.photo],['Producción',ss.production]].filter(a=>a[1]!=null);
-  const subHTML=hasSub?`<div class="det-bars-hd">Desglose autoral</div><div class="det-bars">${_indic.map(a=>`<div class="det-bar-row"><div class="det-bar-lbl">${a[0]}</div><div class="det-bar-track"><div class="det-bar-fill" style="width:${Math.max(0,Math.min(100,a[1]*10))}%"></div></div><div class="det-bar-val">${fmtR(a[1])}</div></div>`).join('')}${hasPers?`<div class="det-bar-row"><div class="det-bar-lbl" style="color:var(--purple)">Gusto personal</div><div class="det-bar-track"><div class="det-bar-fill pers" style="width:${Math.max(0,Math.min(100,ss.personal*10))}%"></div></div><div class="det-bar-val">${fmtR(ss.personal)}</div></div>`:''}</div>`:'';
+  const _indic=[['Dirección',ss.direction,'direction'],['Guion',ss.script,'script'],['Interpretaciones',ss.acting,'acting'],['Lenguaje cinematográfico',ss.visual,'visual'],['Montaje',ss.editing,'editing'],['BSO/Sonido',ss.sound,'sound'],['Impacto',ss.impact,'impact'],['Propuesta autoral',ss.authorial,'authorial'],['Fotografía',ss.photo,null],['Producción',ss.production,null]].filter(a=>a[1]!=null);
+  const subHTML=hasSub?`<div class="det-bars-hd">Desglose autoral</div><div class="det-bars">${_indic.map(a=>{const q=a[2]?evalQual(a[2],a[1]):'';return `<div class="det-bar-row"><div class="det-bar-lbl">${a[0]}${q?`<small class="det-bar-qual">${esc(q)}</small>`:''}</div><div class="det-bar-track"><div class="det-bar-fill" style="width:${Math.max(0,Math.min(100,a[1]*10))}%"></div></div><div class="det-bar-val">${fmtR(a[1])}</div></div>`;}).join('')}${hasPers?`<div class="det-bar-row"><div class="det-bar-lbl" style="color:var(--purple)">Gusto personal</div><div class="det-bar-track"><div class="det-bar-fill pers" style="width:${Math.max(0,Math.min(100,ss.personal*10))}%"></div></div><div class="det-bar-val">${fmtR(ss.personal)}</div></div>`:''}</div>`:'';
   document.getElementById('det-content').innerHTML=`
     <div class="det-top">
       <div class="det-poster">${f.poster?`<img src="${esc(f.poster)}" alt="${esc(f.title)}">`:noImgHTML(f.title)}</div>
@@ -3517,7 +3526,7 @@ function openForm(id) {
   document.getElementById('f-edition').value=f?.edition||'';
   document.getElementById('physical-fields').style.display=(f?.physical)?'flex':'none';
   const ss=f?.subscores||{};
-  ['direction','script','acting','visual','editing','sound','impact','personal'].forEach(n=>{
+  ['direction','script','acting','visual','editing','sound','impact','authorial','personal'].forEach(n=>{
     const el=document.getElementById('ss-'+n);
     if(el) el.value=ss[n]!=null?ss[n]:'';
   });
@@ -3526,20 +3535,50 @@ function openForm(id) {
   setTimeout(()=>document.getElementById('f-title').focus(),80);
 }
 
+// ── ESCALAS CUALITATIVAS (8 indicadores, bandas de 0.5) ──
+const EVAL_KEYS=['direction','script','acting','visual','editing','sound','impact','authorial'];
+const EVAL_THR=[9.5,9,8.5,8,7.5,7,6.5,6,5.5,5,4.5,4,3.5,3,2.5,2,1.5,1,0.5,0];
+const EVAL_SCALES={
+ direction:['Perfección — visión absoluta','Maestría de autor','Dirección sobresaliente','Mano firme y clara','Dirección muy sólida','Dirección solvente','Oficio correcto','Cumple sin sello','Dirección irregular','Apenas funcional','Floja, sin control','Dirección deficiente','Pierde el rumbo','Dirección pobre','Muy descuidada','Sin dirección real','Caótica','Dirección fallida','Prácticamente nula','Inexistente'],
+ script:['Guion impecable','Escritura excepcional','Guion notable','Muy bien escrito','Guion sólido','Bien construido','Correcto, funciona','Guion sin relieve','Desigual, con baches','Apenas se sostiene','Flojo y previsible','Guion deficiente','Mal estructurado','Guion pobre','Lleno de fallas','Muy mal escrito','Incoherente','Guion fallido','Sin guion real','Inexistente'],
+ acting:['Interpretaciones perfectas','Actuaciones memorables','Reparto sobresaliente','Muy convincentes','Interpretaciones sólidas','Buen trabajo actoral','Correctas','Cumplen sin brillar','Irregulares','Planas','Flojas','Poco creíbles','Forzadas','Pobres','Muy deficientes','Malas','Acartonadas','Fallidas','Nulas','Inexistentes'],
+ visual:['Lenguaje perfecto','Puesta en escena magistral','Visualmente sobresaliente','Gran dominio formal','Lenguaje sólido','Bien resuelto','Correcto','Convencional','Irregular','Plano, sin ideas','Flojo','Pobre de recursos','Torpe','Muy pobre','Descuidado','Malo','Tosco','Fallido','Nulo','Inexistente'],
+ editing:['Montaje perfecto','Edición magistral','Montaje sobresaliente','Ritmo impecable','Montaje sólido','Bien editado','Correcto','Funcional','Irregular','Ritmo desigual','Flojo','Mal ritmado','Torpe','Pobre','Muy deficiente','Malo','Confuso','Fallido','Nulo','Inexistente'],
+ sound:['Sonido perfecto','BSO memorable','Sobresaliente','Muy envolvente','Sólido','Bien trabajado','Correcto','Cumple','Irregular','Anodino','Flojo','Pobre','Descuidado','Muy pobre','Deficiente','Malo','Molesto','Fallido','Nulo','Inexistente'],
+ impact:['Impacto arrollador','Te marca para siempre','Hondo y duradero','Deja gran huella','Impacto fuerte','Conmueve','Deja algo','Impacto leve','Apenas resuena','Tibio','Casi no deja nada','Olvidable','Indiferente','Frío','Vacío','Nulo interés','Tedioso','Sin efecto','Nada','Inexistente'],
+ authorial:['Propuesta única','Voz autoral plena','Muy personal y arriesgada','Propuesta clara','Tiene voz propia','Apuesta interesante','Algo personal','Convencional','Poco original','Genérica','Sin riesgo','Fórmula vista','Imitativa','Sin ideas','Muy derivada','Nula ambición','Vacía','Fallida','Nada propio','Inexistente']
+};
+function evalQual(key,v){ if(v==null||isNaN(v)) return ''; const arr=EVAL_SCALES[key]; if(!arr) return ''; for(let i=0;i<EVAL_THR.length;i++){ if(v>=EVAL_THR[i]) return arr[i]; } return arr[arr.length-1]; }
+
+// Borrado único de las evaluaciones OBJETIVAS (conserva el Gusto Personal).
+// Se ejecuta una sola vez a nivel global gracias a la bandera cl_eval_schema (sincronizada).
+function migrateEvalSchema(){
+  if(parseInt(idbGetSync('cl_eval_schema',0)||0) >= 2) return;
+  const OBJ=['direction','script','acting','visual','editing','sound','impact','authorial','photo','production'];
+  const wipe=(f)=>{ if(f && f.subscores){ OBJ.forEach(k=>{ if(f.subscores[k]!=null) delete f.subscores[k]; }); } if(f) f.rating=null; };
+  if(typeof FILMS!=='undefined' && FILMS.forEach) FILMS.forEach(wipe);
+  const sv=idbGetSync('cl_films',[]);
+  sv.forEach(wipe);
+  idbSetSync('cl_films', sv);
+  idbSetSync('cl_eval_schema', 2);
+}
+
 function updatePreviews() {
-  const vals=['direction','script','acting','visual','editing','sound','impact'].map(n=>{const v=parseFloat(document.getElementById('ss-'+n).value);return isNaN(v)?null:v;});
+  const vals=EVAL_KEYS.map(n=>{const el=document.getElementById('ss-'+n);const v=el?parseFloat(el.value):NaN;return isNaN(v)?null:v;});
   const filled=vals.filter(v=>v!==null);
   document.getElementById('avg-val').textContent=filled.length?fmtR(filled.reduce((a,b)=>a+b,0)/filled.length):'—';
   const pv=parseFloat(document.getElementById('ss-personal').value);
   document.getElementById('pers-val').textContent=isNaN(pv)?'—':fmtR(pv);
+  // Etiquetas cualitativas bajo cada campo (opción A)
+  EVAL_KEYS.forEach((n,i)=>{ const q=document.getElementById('sq-'+n); if(q) q.textContent=evalQual(n,vals[i]); });
 }
 
 // Clear all 8 score fields (7 objective indicators + Gusto Personal) in one go,
 // so the user can re-evaluate a film from scratch without clearing each field by hand.
 // Only affects the open form; nothing is saved until the user clicks "Guardar".
 function clearFilmScores() {
-  if(!confirm('¿Borrar las 7 notas objetivas y el Gusto Personal de esta película?\n\nLa reseña, el póster y el resto de los datos no se tocan. El cambio recién se guarda si le das a "Guardar".')) return;
-  ['direction','script','acting','visual','editing','sound','impact','personal'].forEach(n=>{
+  if(!confirm('¿Borrar las 8 notas objetivas y el Gusto Personal de esta película?\n\nLa reseña, el póster y el resto de los datos no se tocan. El cambio recién se guarda si le das a "Guardar".')) return;
+  ['direction','script','acting','visual','editing','sound','impact','authorial','personal'].forEach(n=>{
     const el=document.getElementById('ss-'+n);
     if(el) el.value='';
   });
@@ -3704,8 +3743,8 @@ function saveFilm() {
   const eid=document.getElementById('f-eid').value;
   const isEdit=!!eid;
   const getN=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:Math.round(v*100)/100;};
-  const sc={direction:getN('ss-direction'),script:getN('ss-script'),acting:getN('ss-acting'),visual:getN('ss-visual'),editing:getN('ss-editing'),sound:getN('ss-sound'),impact:getN('ss-impact'),personal:getN('ss-personal')};
-  const filled=[sc.direction,sc.script,sc.acting,sc.visual,sc.editing,sc.sound,sc.impact].filter(v=>v!==null);
+  const sc={direction:getN('ss-direction'),script:getN('ss-script'),acting:getN('ss-acting'),visual:getN('ss-visual'),editing:getN('ss-editing'),sound:getN('ss-sound'),impact:getN('ss-impact'),authorial:getN('ss-authorial'),personal:getN('ss-personal')};
+  const filled=[sc.direction,sc.script,sc.acting,sc.visual,sc.editing,sc.sound,sc.impact,sc.authorial].filter(v=>v!==null);
   const obj=filled.length?Math.round(filled.reduce((a,b)=>a+b,0)/filled.length*100)/100:null;
   const rwCount=parseInt(document.getElementById('f-rewatch-count').value)||1;
   const film={
@@ -3821,7 +3860,9 @@ function renderRankingMain() {
   const filterCountry=(document.getElementById('rank-fc-country')?.value||'').trim();
   const filterDecadeRaw=document.getElementById('rank-fc-decade')?.value||'';
   const filterDecade=parseInt(filterDecadeRaw)||0;
-  const hasFilter=filterTipo||filterDir||filterCountry||filterDecadeRaw;
+  const filterYearRaw=(document.getElementById('rank-fc-year')?.value||'').trim();
+  const filterYear=parseInt(filterYearRaw)||0;
+  const hasFilter=filterTipo||filterDir||filterCountry||filterDecadeRaw||filterYearRaw;
   // Etiqueta del modo con el tipo elegido
   const tipoLbl={largometraje:'Largometrajes',documental:'Documentales',serie:'Series',cortometraje:'Cortometrajes'}[filterTipo]||'';
   const mlab=document.getElementById('rank-mode-label');
@@ -3843,6 +3884,7 @@ function renderRankingMain() {
     const realPos=seqPos;
     if(filterDir && f.director!==filterDir) continue;
     if(filterCountry && f.country!==filterCountry) continue;
+    if(filterYear && (f.year||0)!==filterYear) continue;
     if(filterDecade){
       const yr=f.year||0;
       if(filterDecade===1920){if(yr>=1930)continue;}
@@ -3892,10 +3934,12 @@ function clearRankFilters() {
   const d=document.getElementById('rank-fc-dir');
   const c=document.getElementById('rank-fc-country');
   const dec=document.getElementById('rank-fc-decade');
+  const yr=document.getElementById('rank-fc-year');
   if(t) t.value='';
   if(d) d.value='';
   if(c) c.value='';
   if(dec) dec.value='';
+  if(yr) yr.value='';
   const badge=document.getElementById('rank-filter-badge');
   const clearBtn=document.getElementById('rank-clear-btn');
   if(badge) badge.style.display='none';
@@ -7859,7 +7903,7 @@ function ecRenderYear(){
    estado de la biblioteca. Lectura pública, escritura solo del dueño.
    Inerte si supabase-config.js tiene placeholders.
    ══════════════════════════════════════════════════════════════════════════ */
-var EC_SYNC_KEYS = ['cl_films','cl_dels','cl_rankorder','cl_rankorder_pers','cl_blog','cl_col_wish','cl_watchlist','cl_lists'];
+var EC_SYNC_KEYS = ['cl_films','cl_dels','cl_rankorder','cl_rankorder_pers','cl_blog','cl_col_wish','cl_watchlist','cl_lists','cl_eval_schema'];
 var ecSB = null, ecOwnerEmail = null, ecPushTimer = null, ecLastServerAt = null;
 
 function ecConfigured(){
