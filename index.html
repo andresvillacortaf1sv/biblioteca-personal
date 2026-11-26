@@ -3550,17 +3550,12 @@ const EVAL_SCALES={
 };
 function evalQual(key,v){ if(v==null||isNaN(v)) return ''; const arr=EVAL_SCALES[key]; if(!arr) return ''; for(let i=0;i<EVAL_THR.length;i++){ if(v>=EVAL_THR[i]) return arr[i]; } return arr[arr.length-1]; }
 
-// Borrado único de las evaluaciones OBJETIVAS (conserva el Gusto Personal).
-// Se ejecuta una sola vez a nivel global gracias a la bandera cl_eval_schema (sincronizada).
+// DESACTIVADO. Antes borraba las evaluaciones objetivas y, al re-ejecutarse
+// en otro dispositivo, llegó a borrar notas nuevas y a subir esa versión.
+// Ya no borra nada: solo deja la bandera en 2 por si algún equipo con código
+// viejo la consulta. NUNCA volver a poner lógica de borrado aquí.
 function migrateEvalSchema(){
-  if(parseInt(idbGetSync('cl_eval_schema',0)||0) >= 2) return;
-  const OBJ=['direction','script','acting','visual','editing','sound','impact','authorial','photo','production'];
-  const wipe=(f)=>{ if(f && f.subscores){ OBJ.forEach(k=>{ if(f.subscores[k]!=null) delete f.subscores[k]; }); } if(f) f.rating=null; };
-  if(typeof FILMS!=='undefined' && FILMS.forEach) FILMS.forEach(wipe);
-  const sv=idbGetSync('cl_films',[]);
-  sv.forEach(wipe);
-  idbSetSync('cl_films', sv);
-  idbSetSync('cl_eval_schema', 2);
+  try{ if(parseInt(idbGetSync('cl_eval_schema',0)||0) < 2) idbSetSync('cl_eval_schema', 2); }catch(e){}
 }
 
 function updatePreviews() {
@@ -7923,8 +7918,32 @@ function ecCollectState(){
   EC_SYNC_KEYS.forEach(function(k){ var v=(typeof _idbCache!=='undefined' && k in _idbCache)?_idbCache[k]:null; if(v!=null) data[k]=v; });
   return data;
 }
+// Cuenta películas que tienen alguna nota (objetiva o subjetiva) — para detectar
+// si una bajada de la nube reduciría tus datos.
+function ecScoredCount(arr){
+  if(!Array.isArray(arr)) return 0;
+  var n=0;
+  arr.forEach(function(f){
+    var s=f&&f.subscores;
+    if(f&&f.rating!=null) { n++; return; }
+    if(s&&(s.personal!=null||s.direction!=null||s.script!=null||s.acting!=null||s.visual!=null||s.editing!=null||s.sound!=null||s.impact!=null||s.authorial!=null)) n++;
+  });
+  return n;
+}
+// Copia de rescate: antes de sobrescribir cl_films con una versión que tenga
+// MENOS notas que la local, guarda la local (la más completa) por si hace falta.
+function ecRescueSnapshot(incomingFilms){
+  try{
+    var local=idbGetSync('cl_films',[]);
+    var lc=ecScoredCount(local), ic=ecScoredCount(incomingFilms);
+    if(lc>0 && ic < lc){
+      localStorage.setItem('cl_films_rescue', JSON.stringify({at:new Date().toISOString(), localScored:lc, incomingScored:ic, films:local}));
+    }
+  }catch(e){ /* quota u otro: mejor seguir */ }
+}
 function ecApplyState(data){
   if(!data) return;
+  if('cl_films' in data){ ecRescueSnapshot(data.cl_films); }
   EC_SYNC_KEYS.forEach(function(k){ if(k in data){ _idbCache[k]=data[k]; try{ _idbWrite(k, data[k]); }catch(e){} } });
 }
 function ecRehydrate(){
@@ -7974,10 +7993,13 @@ async function ecBootSync(){
     var s=await sb.auth.getSession();
     ecOwnerEmail = s && s.data && s.data.session && s.data.session.user ? s.data.session.user.email : null;
   }catch(e){ ecOwnerEmail=null; }
-  // Si hay cambios locales sin subir y podemos escribir → suben (gana lo local).
-  // Si no → bajamos lo del servidor (gana la nube) para ver la misma data en todos lados.
-  if(ecDirty() && ecCanWrite()){ await ecPush(); }
-  else { await ecPull(); }
+  // Al abrir SIEMPRE bajamos la nube (así un equipo con copia vieja no la pisa).
+  // Solo si la nube está vacía y tenemos datos locales, sembramos una vez.
+  const pulled = await ecPull();
+  if(!pulled && ecCanWrite()){
+    const local = idbGetSync('cl_films', []);
+    if(Array.isArray(local) && local.length) await ecPush();
+  }
   // Reacciona a login/logout
   sb.auth.onAuthStateChange(function(_ev, session){
     ecOwnerEmail = session && session.user ? session.user.email : null;
