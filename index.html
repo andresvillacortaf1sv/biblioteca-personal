@@ -3020,7 +3020,7 @@ html,body{max-width:100%;}
         <div class="fg"><label>País</label><input type="text" id="f-country" placeholder="País de producción"></div>
       </div>
       <div class="frow">
-        <div class="fg"><label>Tipo</label><select id="f-tipo" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:inherit;"><option value="largometraje">Largometraje</option><option value="cortometraje">Cortometraje</option><option value="documental">Documental</option><option value="serie">Serie</option></select></div>
+        <div class="fg"><label>Tipo</label><select id="f-tipo" onchange="onTipoChange()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:inherit;"><option value="largometraje">Largometraje</option><option value="cortometraje">Cortometraje</option><option value="documental">Documental</option><option value="serie">Serie</option></select></div>
         <div class="fg"><label>Año</label><input type="number" id="f-year" placeholder="2024" min="1900" max="2030"></div>
         <div class="fg"><label>Fecha de visionado</label><input type="date" id="f-watched-date"></div>
       </div>
@@ -3074,46 +3074,47 @@ html,body{max-width:100%;}
       </div>
       <div class="subscores-grid">
         <div class="score-inp-grp">
-          <label>Dirección</label>
+          <label id="lbl-direction">Dirección</label>
           <input type="number" id="ss-direction" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-direction"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Guion</label>
+          <label id="lbl-script">Guion</label>
           <input type="number" id="ss-script" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-script"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Interpretaciones</label>
+          <label id="lbl-acting">Interpretaciones</label>
           <input type="number" id="ss-acting" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-acting"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Lenguaje cinematográfico</label>
+          <label id="lbl-visual">Lenguaje cinematográfico</label>
           <input type="number" id="ss-visual" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-visual"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Montaje</label>
+          <label id="lbl-editing">Montaje</label>
           <input type="number" id="ss-editing" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-editing"></span>
         </div>
         <div class="score-inp-grp">
-          <label>BSO/Sonido</label>
+          <label id="lbl-sound">BSO/Sonido</label>
           <input type="number" id="ss-sound" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-sound"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Impacto</label>
+          <label id="lbl-impact">Impacto</label>
           <input type="number" id="ss-impact" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-impact"></span>
         </div>
         <div class="score-inp-grp">
-          <label>Propuesta autoral</label>
+          <label id="lbl-authorial">Propuesta autoral</label>
           <input type="number" id="ss-authorial" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
           <span class="score-qual" id="sq-authorial"></span>
         </div>
       </div>
+      <div id="tipo-eval-note" style="display:none;font-size:11px;color:var(--text3);margin-top:-4px;padding:0 2px 6px;"></div>
       <div class="avg-preview">
         <span>Nota objetiva (promedio de los 7 indicadores)</span>
         <strong id="avg-val">—</strong>
@@ -3124,6 +3125,7 @@ html,body{max-width:100%;}
         <label>Gusto Personal</label>
         <input type="number" id="ss-personal" class="pers-inp" min="0" max="10" step="0.01" placeholder="—" oninput="updatePreviews()">
         <span class="score-hint">Tu nota subjetiva independiente</span>
+        <span class="score-qual" id="sq-personal" style="color:#d6c2f7"></span>
       </div>
       <div class="pavg-preview">
         <span>Tu nota de gusto personal</span>
@@ -3531,8 +3533,10 @@ function openDetail(id) {
   const hasSub=ss.direction!=null||ss.script!=null||ss.acting!=null||ss.visual!=null||ss.editing!=null||ss.sound!=null||ss.impact!=null||ss.authorial!=null||ss.photo!=null||ss.production!=null;
   const hasPers=ss.personal!=null;
   const rwCount=f.rewatchCount||1;
-  const _indic=[['Dirección',ss.direction,'direction'],['Guion',ss.script,'script'],['Interpretaciones',ss.acting,'acting'],['Lenguaje cinematográfico',ss.visual,'visual'],['Montaje',ss.editing,'editing'],['BSO/Sonido',ss.sound,'sound'],['Impacto',ss.impact,'impact'],['Propuesta autoral',ss.authorial,'authorial'],['Fotografía',ss.photo,null],['Producción',ss.production,null]].filter(a=>a[1]!=null);
-  const subHTML=hasSub?`<div class="det-bars-hd">Desglose autoral</div><div class="det-bars">${_indic.map(a=>{const q=a[2]?evalQual(a[2],a[1]):'';return `<div class="det-bar-row"><div class="det-bar-lbl">${a[0]}${q?`<small class="det-bar-qual">${esc(q)}</small>`:''}</div><div class="det-bar-track"><div class="det-bar-fill" style="width:${Math.max(0,Math.min(100,a[1]*10))}%"></div></div><div class="det-bar-val">${fmtR(a[1])}</div></div>`;}).join('')}${hasPers?`<div class="det-bar-row"><div class="det-bar-lbl" style="color:var(--purple)">Gusto personal</div><div class="det-bar-track"><div class="det-bar-fill pers" style="width:${Math.max(0,Math.min(100,ss.personal*10))}%"></div></div><div class="det-bar-val">${fmtR(ss.personal)}</div></div>`:''}</div>`:'';
+  const _L=evalLabels(f.tipo);
+  const _indic=[['direction'],['script'],['acting'],['visual'],['editing'],['sound'],['impact'],['authorial']].map(([k])=>[_L[k],ss[k],k]).concat([['Fotografía',ss.photo,null],['Producción',ss.production,null]]).filter(a=>a[1]!=null);
+  const _persQ=hasPers?evalQualPersonal(ss.personal):'';
+  const subHTML=hasSub?`<div class="det-bars-hd">Desglose autoral</div><div class="det-bars">${_indic.map(a=>{const q=a[2]?evalQual(a[2],a[1],f.tipo):'';return `<div class="det-bar-row"><div class="det-bar-lbl">${a[0]}${q?`<small class="det-bar-qual">${esc(q)}</small>`:''}</div><div class="det-bar-track"><div class="det-bar-fill" style="width:${Math.max(0,Math.min(100,a[1]*10))}%"></div></div><div class="det-bar-val">${fmtR(a[1])}</div></div>`;}).join('')}${hasPers?`<div class="det-bar-row"><div class="det-bar-lbl" style="color:var(--purple)">Gusto personal${_persQ?`<small class="det-bar-qual" style="color:#d6c2f7">${esc(_persQ)}</small>`:''}</div><div class="det-bar-track"><div class="det-bar-fill pers" style="width:${Math.max(0,Math.min(100,ss.personal*10))}%"></div></div><div class="det-bar-val">${fmtR(ss.personal)}</div></div>`:''}</div>`:'';
   document.getElementById('det-content').innerHTML=`
     <div class="det-top">
       <div class="det-poster">${f.poster?`<img src="${esc(f.poster)}" alt="${esc(f.title)}">`:noImgHTML(f.title)}</div>
@@ -3597,6 +3601,8 @@ function openForm(id) {
     const el=document.getElementById('ss-'+n);
     if(el) el.value=ss[n]!=null?ss[n]:'';
   });
+  _formPrevTipo=f?.tipo||'largometraje';
+  applyTipoLabels(_formPrevTipo);
   updatePreviews();
   document.getElementById('ov-form').classList.add('on');
   setTimeout(()=>document.getElementById('f-title').focus(),80);
@@ -3615,7 +3621,51 @@ const EVAL_SCALES={
  impact:['Impacto arrollador','Te marca para siempre','Hondo y duradero','Deja gran huella','Impacto fuerte','Conmueve','Deja algo','Impacto leve','Apenas resuena','Tibio','Casi no deja nada','Olvidable','Indiferente','Frío','Vacío','Nulo interés','Tedioso','Sin efecto','Nada','Inexistente'],
  authorial:['Propuesta única','Voz autoral plena','Muy personal y arriesgada','Propuesta clara','Tiene voz propia','Apuesta interesante','Algo personal','Convencional','Poco original','Genérica','Sin riesgo','Fórmula vista','Imitativa','Sin ideas','Muy derivada','Nula ambición','Vacía','Fallida','Nada propio','Inexistente']
 };
-function evalQual(key,v){ if(v==null||isNaN(v)) return ''; const arr=EVAL_SCALES[key]; if(!arr) return ''; for(let i=0;i<EVAL_THR.length;i++){ if(v>=EVAL_THR[i]) return arr[i]; } return arr[arr.length-1]; }
+// Escalas específicas para DOCUMENTAL en los dos indicadores que cambian de
+// significado respecto a la ficción: 'script' pasa a ser Estructura narrativa y
+// 'acting' pasa a ser Investigación y rigor. El resto reutiliza las escalas base.
+const EVAL_SCALES_DOC={
+ script:['Estructura perfecta','Arquitectura magistral','Muy bien estructurada','Narrativa sólida','Bien armada','Fluye con claridad','Correcta','Funcional','Irregular','Desigual','Floja','Confusa a ratos','Mal armada','Pobre','Muy deficiente','Caótica','Dispersa','Fallida','Sin estructura','Inexistente'],
+ acting:['Investigación impecable','Rigor excepcional','Muy documentado','Sólidamente investigado','Buen respaldo','Bien fundamentado','Correcto','Suficiente','Irregular','Algo flojo','Poco riguroso','Datos endebles','Superficial','Pobre','Muy flojo','Sin rigor','Tendencioso','Infundado','Nulo','Inexistente']
+};
+// Etiquetas de los 8 indicadores según el tipo de obra.
+const EVAL_LABELS_DEFAULT={direction:'Dirección',script:'Guion',acting:'Interpretaciones',visual:'Lenguaje cinematográfico',editing:'Montaje',sound:'BSO/Sonido',impact:'Impacto',authorial:'Propuesta autoral'};
+const EVAL_LABELS_DOC={direction:'Dirección',script:'Estructura narrativa',acting:'Investigación y rigor',visual:'Lenguaje visual',editing:'Montaje',sound:'BSO/Sonido',impact:'Impacto y relevancia',authorial:'Propuesta autoral'};
+function evalLabels(tipo){ return tipo==='documental'?EVAL_LABELS_DOC:EVAL_LABELS_DEFAULT; }
+function evalQual(key,v,tipo){ if(v==null||isNaN(v)) return ''; const arr=(tipo==='documental'&&EVAL_SCALES_DOC[key])?EVAL_SCALES_DOC[key]:EVAL_SCALES[key]; if(!arr) return ''; for(let i=0;i<EVAL_THR.length;i++){ if(v>=EVAL_THR[i]) return arr[i]; } return arr[arr.length-1]; }
+// Escala cualitativa de la nota SUBJETIVA (Gusto Personal). 10 exacto y 9.4–9.99
+// tienen frases propias; el resto va en bandas de 0.5.
+function evalQualPersonal(v){
+  if(v==null||isNaN(v)) return '';
+  if(v>=10) return 'Película de mi vida';
+  if(v>=9.4) return 'La amo con locura';
+  const THR=[9,8.5,8,7.5,7,6.5,6,5.5,5,4.5,4,3.5,3,2.5,2,1.5,1,0.5,0];
+  const PH=['La adoro, la revisito siempre','Me encanta','Me gusta muchísimo','Me gusta mucho','Me gusta','Me gusta bastante','Me agrada','Me entretuvo','Correcta, ni fu ni fa','Me dejó frío','Me aburrió por momentos','Me costó terminarla','No me gustó','No la disfruté','Me desagradó','Mala experiencia','No la soporté','Horrible para mí','Lo peor'];
+  for(let i=0;i<THR.length;i++){ if(v>=THR[i]) return PH[i]; }
+  return PH[PH.length-1];
+}
+// Renombra las etiquetas del formulario según el tipo elegido.
+let _formPrevTipo='largometraje';
+function applyTipoLabels(tipo){
+  const L=evalLabels(tipo);
+  Object.keys(L).forEach(k=>{ const el=document.getElementById('lbl-'+k); if(el) el.textContent=L[k]; });
+  const note=document.getElementById('tipo-eval-note');
+  if(note){
+    if(tipo==='documental'){ note.style.display='block'; note.textContent='Escala de documental: «Investigación y rigor» y «Estructura narrativa» reemplazan a Interpretaciones y Guion.'; }
+    else { note.style.display='none'; note.textContent=''; }
+  }
+}
+// Cuando el usuario cambia el tipo cruzando hacia/desde documental, los dos
+// indicadores que cambian de significado (acting↔Investigación, script↔Estructura)
+// se dejan en blanco para que los vuelva a cargar; el resto se conserva.
+function onTipoChange(){
+  const tipo=document.getElementById('f-tipo').value;
+  const crossing=(tipo==='documental')!==(_formPrevTipo==='documental');
+  if(crossing){ ['ss-acting','ss-script'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); }
+  _formPrevTipo=tipo;
+  applyTipoLabels(tipo);
+  updatePreviews();
+}
 
 // DESACTIVADO. Antes borraba las evaluaciones objetivas y, al re-ejecutarse
 // en otro dispositivo, llegó a borrar notas nuevas y a subir esa versión.
@@ -3631,8 +3681,10 @@ function updatePreviews() {
   document.getElementById('avg-val').textContent=filled.length?fmtR(filled.reduce((a,b)=>a+b,0)/filled.length):'—';
   const pv=parseFloat(document.getElementById('ss-personal').value);
   document.getElementById('pers-val').textContent=isNaN(pv)?'—':fmtR(pv);
-  // Etiquetas cualitativas bajo cada campo (opción A)
-  EVAL_KEYS.forEach((n,i)=>{ const q=document.getElementById('sq-'+n); if(q) q.textContent=evalQual(n,vals[i]); });
+  const tipo=document.getElementById('f-tipo')?.value||'largometraje';
+  // Etiquetas cualitativas bajo cada campo (opción A), según el tipo
+  EVAL_KEYS.forEach((n,i)=>{ const q=document.getElementById('sq-'+n); if(q) q.textContent=evalQual(n,vals[i],tipo); });
+  const sqp=document.getElementById('sq-personal'); if(sqp) sqp.textContent=isNaN(pv)?'':evalQualPersonal(pv);
 }
 
 // Clear all 8 score fields (7 objective indicators + Gusto Personal) in one go,
@@ -8361,7 +8413,10 @@ function renderTop100Films(){
 }
 
 let cmpvSort = 'move_up';
+let cmpvYear = 0, cmpvDir = '', cmpvCountry = '';
 function setCmpvSort(v){ cmpvSort=v; renderComparativa(); }
+function setCmpvFilter(k,v){ if(k==='year')cmpvYear=parseInt(v)||0; else if(k==='dir')cmpvDir=v; else if(k==='country')cmpvCountry=v; renderComparativa(); }
+function clearCmpvFilters(){ cmpvYear=0; cmpvDir=''; cmpvCountry=''; renderComparativa(); }
 function cmpvDangerZone(){
   return `<div class="cmpv-danger">
     <h4>⚠ Reiniciar mis puntajes subjetivos</h4>
@@ -8381,11 +8436,21 @@ function renderComparativa(){
     if(op==null||pp==null) return;      // debe estar en ambos rankings
     rows.push({f, op, pp, delta: op-pp}); // delta>0 => sube en subjetivo
   });
-  if(cmpvSort==='move_up')      rows.sort((a,b)=>b.delta-a.delta);
-  else if(cmpvSort==='move_down') rows.sort((a,b)=>a.delta-b.delta);
-  else if(cmpvSort==='abs')     rows.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
-  else if(cmpvSort==='obj')     rows.sort((a,b)=>a.op-b.op);
-  else if(cmpvSort==='pers')    rows.sort((a,b)=>a.pp-b.pp);
+  // opciones de filtro a partir de las películas comparables
+  const years=[...new Set(rows.map(r=>r.f.year).filter(Boolean))].sort((a,b)=>b-a);
+  const dirs=[...new Set(rows.map(r=>r.f.director).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const countries=[...new Set(rows.map(r=>r.f.country).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  // aplicar filtros activos (las posiciones #Obj/#Subj siguen siendo del ranking completo)
+  let view=rows.filter(r=>
+    (!cmpvYear || (r.f.year||0)===cmpvYear) &&
+    (!cmpvDir || r.f.director===cmpvDir) &&
+    (!cmpvCountry || r.f.country===cmpvCountry));
+  if(cmpvSort==='move_up')      view.sort((a,b)=>b.delta-a.delta);
+  else if(cmpvSort==='move_down') view.sort((a,b)=>a.delta-b.delta);
+  else if(cmpvSort==='abs')     view.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+  else if(cmpvSort==='obj')     view.sort((a,b)=>a.op-b.op);
+  else if(cmpvSort==='pers')    view.sort((a,b)=>a.pp-b.pp);
+  const hasCmpvFilter=cmpvYear||cmpvDir||cmpvCountry;
   const head = `<div class="cmpv-head">
     <div class="cmpv-title">Objetivo vs. Subjetivo</div>
     <div class="cmpv-intro">Cuánto sube o baja cada película entre tu ranking <strong>objetivo</strong> (nota técnica) y tu ranking <strong>subjetivo</strong> (Gusto Personal). Un <span style="color:#7ddf9b">▲ verde</span> = la disfrutás más de lo que indica su nota objetiva; un <span style="color:#f0897f">▼ rojo</span> = la disfrutás menos de lo que "debería".</div>
@@ -8398,14 +8463,22 @@ function renderComparativa(){
       <option value="obj"${cmpvSort==='obj'?' selected':''}>Orden objetivo</option>
       <option value="pers"${cmpvSort==='pers'?' selected':''}>Orden subjetivo</option>
     </select>
-    <span class="cmpv-count">${rows.length} película(s) con ambas notas</span>
+    <select onchange="setCmpvFilter('year',this.value)"><option value="">Todos los años</option>${years.map(y=>`<option value="${y}"${cmpvYear===y?' selected':''}>${y}</option>`).join('')}</select>
+    <select onchange="setCmpvFilter('dir',this.value)"><option value="">Todos los directores</option>${dirs.map(d=>`<option value="${esc(d)}"${cmpvDir===d?' selected':''}>${esc(d)}</option>`).join('')}</select>
+    <select onchange="setCmpvFilter('country',this.value)"><option value="">Todos los países</option>${countries.map(c=>`<option value="${esc(c)}"${cmpvCountry===c?' selected':''}>${esc(c)}</option>`).join('')}</select>
+    ${hasCmpvFilter?`<button onclick="clearCmpvFilters()" style="background:none;border:1px solid var(--border2);border-radius:7px;color:var(--text3);padding:7px 11px;font-size:12px;cursor:pointer;font-family:inherit;">Limpiar</button>`:''}
+    <span class="cmpv-count">${hasCmpvFilter?view.length+' de '+rows.length:rows.length+' con ambas notas'}</span>
   </div>`;
   if(!rows.length){
     wrap.innerHTML = head + `<div class="cmpv-empty">Necesitás películas que tengan <strong>nota objetiva</strong> y <strong>Gusto Personal</strong> a la vez para poder compararlas.</div>` + cmpvDangerZone();
     return;
   }
+  if(!view.length){
+    wrap.innerHTML = head + `<div class="cmpv-empty">Ninguna película comparable con esos filtros. <a href="#" onclick="clearCmpvFilters();return false;" style="color:var(--gold2)">Limpiar filtros</a></div>` + cmpvDangerZone();
+    return;
+  }
   let body = '<div class="cmpv-table"><div class="cmpv-row hd"><span style="text-align:right">#Obj</span><span>Película</span><span style="text-align:center">Obj.</span><span style="text-align:center">Subj.</span><span style="text-align:center">Movim.</span></div>';
-  rows.forEach(r=>{
+  view.forEach(r=>{
     const f=r.f;
     const mv = r.delta>0 ? `<div class="cmpv-move cmpv-up">▲ ${r.delta}</div>`
              : r.delta<0 ? `<div class="cmpv-move cmpv-down">▼ ${Math.abs(r.delta)}</div>`
