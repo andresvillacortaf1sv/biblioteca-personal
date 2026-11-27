@@ -2672,6 +2672,10 @@ html,body{max-width:100%;}
 .osc-add button{background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
 .osc-add button:hover{background:var(--gold2);}
 .osc-empty-hint{font-size:10.5px;color:var(--text3);font-style:italic;padding:2px 0 8px;}
+.osc-entry.cand{opacity:.5;}
+.osc-nom{cursor:pointer;background:var(--bg2);border:1px solid var(--border2);color:var(--text3);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:600;font-family:inherit;flex-shrink:0;transition:.15s;}
+.osc-nom.on{background:rgba(240,192,80,.14);border-color:rgba(240,192,80,.5);color:var(--gold2);}
+.osc-nom:hover{border-color:var(--gold2);color:var(--gold2);}
 </style>
 
 <div id="view-oscars" class="view">
@@ -8615,26 +8619,34 @@ function oscarSave(data){
 function renderOscars(){
   const wrap=document.getElementById('oscars-wrap'); if(!wrap) return;
   const data=oscarData();
-  const done=OSCAR_CATS.filter(c=>(data[c.k]||[]).length).length;
+  const isNom=e=>e.nominee!==false;
+  const done=OSCAR_CATS.filter(c=>(data[c.k]||[]).some(isNom)).length;
   const pct=Math.round(done/OSCAR_CATS.length*100);
   let html=`<div class="osc-head">
     <div class="osc-eyebrow">Mi quiniela · 99.ª edición</div>
     <div class="osc-title">🏆 Predicciones Óscars 2027</div>
-    <div class="osc-intro">Armá tus pronósticos por categoría. Agregá tus candidatos (película, actor, director…) y marcá con la ⭐ a tu favorito para ganar. Se guarda solo y se sincroniza con tus demás dispositivos.</div>
+    <div class="osc-intro">Armá tu <strong>terna de nominados</strong> en cada categoría (los que creés que van a sonar) y marcá con la ⭐ a tu favorito para ganar. También podés dejar nombres como <em>candidatos</em> sin meterlos todavía a la terna. Se guarda solo y se sincroniza con tus dispositivos.</div>
   </div>
   <div class="osc-progress"><div class="osc-progress-fill" style="width:${pct}%"></div></div>
-  <div class="osc-progress-txt">${done} de ${OSCAR_CATS.length} categorías con predicción</div>
+  <div class="osc-progress-txt">${done} de ${OSCAR_CATS.length} categorías con terna armada</div>
   <div class="osc-grid">`;
   OSCAR_CATS.forEach(c=>{
-    const entries=data[c.k]||[];
-    html+=`<div class="osc-cat${entries.length?' done':''}">
+    let entries=(data[c.k]||[]).slice();
+    const nomCount=entries.filter(isNom).length;
+    const hasWin=entries.some(e=>e.winner);
+    // orden: ganador arriba, luego nominados, luego candidatos
+    entries.sort((a,b)=> (b.winner?1:0)-(a.winner?1:0) || (isNom(b)?1:0)-(isNom(a)?1:0) );
+    html+=`<div class="osc-cat${nomCount?' done':''}">
       <div class="osc-cat-h"><span class="osc-cat-ic">${c.ic}</span><span class="osc-cat-t">${c.t}</span></div>
+      <div class="osc-cat-sub">${nomCount?nomCount+' en la terna':'sin terna'}${hasWin?' · ⭐ ganador elegido':''}</div>
       <div class="osc-entries">`;
     if(!entries.length){ html+=`<div class="osc-empty-hint">Sin candidatos todavía.</div>`; }
     entries.forEach(e=>{
-      html+=`<div class="osc-entry${e.winner?' win':''}">
+      const nom=isNom(e);
+      html+=`<div class="osc-entry${e.winner?' win':''}${nom?'':' cand'}">
         <button class="osc-star" title="Marcar como ganador" onclick="oscarWin('${c.k}','${e.id}')">${e.winner?'★':'☆'}</button>
         <span class="osc-entry-name">${esc(e.name)}</span>
+        <button class="osc-nom${nom?' on':''}" title="${nom?'Está en tu terna de nominados (click para quitar)':'Marcar como nominado'}" onclick="oscarNom('${c.k}','${e.id}')">${nom?'Nominado':'Candidato'}</button>
         <button class="osc-del" title="Quitar" onclick="oscarDel('${c.k}','${e.id}')">✕</button>
       </div>`;
     });
@@ -8653,7 +8665,7 @@ function oscarAdd(k){
   const name=inp.value.trim(); if(!name) return;
   const data=oscarData();
   if(!data[k]) data[k]=[];
-  data[k].push({id:'o'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, winner:false});
+  data[k].push({id:'o'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, nominee:true, winner:false});
   oscarSave(data);
   renderOscars();
   const ni=document.getElementById('osc-in-'+k); if(ni) ni.focus();
@@ -8664,11 +8676,18 @@ function oscarDel(k,id){
   if(!data[k].length) delete data[k];
   oscarSave(data); renderOscars();
 }
+function oscarNom(k,id){
+  const data=oscarData(); if(!data[k]) return;
+  const e=data[k].find(x=>x.id===id); if(!e) return;
+  e.nominee = (e.nominee===false);        // alterna nominado/candidato
+  if(!e.nominee) e.winner=false;          // si sale de la terna, no puede ser ganador
+  oscarSave(data); renderOscars();
+}
 function oscarWin(k,id){
   const data=oscarData(); if(!data[k]) return;
   const cur=data[k].find(e=>e.id===id); const was=cur&&cur.winner;
   data[k].forEach(e=>e.winner=false);
-  if(cur&&!was) cur.winner=true; // alterna
+  if(cur&&!was){ cur.winner=true; cur.nominee=true; } // ganador siempre está en la terna
   oscarSave(data); renderOscars();
 }
 
