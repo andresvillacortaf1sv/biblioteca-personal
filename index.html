@@ -823,6 +823,9 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,.97);backdrop-
 .fmg-filter-wrap{padding:18px 22px;border-bottom:1px solid var(--border2);}
 .fmg-filter{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border2);color:var(--text2);font-size:12px;font-family:'Inter',sans-serif;padding:10px 12px;outline:none;transition:.15s;}
 .fmg-filter:focus{border-color:var(--gold2);color:var(--text);}
+.fmg-sort-row{display:flex;align-items:center;gap:10px;margin-top:9px;}
+.fmg-sort-row select{flex:1;cursor:pointer;}
+.fmg-dcount-total{white-space:nowrap;font-size:11px;}
 .fmg-dscroll{max-height:620px;overflow-y:auto;}
 .fmg-ditem{padding:14px 22px;border-bottom:1px solid var(--border);cursor:pointer;transition:.15s;}
 .fmg-ditem:hover{background:var(--bg2);}
@@ -2289,6 +2292,7 @@ html,body{max-width:100%;}
       <button class="nav-btn" onclick="switchView('ranking',this)">Mi Ranking</button>
       <button class="nav-btn" onclick="switchView('top100films',this)">Top 100</button>
       <button class="nav-btn" onclick="switchView('comparativa',this)">Comparativa</button>
+      <button class="nav-btn" onclick="switchView('oscars',this)">Óscars 2027</button>
       <button class="nav-btn" onclick="switchView('lists',this)">Listas</button>
       <button class="nav-btn" onclick="switchView('blog',this)">Cuaderno</button>
       <button class="nav-btn" onclick="switchView('rewatched',this)">Re-vistas</button>
@@ -2539,6 +2543,15 @@ html,body{max-width:100%;}
       <div class="fmg-dirlist">
         <div class="fmg-filter-wrap">
           <input type="text" id="filmog-list-search" class="fmg-filter" placeholder="Filtrar por nombre…" oninput="renderFilmogDirList()">
+          <div class="fmg-sort-row">
+            <select id="filmog-list-sort" class="fmg-filter" onchange="setFilmogSort(this.value)">
+              <option value="n">Más películas</option>
+              <option value="name">Nombre (A–Z)</option>
+              <option value="avg">Mejor nota promedio</option>
+              <option value="pct">% completado</option>
+            </select>
+            <span class="fmg-dcount-total fmg-lbl" id="filmog-list-count"></span>
+          </div>
         </div>
         <div id="filmog-list-results" class="fmg-dscroll"></div>
       </div>
@@ -2625,6 +2638,44 @@ html,body{max-width:100%;}
 
 <div id="view-comparativa" class="view">
   <div id="comparativa-wrap"></div>
+</div>
+
+<style id="ec-oscars-css">
+.osc-head{padding:28px 24px 6px;}
+.osc-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);font-weight:600;}
+.osc-title{font-family:'Fraunces',serif;font-size:34px;font-weight:400;letter-spacing:-.01em;margin-top:4px;display:flex;align-items:center;gap:12px;}
+.osc-intro{font-size:12.5px;color:var(--text3);margin-top:8px;max-width:640px;line-height:1.55;}
+.osc-progress{margin:16px 24px 4px;height:6px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.osc-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .3s;}
+.osc-progress-txt{font-size:11px;color:var(--text3);margin:6px 24px 0;}
+.osc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:18px 24px 50px;}
+.osc-cat{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:15px 16px 13px;display:flex;flex-direction:column;}
+.osc-cat.done{border-color:rgba(240,192,80,.35);}
+.osc-cat-h{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.osc-cat-ic{font-size:15px;}
+.osc-cat-t{font-size:13.5px;font-weight:600;letter-spacing:-.01em;}
+.osc-cat-sub{font-size:10.5px;color:var(--text3);margin-bottom:10px;}
+.osc-entries{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.osc-entry{display:flex;align-items:center;gap:8px;padding:7px 9px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;transition:.15s;}
+.osc-entry.win{border-color:var(--gold);background:rgba(240,192,80,.08);}
+.osc-star{cursor:pointer;font-size:14px;line-height:1;opacity:.4;transition:.15s;flex-shrink:0;background:none;border:none;padding:0;color:var(--text3);}
+.osc-star:hover{opacity:.9;}
+.osc-entry.win .osc-star{opacity:1;color:var(--gold2);}
+.osc-entry-name{flex:1;min-width:0;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.osc-entry.win .osc-entry-name{font-weight:600;}
+.osc-entry-sub{font-size:10.5px;color:var(--text3);}
+.osc-del{cursor:pointer;color:var(--text3);background:none;border:none;font-size:14px;line-height:1;padding:0 2px;flex-shrink:0;transition:.15s;}
+.osc-del:hover{color:#f0897f;}
+.osc-add{display:flex;gap:6px;margin-top:auto;}
+.osc-add input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--text);padding:7px 10px;font-size:12px;font-family:inherit;outline:none;}
+.osc-add input:focus{border-color:var(--gold2);}
+.osc-add button{background:var(--gold);color:#0b0b0e;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+.osc-add button:hover{background:var(--gold2);}
+.osc-empty-hint{font-size:10.5px;color:var(--text3);font-style:italic;padding:2px 0 8px;}
+</style>
+
+<div id="view-oscars" class="view">
+  <div id="oscars-wrap"></div>
 </div>
 
 <div id="view-collection" class="view">
@@ -4211,6 +4262,8 @@ function switchFilmogTab(tab) {
 // ── MIS DIRECTORES (lista editorial + detalle) ──
 const jesc = s => String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 let filmogSelected = null;
+let filmogSort = 'n';
+function setFilmogSort(v){ filmogSort = v; renderFilmogDirList(); }
 const filmogCache = {};   // name -> promise of TMDB data
 const filmogTotals = {};  // name -> total largometrajes (resolved)
 
@@ -4232,7 +4285,13 @@ function renderFilmogDirList() {
   const q = (document.getElementById('filmog-list-search')?.value||'').toLowerCase().trim();
   let dirs = filmogLibDirs();
   if(q) dirs = dirs.filter(d=>d.name.toLowerCase().includes(q));
-  dirs.sort((a,b)=>b.n-a.n || a.name.localeCompare(b.name));
+  const pct = d => { const t=filmogTotals[d.name]; return t ? d.n/t : -1; };
+  if(filmogSort==='name')      dirs.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(filmogSort==='avg')  dirs.sort((a,b)=>((b.rn?b.rsum/b.rn:-1)-(a.rn?a.rsum/a.rn:-1)) || b.n-a.n || a.name.localeCompare(b.name));
+  else if(filmogSort==='pct')  dirs.sort((a,b)=>(pct(b)-pct(a)) || b.n-a.n || a.name.localeCompare(b.name));
+  else                         dirs.sort((a,b)=>b.n-a.n || a.name.localeCompare(b.name));
+  const countEl=document.getElementById('filmog-list-count');
+  if(countEl) countEl.textContent = dirs.length + (dirs.length===1?' director':' directores');
 
   if(!dirs.length){
     wrap.innerHTML = '<div class="fmg-empty" style="padding:24px 22px">Sin directores con ese nombre.</div>';
@@ -6904,6 +6963,7 @@ function switchView(view,el) {
   else if(view==='top100') renderTop100();
   else if(view==='top100films') renderTop100Films();
   else if(view==='comparativa') renderComparativa();
+  else if(view==='oscars') renderOscars();
   else if(view==='filmog') renderFilmogDirList();
 }
 
@@ -8019,7 +8079,7 @@ function ecRenderYear(){
    estado de la biblioteca. Lectura pública, escritura solo del dueño.
    Inerte si supabase-config.js tiene placeholders.
    ══════════════════════════════════════════════════════════════════════════ */
-var EC_SYNC_KEYS = ['cl_films','cl_dels','cl_rankorder','cl_rankorder_pers','cl_blog','cl_col_wish','cl_watchlist','cl_lists','cl_eval_schema','cl_personal_reset'];
+var EC_SYNC_KEYS = ['cl_films','cl_dels','cl_rankorder','cl_rankorder_pers','cl_blog','cl_col_wish','cl_watchlist','cl_lists','cl_eval_schema','cl_personal_reset','cl_oscars2027'];
 var ecSB = null, ecOwnerEmail = null, ecPushTimer = null, ecLastServerAt = null;
 
 function ecConfigured(){
@@ -8520,6 +8580,96 @@ function resetSubjectiveScores(){
   try{ renderStats(); }catch(e){}
   renderComparativa();
   showToast('✓ Puntajes subjetivos reiniciados (respaldo descargado)');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ÓSCARS 2027 — quiniela de predicciones por categoría
+   ══════════════════════════════════════════════════════════════════════════ */
+const OSCAR_CATS=[
+ {k:'picture',        ic:'🏆', t:'Mejor Película',                ph:'Título de la película'},
+ {k:'director',       ic:'🎬', t:'Mejor Dirección',               ph:'Director/a'},
+ {k:'actor',          ic:'🎭', t:'Mejor Actor',                   ph:'Actor'},
+ {k:'actress',        ic:'🎭', t:'Mejor Actriz',                  ph:'Actriz'},
+ {k:'supp_actor',     ic:'🎭', t:'Mejor Actor de Reparto',        ph:'Actor'},
+ {k:'supp_actress',   ic:'🎭', t:'Mejor Actriz de Reparto',       ph:'Actriz'},
+ {k:'orig_screenplay',ic:'✍️', t:'Mejor Guion Original',          ph:'Película'},
+ {k:'adap_screenplay',ic:'✍️', t:'Mejor Guion Adaptado',          ph:'Película'},
+ {k:'international',   ic:'🌍', t:'Mejor Película Internacional',  ph:'Película (país)'},
+ {k:'animated',       ic:'🧸', t:'Mejor Película Animada',        ph:'Película'},
+ {k:'documentary',    ic:'📽️', t:'Mejor Documental',              ph:'Documental'},
+ {k:'cinematography', ic:'📷', t:'Mejor Fotografía',              ph:'Película'},
+ {k:'editing',        ic:'✂️', t:'Mejor Montaje',                 ph:'Película'},
+ {k:'score',          ic:'🎵', t:'Mejor Banda Sonora',            ph:'Película / compositor'},
+ {k:'song',           ic:'🎤', t:'Mejor Canción Original',        ph:'Canción (película)'},
+ {k:'prod_design',    ic:'🏛️', t:'Mejor Diseño de Producción',    ph:'Película'},
+ {k:'costume',        ic:'👗', t:'Mejor Vestuario',               ph:'Película'},
+ {k:'makeup',         ic:'💄', t:'Mejor Maquillaje y Peinado',    ph:'Película'},
+ {k:'sound',          ic:'🔊', t:'Mejor Sonido',                  ph:'Película'},
+ {k:'vfx',            ic:'💥', t:'Mejores Efectos Visuales',      ph:'Película'}
+];
+function oscarData(){ try{ return idbGetSync('cl_oscars2027', {})||{}; }catch(e){ return {}; } }
+function oscarSave(data){
+  try{ idbSetSync('cl_oscars2027', data); }catch(e){}
+  try{ if(typeof ecDirty==='function') ecDirty(true); if(typeof ecPush==='function') ecPush(); }catch(e){}
+}
+function renderOscars(){
+  const wrap=document.getElementById('oscars-wrap'); if(!wrap) return;
+  const data=oscarData();
+  const done=OSCAR_CATS.filter(c=>(data[c.k]||[]).length).length;
+  const pct=Math.round(done/OSCAR_CATS.length*100);
+  let html=`<div class="osc-head">
+    <div class="osc-eyebrow">Mi quiniela · 99.ª edición</div>
+    <div class="osc-title">🏆 Predicciones Óscars 2027</div>
+    <div class="osc-intro">Armá tus pronósticos por categoría. Agregá tus candidatos (película, actor, director…) y marcá con la ⭐ a tu favorito para ganar. Se guarda solo y se sincroniza con tus demás dispositivos.</div>
+  </div>
+  <div class="osc-progress"><div class="osc-progress-fill" style="width:${pct}%"></div></div>
+  <div class="osc-progress-txt">${done} de ${OSCAR_CATS.length} categorías con predicción</div>
+  <div class="osc-grid">`;
+  OSCAR_CATS.forEach(c=>{
+    const entries=data[c.k]||[];
+    html+=`<div class="osc-cat${entries.length?' done':''}">
+      <div class="osc-cat-h"><span class="osc-cat-ic">${c.ic}</span><span class="osc-cat-t">${c.t}</span></div>
+      <div class="osc-entries">`;
+    if(!entries.length){ html+=`<div class="osc-empty-hint">Sin candidatos todavía.</div>`; }
+    entries.forEach(e=>{
+      html+=`<div class="osc-entry${e.winner?' win':''}">
+        <button class="osc-star" title="Marcar como ganador" onclick="oscarWin('${c.k}','${e.id}')">${e.winner?'★':'☆'}</button>
+        <span class="osc-entry-name">${esc(e.name)}</span>
+        <button class="osc-del" title="Quitar" onclick="oscarDel('${c.k}','${e.id}')">✕</button>
+      </div>`;
+    });
+    html+=`</div>
+      <div class="osc-add">
+        <input type="text" id="osc-in-${c.k}" placeholder="${c.ph}" onkeydown="if(event.key==='Enter')oscarAdd('${c.k}')">
+        <button onclick="oscarAdd('${c.k}')">Añadir</button>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  wrap.innerHTML=html;
+}
+function oscarAdd(k){
+  const inp=document.getElementById('osc-in-'+k); if(!inp) return;
+  const name=inp.value.trim(); if(!name) return;
+  const data=oscarData();
+  if(!data[k]) data[k]=[];
+  data[k].push({id:'o'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, winner:false});
+  oscarSave(data);
+  renderOscars();
+  const ni=document.getElementById('osc-in-'+k); if(ni) ni.focus();
+}
+function oscarDel(k,id){
+  const data=oscarData(); if(!data[k]) return;
+  data[k]=data[k].filter(e=>e.id!==id);
+  if(!data[k].length) delete data[k];
+  oscarSave(data); renderOscars();
+}
+function oscarWin(k,id){
+  const data=oscarData(); if(!data[k]) return;
+  const cur=data[k].find(e=>e.id===id); const was=cur&&cur.winner;
+  data[k].forEach(e=>e.winner=false);
+  if(cur&&!was) cur.winner=true; // alterna
+  oscarSave(data); renderOscars();
 }
 
 </script>
