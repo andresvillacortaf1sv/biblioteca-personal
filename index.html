@@ -60,6 +60,21 @@ header{position:sticky;top:0;z-index:100;background:rgba(11,11,14,0.97);backdrop
 .fbar input.fc-input:hover{border-color:var(--border2);}
 .fbar input.fc-input:focus{border-color:var(--gold2);color:var(--text);}
 .fbar input.fc-input::placeholder{color:var(--text3);}
+.dirdd{position:relative;flex-shrink:0;}
+.dirdd-btn{min-width:180px;cursor:pointer;display:inline-flex;align-items:center;justify-content:space-between;gap:8px;}
+.dirdd-btn.active{border-color:var(--gold2);color:var(--text);}
+.dirdd-panel{position:fixed;z-index:200;width:270px;max-width:86vw;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.55);padding:9px;}
+.dirdd-search{width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);padding:8px 10px;font-size:12px;font-family:inherit;outline:none;margin-bottom:7px;}
+.dirdd-search:focus{border-color:var(--gold2);}
+.dirdd-sort{display:flex;gap:5px;margin-bottom:7px;}
+.dirdd-sort button{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
+.dirdd-sort button.on{background:var(--gold);color:#0b0b0e;border-color:var(--gold);}
+.dirdd-list{max-height:320px;overflow-y:auto;}
+.dirdd-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:12.5px;color:var(--text2);}
+.dirdd-item:hover{background:var(--bg3);color:var(--text);}
+.dirdd-item.sel{background:rgba(240,192,80,.1);color:var(--gold2);}
+.dirdd-n{font-size:10.5px;color:var(--text3);flex-shrink:0;}
+.dirdd-empty{padding:14px;text-align:center;color:var(--text3);font-size:12px;}
 select{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:5px 8px;outline:none;font-family:inherit;flex-shrink:0;transition:.15s;}
 select:hover{border-color:var(--border2);}
 .fcount{margin-left:auto;font-size:12px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
@@ -2390,8 +2405,18 @@ html,body{max-width:100%;}
   <div class="fbar">
     <select id="fc-country" onchange="applyFilters()"><option value="">Todos los países</option></select>
     <button id="fc-nocountry" type="button" onclick="this.classList.toggle('on');applyFilters()" title="Mostrar solo películas sin país asignado" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;padding:7px 12px;cursor:pointer;font-family:inherit;white-space:nowrap;">Sin país</button>
-    <input id="fc-director" class="fc-input" list="fc-directors-dl" placeholder="Todos los directores" oninput="applyFilters()" style="min-width:170px;">
-    <datalist id="fc-directors-dl"></datalist>
+    <div class="dirdd" id="fc-dirdd">
+      <button type="button" class="fc-input dirdd-btn" id="fc-dir-btn" onclick="toggleDirDD(event)"><span id="fc-dir-label">Todos los directores</span><span style="opacity:.55;font-size:10px">▾</span></button>
+      <input type="hidden" id="fc-director">
+      <div class="dirdd-panel" id="fc-dir-panel" style="display:none">
+        <input type="text" class="dirdd-search" id="fc-dir-search" placeholder="Buscar director…" oninput="renderDirDD()" onkeydown="if(event.key==='Escape')closeDirDD()">
+        <div class="dirdd-sort">
+          <button type="button" id="dirdd-sort-name" class="on" onclick="setDirDDSort('name')">A–Z</button>
+          <button type="button" id="dirdd-sort-count" onclick="setDirDDSort('count')">N.º pelis</button>
+        </div>
+        <div class="dirdd-list" id="fc-dir-list"></div>
+      </div>
+    </div>
     <select id="fc-sort" onchange="applyFilters()">
       <optgroup label="General">
         <option value="rating_desc">Nota objetiva: Mayor → Menor</option>
@@ -8585,6 +8610,67 @@ function resetSubjectiveScores(){
   renderComparativa();
   showToast('✓ Puntajes subjetivos reiniciados (respaldo descargado)');
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FILTRO DE DIRECTORES (Películas) — buscador con orden por nombre o cantidad
+   ══════════════════════════════════════════════════════════════════════════ */
+let dirDDSort='name', dirDDList=[];
+function buildDirDDList(){
+  const dm={};
+  FILMS.forEach(f=>{ if(!f.director||f.director.includes(','))return; const n=f.director.trim(); if(!n)return; dm[n]=(dm[n]||0)+1; });
+  dirDDList=Object.entries(dm).map(([name,n])=>({name,n}));
+}
+function setDirDDSort(s){
+  dirDDSort=s;
+  const a=document.getElementById('dirdd-sort-name'), b=document.getElementById('dirdd-sort-count');
+  if(a) a.classList.toggle('on',s==='name'); if(b) b.classList.toggle('on',s==='count');
+  renderDirDD();
+}
+function renderDirDD(){
+  const list=document.getElementById('fc-dir-list'); if(!list) return;
+  const q=(document.getElementById('fc-dir-search').value||'').toLowerCase().trim();
+  let arr=dirDDList.filter(d=>d.name.toLowerCase().includes(q));
+  if(dirDDSort==='count') arr.sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name));
+  else arr.sort((a,b)=>a.name.localeCompare(b.name));
+  const cur=document.getElementById('fc-director').value;
+  let html=`<div class="dirdd-item${!cur?' sel':''}" onclick="pickDir('')">Todos los directores</div>`;
+  html+=arr.map(d=>`<div class="dirdd-item${cur===d.name?' sel':''}" onclick="pickDir('${jesc(d.name)}')"><span>${esc(d.name)}</span><span class="dirdd-n">${d.n}</span></div>`).join('');
+  if(!arr.length) html+=`<div class="dirdd-empty">Sin resultados</div>`;
+  list.innerHTML=html;
+}
+function pickDir(name){
+  document.getElementById('fc-director').value=name;
+  document.getElementById('fc-dir-label').textContent=name||'Todos los directores';
+  document.getElementById('fc-dir-btn').classList.toggle('active',!!name);
+  closeDirDD();
+  applyFilters();
+}
+function positionDirDD(){
+  const btn=document.getElementById('fc-dir-btn'), p=document.getElementById('fc-dir-panel');
+  if(!btn||!p) return;
+  const r=btn.getBoundingClientRect();
+  let left=r.left; const w=Math.min(270, window.innerWidth*0.86);
+  if(left+w>window.innerWidth-8) left=window.innerWidth-8-w;
+  if(left<8) left=8;
+  p.style.left=left+'px'; p.style.top=(r.bottom+4)+'px';
+}
+function toggleDirDD(e){
+  e.stopPropagation();
+  const p=document.getElementById('fc-dir-panel');
+  if(p.style.display!=='none'){ closeDirDD(); return; }
+  buildDirDDList(); renderDirDD(); p.style.display='block'; positionDirDD();
+  setTimeout(()=>{ const s=document.getElementById('fc-dir-search'); if(s) s.focus(); },0);
+  document.addEventListener('click',dirDDOutside);
+  window.addEventListener('scroll',closeDirDD,true);
+  window.addEventListener('resize',closeDirDD);
+}
+function closeDirDD(){
+  const p=document.getElementById('fc-dir-panel'); if(p) p.style.display='none';
+  document.removeEventListener('click',dirDDOutside);
+  window.removeEventListener('scroll',closeDirDD,true);
+  window.removeEventListener('resize',closeDirDD);
+}
+function dirDDOutside(e){ const dd=document.getElementById('fc-dirdd'); if(dd && !dd.contains(e.target)) closeDirDD(); }
 
 /* ══════════════════════════════════════════════════════════════════════════
    ÓSCARS 2027 — quiniela de predicciones por categoría
