@@ -1,5 +1,5 @@
 /* Espacio Cinéfilo — service worker (offline + instalable) */
-const CACHE = 'ec-pwa-v3';
+const CACHE = 'ec-pwa-v4';
 const SHELL = ['/', '/index.html', '/films_data.json', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 // Hosts de API dinámica que NUNCA deben cachearse (si no, se sirve estado viejo):
